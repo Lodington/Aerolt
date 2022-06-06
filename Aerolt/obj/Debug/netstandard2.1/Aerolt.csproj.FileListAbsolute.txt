@@ -1,0 +1,13 @@
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\bin\Debug\netstandard2.1\Aerolt.deps.json
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\bin\Debug\netstandard2.1\Aerolt.dll
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\bin\Debug\netstandard2.1\Aerolt.pdb
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.csproj.AssemblyReference.cache
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.AssemblyInfoInputs.cache
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.AssemblyInfo.cs
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.csproj.CoreCompileInputs.cache
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.dll
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.pdb
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\bin\Debug\netstandard2.1\R2API.dll
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\bin\Debug\netstandard2.1\R2API.xml
+C:\Users\tyler\RiderProjects\Aerolt\Aerolt\obj\Debug\netstandard2.1\Aerolt.csproj.CopyComplete
