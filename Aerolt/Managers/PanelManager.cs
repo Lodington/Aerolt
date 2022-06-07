@@ -15,18 +15,24 @@ namespace Aerolt.Managers
         private void Start()
         {
             _objectPool = ObjectPool.Instance;
-            PanelManager.Instance.ShowPanel("Menu");
+            Instance.ShowPanel("Menu");
         }
 
         public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS)
         {
-            GameObject panelInstance = _objectPool.GetObjectFromPool(panelId);
+            GameObject panelInstance = _objectPool.GetObjectFromPool(panelId);;
             if (panelInstance != null)
             {
                 if (behaviour == PanelShowBehaviour.HIDE_PREVIOUS && GetAmountPanelsInQueue() > 0)
                 {
+                    panelInstance = _objectPool.GetObjectFromPool(panelId);
                     var lastPanel = GetLastPanel();
                     lastPanel?.PanelInstance.SetActive(false);
+                }
+
+                if (behaviour == PanelShowBehaviour.KEEP_PREVIOUS && GetAmountPanelsInQueue() > 0)
+                {
+                    panelInstance = _objectPool.GetObjectFromPool(panelId, true);
                 }
 
                 _panelInstanceModels.Add(new PanelInstanceModel

@@ -6,28 +6,16 @@ namespace Aerolt.Helpers
 {
     public class ObjectPool : Singleton<ObjectPool>
     {
-        /// <summary>
-        /// List of the objects to be pooled
-        /// </summary>
         public List<GameObject> PrefabsForPool;
-
-        /// <summary>
-        /// List of the pooled objects
-        /// </summary>
         private List<GameObject> _pooledObjects = new List<GameObject>();
 
-        public GameObject GetObjectFromPool(string objectName)
+        public GameObject GetObjectFromPool(string objectName, bool isDetachable = false)
         {
-            // Try to get a pooled instance
             var instance = _pooledObjects.FirstOrDefault(obj => obj.name == objectName);
-
-            // If we have a pooled instance already
+            
             if (instance != null)
             {
-                // Remove it from the list of pooled objects
                 _pooledObjects.Remove(instance);
-
-                // Enable it
                 instance.SetActive(true);
 
                 return instance;
@@ -37,13 +25,20 @@ namespace Aerolt.Helpers
             var prefab = PrefabsForPool.FirstOrDefault(obj => obj.name == objectName);
             if (prefab != null)
             {
-                // Create a new instance
-                var newInstace = Instantiate(prefab, prefab.transform.position, Quaternion.identity, transform);
+                GameObject newInstace;
 
-                // Make sure you set it's name (so you remove the Clone that Unity ads)
+                switch (isDetachable)
+                {
+                    case true:
+                        newInstace = Instantiate(prefab, prefab.transform.position, Quaternion.identity);
+                        break;
+                    case false:
+                        newInstace = Instantiate(prefab, prefab.transform.position, Quaternion.identity, transform);
+                        break;
+                }
+                
                 newInstace.name = objectName;
-
-                // Set it's position to zero
+                
                 newInstace.transform.localPosition = Vector3.zero;
 
                 return newInstace;
@@ -55,10 +50,8 @@ namespace Aerolt.Helpers
 
         public void PoolObject(GameObject obj)
         {
-            // Disable the object
             obj.SetActive(false);
 
-            // Add it to the list of pooled objects
             _pooledObjects.Add(obj);
         }
     }

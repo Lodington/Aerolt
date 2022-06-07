@@ -9,6 +9,7 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="Buttons" t="Include">
           <e p="CustomButton.cs" t="Include" />
+          <e p="EditItemButton.cs" t="Include" />
           <e p="EquipmentButtonGenerator.cs" t="Include" />
           <e p="HidePanelButton.cs" t="Include" />
           <e p="ItemButtonGenerator.cs" t="Include" />
@@ -17,10 +18,9 @@
         </e>
         <e p="Classes" t="Include">
           <e p="Console.cs" t="Include" />
+          <e p="Currency.cs" t="Include" />
           <e p="Esp.cs" t="Include" />
-          <e p="Items.cs" t="Include" />
           <e p="Player.cs" t="Include" />
-          <e p="ToggleWindow.cs" t="Include" />
         </e>
         <e p="Enums" t="Include">
           <e p="PanelShowBehavior.cs" t="Include" />
@@ -31,6 +31,7 @@
           <e p="Extentions.cs" t="Include" />
           <e p="ObjectPool.cs" t="Include" />
           <e p="Singleton.cs" t="Include" />
+          <e p="ToggleWindow.cs" t="Include" />
         </e>
         <e p="Load.cs" t="Include" />
         <e p="Managers" t="Include">
