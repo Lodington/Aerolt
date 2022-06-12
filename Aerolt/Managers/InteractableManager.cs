@@ -29,7 +29,7 @@ namespace Aerolt.Managers
             if (!Cards.Any())
                 return;
 
-            var newCards = Cards.Except(cachedCards).ToArray();
+            var newCards = cachedCards != null ?  Cards.Except(cachedCards).ToArray() : Cards.ToArray();
             if (newCards.Any())
             {
                 // add new buttons
@@ -43,7 +43,7 @@ namespace Aerolt.Managers
                 }
             }
 
-            var removedCards = cachedCards.Except(Cards).ToArray();
+            var removedCards = cachedCards != null ? cachedCards.Except(Cards).ToArray() : new SpawnCard[0];
             if (removedCards.Any())
             {
                 // remove cards
@@ -52,7 +52,7 @@ namespace Aerolt.Managers
                     Destroy(interactableButtons[card]);
                 }
             }
-            
+
             cachedCards = Cards;
         }
         
