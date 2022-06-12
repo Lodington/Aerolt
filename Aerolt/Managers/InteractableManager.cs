@@ -50,6 +50,7 @@ namespace Aerolt.Managers
                 foreach (var card in removedCards)
                 {
                     Destroy(interactableButtons[card]);
+                    interactableButtons.Remove(card);
                 }
             }
 

@@ -4,6 +4,7 @@ using Aerolt.Managers;
 using HarmonyLib;
 using RoR2;
 using RoR2.UI;
+using UnityEngine;
 
 namespace Aerolt.Overrides
 {
@@ -21,6 +22,5 @@ namespace Aerolt.Overrides
             InteractableManager.Cards = director.GenerateInteractableCardSelection().choices.Where(x => x.value != null).Select(x => x.value.spawnCard).ToList();
             
         }
-
     }
 }
