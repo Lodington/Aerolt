@@ -32,7 +32,17 @@ namespace Aerolt.Buttons
             EquipmentText.text = Language.GetString(def.nameToken);
             _equipmentDef = def;
         }
-        public void dropEquipment(int amount = 1)
+
+        public void GiveEquipment()
+        {
+            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
+            var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>();
+
+            inventory.GiveEquipmentString(_equipmentDef.name);
+        }
+        
+        public void DropEquipment(int amount = 1)
         {
             var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;

@@ -4,7 +4,6 @@ using RoR2.ContentManagement;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Aerolt.Buttons
@@ -35,17 +34,25 @@ namespace Aerolt.Buttons
             _itemDef = def;
         }
 
-        public void dropItem(int amount = 1)
+
+        public void GiveItem(int amount)
         {
-            for (int i = 0; i < amount; i++)
-            {
-                var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
-                if (localUser.cachedMasterController && localUser.cachedMasterController.master)
-                {
-                    var body = localUser.cachedMasterController.master.GetBody();
-                    PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_itemDef.itemIndex), body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);
-                }
-            }
+            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
+            var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>();
+
+            for (var i = 0; i < amount; i++) inventory.GiveItem(_itemDef, amount);
+        }
+        
+        public void DropItem(int amount)
+        {
+            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
+            var body = localUser.cachedMasterController.master.GetBody();
+            
+            for (var i = 0; i < amount; i++)
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_itemDef.itemIndex),
+                    body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);
         }
     }
 }
