@@ -22,7 +22,7 @@ namespace Aerolt.Managers
         private SpawnCard _spawnCard;
 
         public static Dictionary<SpawnCard, GameObject> interactableButtons = new();
-        private List<SpawnCard> cachedCards;
+        private List<SpawnCard> cachedCards = new();
 
         private void OnEnable()
         {
