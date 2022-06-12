@@ -6,7 +6,7 @@ namespace Aerolt.Helpers
 {
     public class ObjectPool : Singleton<ObjectPool>
     {
-        public List<GameObject> PrefabsForPool;
+        public List<GameObject> prefabsForPool;
         private List<GameObject> _pooledObjects = new List<GameObject>();
 
         public GameObject GetObjectFromPool(string objectName, bool isDetachable = false)
@@ -22,7 +22,7 @@ namespace Aerolt.Helpers
             }
 
             // If we don't have a pooled instance
-            var prefab = PrefabsForPool.FirstOrDefault(obj => obj.name == objectName);
+            var prefab = prefabsForPool.FirstOrDefault(obj => obj.name == objectName);
             if (prefab != null)
             {
                 GameObject newInstace;
@@ -43,8 +43,7 @@ namespace Aerolt.Helpers
 
                 return newInstace;
             }
-
-            Debug.LogWarning("Object pool doesn't have a prefab for the object with name " + objectName);
+            Tools.Log(Aerolt.Enums.LogLevel.Error, $"Object pool doesn't have a prefab for the object with name {objectName}");
             return null;
         }
 

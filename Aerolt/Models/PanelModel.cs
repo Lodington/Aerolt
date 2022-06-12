@@ -7,9 +7,9 @@ namespace Aerolt.Models
     [Serializable]
     public class PanelModel
     {
-        public string PanelId;
+        public string panelId;
 
-        public GameObject PanelPrefab;
+        public GameObject panelPrefab;
 
     }
 }

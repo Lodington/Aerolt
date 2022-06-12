@@ -22,7 +22,7 @@ namespace Aerolt
         private const string Name = "Aerolt";
         private const string Guid = "com.Lodington." + Name;
         private const string Version = "1.4.0";
-        private static ManualLogSource _log;
+        public static ManualLogSource Log;
         private static GameObject _co;
         private static AssetBundle _assets;
         private static GameObject _ui;
@@ -31,7 +31,7 @@ namespace Aerolt
 
         public void Awake()
         {
-            _log = Logger;
+            Log = Logger;
 
             var path = System.IO.Path.GetDirectoryName(Info.Location);
                 _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
@@ -40,8 +40,6 @@ namespace Aerolt
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
-
-            RoR2.Console.onLogReceived += GetConsoleOutput.OnLogReceived;
 
         }
         public void OnGUI()
@@ -59,8 +57,8 @@ namespace Aerolt
 
         public void CreateUI()
         {
-            _ui = GameObject.Instantiate(_co);
-            UnityEngine.Object.DontDestroyOnLoad(_ui);
+            _ui = Instantiate(_co);
+            DontDestroyOnLoad(_ui);
         }
         
     }   
