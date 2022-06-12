@@ -22,11 +22,25 @@ namespace Aerolt.Managers
         private SpawnCard _spawnCard;
 
         public static List<GameObject> interactableButtons = new List<GameObject>();
+        private List<SpawnCard> cachedCards;
+
         private void OnEnable()
         {
-            
             if (!Cards.Any())
                 return;
+
+            var newCards = Cards.Except(cachedCards);
+            if (newCards.Any())
+            {
+                // add new buttons
+            }
+
+            var removedCards = cachedCards.Except(Cards);
+            if (removedCards.Any())
+            {
+                // remove cards
+            }
+            
             if(interactableButtons.Count > buttonParent.transform.childCount)
                 
                 foreach (var card in Cards)
@@ -37,6 +51,8 @@ namespace Aerolt.Managers
                     newButton.GetComponent<Button>().onClick.AddListener(() => SetInteractable(card));
                     interactableButtons.Add(newButton);
                 }
+
+            cachedCards = Cards;
         }
         
         public void SpawnInteractable()
