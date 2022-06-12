@@ -18,13 +18,12 @@
           <e p="ShowPanelButton.cs" t="Include" />
         </e>
         <e p="Classes" t="Include">
-          <e p="Console.cs" t="Include" />
-          <e p="Currency.cs" t="Include" />
           <e p="Esp.cs" t="Include" />
           <e p="LobbyManagerStrip.cs" t="Include" />
           <e p="Player.cs" t="Include" />
         </e>
         <e p="Enums" t="Include">
+          <e p="LogLevel.cs" t="Include" />
           <e p="PanelShowBehavior.cs" t="Include" />
         </e>
         <e p="Helpers" t="Include">
@@ -35,6 +34,7 @@
           <e p="ObjectPool.cs" t="Include" />
           <e p="Singleton.cs" t="Include" />
           <e p="ToggleWindow.cs" t="Include" />
+          <e p="Tools.cs" t="Include" />
         </e>
         <e p="Load.cs" t="Include" />
         <e p="Managers" t="Include">
@@ -42,6 +42,7 @@
           <e p="InteractableManager.cs" t="Include" />
           <e p="LobbyManager.cs" t="Include" />
           <e p="PanelManager.cs" t="Include" />
+          <e p="TeleporterManager.cs" t="Include" />
         </e>
         <e p="Models" t="Include">
           <e p="PanelInstanceModel.cs" t="Include" />
@@ -55,7 +56,6 @@
           </e>
         </e>
         <e p="Overrides" t="Include">
-          <e p="GetConsoleOutput.cs" t="Include" />
           <e p="Hooks.cs" t="Include" />
         </e>
       </e>

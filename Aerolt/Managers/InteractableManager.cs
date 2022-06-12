@@ -22,14 +22,14 @@ namespace Aerolt.Managers
         private SpawnCard _spawnCard;
 
         public static Dictionary<SpawnCard, GameObject> interactableButtons = new();
-        private List<SpawnCard> cachedCards;
+        private List<SpawnCard> cachedCards = new();
 
         private void OnEnable()
         {
             if (!Cards.Any())
                 return;
 
-            var newCards = cachedCards != null ?  Cards.Except(cachedCards).ToArray() : Cards.ToArray();
+            var newCards = Cards.Except(cachedCards).ToArray();
             if (newCards.Any())
             {
                 // add new buttons
@@ -43,7 +43,7 @@ namespace Aerolt.Managers
                 }
             }
 
-            var removedCards = cachedCards != null ? cachedCards.Except(Cards).ToArray() : new SpawnCard[0];
+            var removedCards = cachedCards.Except(Cards).ToArray();
             if (removedCards.Any())
             {
                 // remove cards
@@ -61,11 +61,18 @@ namespace Aerolt.Managers
             var user = GetUser.FetchUser(GetComponentInParent<HUD>());
             
             var master = user.cachedMaster;
-            if(!master)
+            if (!master)
+            {
+                Tools.Log(Aerolt.Enums.LogLevel.Error, $"Cant Spawn Interactable Localuser Master is null");
                 return;
+            }
+                
             var body = master.GetBody();
-            if(!body) //wats a erorr catch?
+            if (!body) //wats a erorr catch?
+            {
+                Tools.Log(Aerolt.Enums.LogLevel.Error, $"Cant Spawn Interactable Localuser Body is null");
                 return;
+            }
 
             var position = body.transform.position;
             var aimRay = body.inputBank.GetAimRay().direction * 1.6f;

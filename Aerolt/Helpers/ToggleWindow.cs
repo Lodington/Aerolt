@@ -4,9 +4,9 @@ namespace Aerolt.Classes
 {
     public class ToggleWindow : MonoBehaviour
     {
-        private bool MenuIsOpen = false;
+        private bool _menuIsOpen = false;
 
-        public GameObject Panel;
+        public GameObject panel;
 
         public void Update()
         {
@@ -15,8 +15,8 @@ namespace Aerolt.Classes
         
         public void WindowToggle()
         {
-            MenuIsOpen = !MenuIsOpen;
-            Panel.SetActive(MenuIsOpen);
+            _menuIsOpen = !_menuIsOpen;
+            panel.SetActive(_menuIsOpen);
         }
     }
 }
