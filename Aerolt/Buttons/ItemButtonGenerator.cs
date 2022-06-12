@@ -1,4 +1,5 @@
 ﻿using Aerolt.Helpers;
+using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
 using RoR2.UI;
@@ -37,6 +38,11 @@ namespace Aerolt.Buttons
 
         public void GiveItem(int amount)
         {
+            
+            if (!_itemDef)
+            {
+                Load.CallPopup("Error", "Please Selection a item to spawn it", GetComponentInParent<PanelManager>().transform);
+            }
             var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var inventory = localUser.cachedMasterController.master.inventory;

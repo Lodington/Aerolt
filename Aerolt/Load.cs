@@ -5,6 +5,7 @@ using System.Security;
 using System.Security.Permissions;
 using Aerolt.Classes;
 using Aerolt.Helpers;
+using Aerolt.Managers;
 using Aerolt.Overrides;
 using BepInEx;
 using BepInEx.Logging;
@@ -29,6 +30,7 @@ namespace Aerolt
         public static ManualLogSource Log;
         private static GameObject _co;
         private static GameObject _op;
+        private static GameObject _popup;
         private static AssetBundle _assets;
         private static GameObject _ui;
         public static Load Instance;
@@ -45,6 +47,7 @@ namespace Aerolt
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("AeroltUI");
             _op = _assets.LoadAsset<GameObject>("SettingUI");
+            _popup = _assets.LoadAsset<GameObject>("Popup");
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
@@ -57,11 +60,19 @@ namespace Aerolt
             Esp.Draw();
         }
 
+        public static void CallPopup(string title, string message, Transform parent)
+        {
+            GameObject popup = Instantiate(_popup, parent);
+            popup.GetComponent<PopupManager>().SetupPopup(title, message);
+        }
+        
+        
         public void Start()
         {
             RoR2Application.onLoad += GameLoad;
             SceneDirector.onPostPopulateSceneServer += Hooks.GetEspData;
             HUD.shouldHudDisplay += CreateHud;
+            
         }
 
         private void Update()
@@ -78,6 +89,7 @@ namespace Aerolt
             }
 
             settingsUI.SetActive(!settingsUI.activeSelf);
+            
         }
 
         private void GameLoad()

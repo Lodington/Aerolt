@@ -22,15 +22,13 @@ namespace Aerolt.Classes
         public TMP_InputField lunarCoinsInputField;
         public TMP_InputField voidMarkersInputField;
         public ItemInventoryDisplay itemInventoryDisplay;
-        
-        
-        
+
         public void Init(NetworkUser user, LobbyManager lobbyManager)
         {
             CharacterBody body = user.master.GetBody();
 
             _user = user;
-            
+
             itemInventoryDisplay.SetSubscribedInventory(user.master.inventory);
             
             icon.sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));;
