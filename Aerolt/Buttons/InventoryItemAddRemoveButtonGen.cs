@@ -19,7 +19,7 @@ namespace Aerolt.Buttons
 		private GameObject removeParent;
 		private bool isDecrease;
 
-		public InventoryItemAddRemoveButtonGen(ItemDef def, GameObject prefabIn, Dictionary<ItemDef, int> itemDefDictionary, GameObject parentIn = null, GameObject removeParentIn = null, bool doDestroy = true)
+		public InventoryItemAddRemoveButtonGen(ItemDef def, GameObject prefabIn, Dictionary<ItemDef, int> itemDefDictionary, GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
 		{
 			this.def = def;
 			prefab = prefabIn;
@@ -52,7 +52,7 @@ namespace Aerolt.Buttons
 		{
 			if (!itemCounts.ContainsKey(def))
 			{
-				countRemoveButton = new InventoryItemAddRemoveButtonGen(def, removeParent, itemCounts);
+				countRemoveButton = new InventoryItemAddRemoveButtonGen(def, prefab, itemCounts, removeParent);
 				itemCounts.Add(def, 0);
 			}
 			itemCounts[def]++;
