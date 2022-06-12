@@ -21,7 +21,7 @@ namespace Aerolt.Managers
 
         private SpawnCard _spawnCard;
 
-        public static List<GameObject> interactableButtons = new List<GameObject>();
+        public static Dictionary<SpawnCard, GameObject> interactableButtons = new();
         private List<SpawnCard> cachedCards;
 
         private void OnEnable()
@@ -29,29 +29,30 @@ namespace Aerolt.Managers
             if (!Cards.Any())
                 return;
 
-            var newCards = Cards.Except(cachedCards);
+            var newCards = Cards.Except(cachedCards).ToArray();
             if (newCards.Any())
             {
                 // add new buttons
-            }
-
-            var removedCards = cachedCards.Except(Cards);
-            if (removedCards.Any())
-            {
-                // remove cards
-            }
-            
-            if(interactableButtons.Count > buttonParent.transform.childCount)
-                
-                foreach (var card in Cards)
+                foreach (var card in newCards)
                 {
                     GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                     newButton.GetComponent<CustomButton>().ButtonText.text = Language.GetString(card.name);
                     newButton.GetComponent<Image>().sprite = PingIndicator.GetInteractableIcon(card.prefab);
                     newButton.GetComponent<Button>().onClick.AddListener(() => SetInteractable(card));
-                    interactableButtons.Add(newButton);
+                    interactableButtons.Add(card, newButton);
                 }
+            }
 
+            var removedCards = cachedCards.Except(Cards).ToArray();
+            if (removedCards.Any())
+            {
+                // remove cards
+                foreach (var card in removedCards)
+                {
+                    Destroy(interactableButtons[card]);
+                }
+            }
+            
             cachedCards = Cards;
         }
         
