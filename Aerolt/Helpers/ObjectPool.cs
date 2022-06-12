@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Aerolt.Helpers
 {
-    public class ObjectPool : Singleton<ObjectPool>
+    public class ObjectPool : MonoBehaviour
     {
         public List<GameObject> prefabsForPool;
         private List<GameObject> _pooledObjects = new List<GameObject>();

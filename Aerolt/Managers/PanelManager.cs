@@ -7,15 +7,15 @@ using UnityEngine;
 namespace Aerolt.Managers
 {
 
-    public class PanelManager : Singleton<PanelManager>
+    public class PanelManager : MonoBehaviour
     {
         private List<PanelInstanceModel> _panelInstanceModels = new List<PanelInstanceModel>();
         private ObjectPool _objectPool;
 
         private void Start()
         {
-            _objectPool = ObjectPool.Instance;
-            Instance.ShowPanel("Menu");
+            _objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
+            ShowPanel("Menu");
         }
 
         public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS)
@@ -28,11 +28,6 @@ namespace Aerolt.Managers
                     panelInstance = _objectPool.GetObjectFromPool(panelId);
                     var lastPanel = GetLastPanel();
                     lastPanel?.PanelInstance.SetActive(false);
-                }
-
-                if (behaviour == PanelShowBehaviour.KEEP_PREVIOUS && GetAmountPanelsInQueue() > 0)
-                {
-                    panelInstance = _objectPool.GetObjectFromPool(panelId, true);
                 }
 
                 _panelInstanceModels.Add(new PanelInstanceModel

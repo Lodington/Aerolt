@@ -9,7 +9,7 @@ namespace Aerolt.Buttons
 
         private void Start()
         {
-            _panelManager = PanelManager.Instance;
+            _panelManager = GetComponentInParent<PanelManager>();
         }
 
 

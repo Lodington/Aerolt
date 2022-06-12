@@ -14,12 +14,12 @@ namespace Aerolt.Buttons
 
         private void Start()
         {
-            _panelManager = PanelManager.Instance;
+            _panelManager = GetComponentInParent<PanelManager>();
         }
 
         public void DoShowPanel()
         {
-            PanelManager.Instance.ShowPanel(PanelId, Behaviour);
+            _panelManager.ShowPanel(PanelId, Behaviour);
         }
     }
 }
