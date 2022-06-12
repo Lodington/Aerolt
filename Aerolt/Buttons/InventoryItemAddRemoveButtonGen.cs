@@ -19,25 +19,20 @@ namespace Aerolt.Buttons
 		private GameObject removeParent;
 		private bool isDecrease;
 
-		public InventoryItemAddRemoveButtonGen(ItemDef def, GameObject prefabIn, Dictionary<ItemDef, int> itemDefDictionary, GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
+		public InventoryItemAddRemoveButtonGen(ItemDef defIn, GameObject prefabIn, Dictionary<ItemDef, int> itemDefDictionary, GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
 		{
-			this.def = def;
+			def = defIn;
 			prefab = prefabIn;
 			isDecrease = doDestroy;
-			button = CreateButton();
-			customButton = button.GetComponent<CustomButton>();
-			itemCounts = itemDefDictionary;
 			parent = parentIn;
 			removeParent = removeParentIn;
-		}
-		public GameObject CreateButton()
-		{
-			var newButton = GameObject.Instantiate(prefab, parent.transform);
-            
-			newButton.GetComponent<CustomButton>().ButtonText.text = Language.GetString(def.nameToken);
-			newButton.GetComponent<Image>().sprite = def.pickupIconSprite;
-			newButton.GetComponent<Button>().onClick.AddListener(!isDecrease ? Increase : Decrease);
-			return newButton;
+			itemCounts = itemDefDictionary;
+			
+			button = GameObject.Instantiate(prefabIn, parentIn.transform);
+			customButton = button.GetComponent<CustomButton>();
+			customButton.ButtonText.text = Language.GetString(def.nameToken);
+			button.GetComponent<Image>().sprite = def.pickupIconSprite;
+			button.GetComponent<Button>().onClick.AddListener(!isDecrease ? Increase : Decrease);
 		}
 		public void Decrease()
 		{

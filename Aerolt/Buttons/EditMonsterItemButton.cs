@@ -13,7 +13,7 @@ namespace Aerolt.Buttons
         private void Awake()
         {
             foreach (var def in ContentManager._itemDefs)
-                new InventoryItemAddRemoveButtonGen(def, buttonPrefab, MonsterButtonGenerator.ItemDef, itemListParent, buttonParent, false);
+                new InventoryItemAddRemoveButtonGen(def, buttonPrefab, MonsterButtonGenerator.ItemDef, buttonParent, itemListParent, false);
         }
     }
 }
