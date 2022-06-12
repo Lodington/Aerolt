@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security;
 using System.Security.Permissions;
 using Aerolt.Classes;
@@ -9,6 +11,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using MonoMod.RuntimeDetour;
 using RoR2;
+using RoR2.UI;
 using UnityEngine;
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -35,7 +38,7 @@ namespace Aerolt
             Log = Logger;
 
             var path = System.IO.Path.GetDirectoryName(Info.Location);
-                _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
+            _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("AeroltUI");
 
@@ -52,16 +55,38 @@ namespace Aerolt
 
         public void Start()
         {
-            RoR2Application.onLoad += CreateUI;
+            RoR2Application.onLoad += GameLoad;
             SceneDirector.onPostPopulateSceneServer += Hooks.GetEspData;
+            HUD.shouldHudDisplay += CreateHud;
         }
 
-        public void CreateUI()
+        private void GameLoad()
         {
-            _ui = Instantiate(_co);
-            DontDestroyOnLoad(_ui);
+            // create settings menu;
             Tools.Log(Enums.LogLevel.Information, "Created UI");
         }
+
+        public static Dictionary<NetworkUser, GameObject> areoltUIs = new();
         
+        public static void CreateHud(HUD hud, ref bool shoulddisplay)
+        {
+            if (!hud.cameraRigController) return;
+            var viewer = hud.cameraRigController.viewer;
+
+            if (areoltUIs.ContainsKey(viewer)) return;
+
+            var ui = Instantiate(_co, hud.mainContainer.transform, true);
+            ui.GetComponentInChildren<ToggleWindow>().Init(viewer);
+            ui.transform.localScale = Vector3.one;
+            var rect = (RectTransform) ui.transform;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMax = Vector2.zero;
+            rect.offsetMin = Vector2.zero;
+            ui.transform.localPosition = Vector3.zero;
+            //rect.anchoredPosition = rect.GetParentSize() * 0.5f;
+            areoltUIs.Add(viewer, ui);
+        }
     }   
 }

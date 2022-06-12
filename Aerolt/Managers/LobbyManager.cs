@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Aerolt.Classes;
 using RoR2;
 using TMPro;
@@ -11,7 +12,7 @@ namespace Aerolt.Managers
 {
     public class LobbyManager : MonoBehaviour
     {
-        public readonly List<string> Players = new List<string>();
+        public readonly Dictionary<NetworkUser, LobbyManagerStrip> Players = new();
 
         private NetworkUser _localPlayer;
         
@@ -19,31 +20,39 @@ namespace Aerolt.Managers
         public GameObject stripPrefab;
         
         public static Dictionary<ItemDef, int> ItemDef = new Dictionary<ItemDef, int>();
-        
+        private NetworkUser[] cachedUsers = {};
+
         public void OnEnable()
         {
             GameObject StripPrefabInstantiated;
 
-            while (stripParent.transform.childCount != 0)
-            {
-                Destroy(stripParent.transform.GetChild(0));
-                Players.RemoveAt(0);
-            }
-            foreach (var networkUser in NetworkUser.readOnlyInstancesList)
+            var array = NetworkUser.readOnlyInstancesList.ToArray();
+            var newUsers = array.Except(cachedUsers).ToArray();
+            foreach (var networkUser in newUsers)
             {
                 if (networkUser.isLocalPlayer)
                 {
                     _localPlayer = networkUser;
                 }
-                Players.Add(networkUser.userName);
                 StripPrefabInstantiated = Instantiate(stripPrefab, stripParent.transform);
-                StripPrefabInstantiated.GetComponent<LobbyManagerStrip>().Init(networkUser, this);
+                var strip = StripPrefabInstantiated.GetComponent<LobbyManagerStrip>();
+                strip.Init(networkUser, this);
+                Players.Add(networkUser, strip);
             }
+            var removedUsers = cachedUsers.Except(array).ToArray();
+            foreach (var user in removedUsers)
+            {
+                Destroy(Players[user].gameObject);
+                Players.Remove(user);
+            }
+
+            cachedUsers = array;
         }
         
         public NetworkUser GetNetUserFromString(string playerString)
         {
             if (playerString != "")
+                
                 if (int.TryParse(playerString, out int result))
                 {
                     if (result < NetworkUser.readOnlyInstancesList.Count && result >= 0)

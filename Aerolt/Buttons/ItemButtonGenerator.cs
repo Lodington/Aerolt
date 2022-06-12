@@ -39,9 +39,9 @@ namespace Aerolt.Buttons
         {
             var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
-            var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>();
+            var inventory = localUser.cachedMasterController.master.inventory;
 
-            for (var i = 0; i < amount; i++) inventory.GiveItem(_itemDef, amount);
+            inventory.GiveItem(_itemDef, amount);
         }
         
         public void DropItem(int amount)
