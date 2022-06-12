@@ -1,4 +1,3 @@
-using R2API.Utils;
 using RoR2;
 using UnityEngine;
 
@@ -8,11 +7,10 @@ namespace Aerolt.Classes
     {
         public void GodModeToggle()
         {
-            var godToggleMethod = typeof(CharacterMaster).GetMethodCached("ToggleGod");
             bool hasNotYetRun = true;
             foreach (var playerInstance in PlayerCharacterMasterController.instances)
             {
-                godToggleMethod.Invoke(playerInstance.master, null);
+                playerInstance.master.ToggleGod();
                 if (hasNotYetRun)
                 {
                     hasNotYetRun = false;
