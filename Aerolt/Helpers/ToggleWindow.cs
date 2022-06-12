@@ -14,6 +14,7 @@ namespace Aerolt.Classes
         public void Init(NetworkUser owner)
         {
             this.owner = owner;
+            WindowToggle();
         }
         public void Update()
         {

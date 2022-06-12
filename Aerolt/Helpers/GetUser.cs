@@ -14,8 +14,9 @@ namespace Aerolt.Helpers
 
         public static LocalUser FetchUser(HUD hud)
         {
-            var localUser = LocalUserManager.GetFirstLocalUser();
-            return localUser;
+            if (!hud || !hud.cameraRigController || hud.cameraRigController.localUserViewer == null)
+                return LocalUserManager.GetFirstLocalUser();
+            return hud.cameraRigController.localUserViewer;
         }
     }
 }

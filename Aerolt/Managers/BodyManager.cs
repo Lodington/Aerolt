@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Aerolt.Buttons;
+using Aerolt.Helpers;
 using Rewired.Utils.Libraries.TinyJson;
 using RoR2;
 using RoR2.ContentManagement;
+using RoR2.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -37,7 +39,7 @@ namespace Aerolt.Managers
         {
             if (_newBody)
             {
-                var localUser = LocalUserManager.GetFirstLocalUser();
+                var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
                 if (localUser.cachedMasterController && localUser.cachedMasterController.master)
                 {
                     var master = localUser.cachedMaster;
