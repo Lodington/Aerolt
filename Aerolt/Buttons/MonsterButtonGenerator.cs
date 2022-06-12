@@ -22,7 +22,7 @@ namespace Aerolt.Buttons
         private CharacterBody _body;
         private CharacterMaster _master;
         
-        public static List<ItemDef> ItemDef = new List<ItemDef>();
+        public static Dictionary<ItemDef, int> ItemDef = new Dictionary<ItemDef, int>();
         private List<string> options = new List<string>();
         private void Awake()
         {
@@ -63,7 +63,7 @@ namespace Aerolt.Buttons
             
             if (ItemDef.Any())
                 foreach (var item in ItemDef)
-                    master.inventory.GiveItem(item);
+                    master.inventory.GiveItem(item.Key, item.Value);
             
             for (var i = 0; i < amount; i++)
             {

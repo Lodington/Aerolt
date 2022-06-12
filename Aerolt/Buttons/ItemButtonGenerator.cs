@@ -1,7 +1,10 @@
-﻿using RoR2;
+﻿using Aerolt.Helpers;
+using RoR2;
 using RoR2.ContentManagement;
+using RoR2.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Aerolt.Buttons
@@ -11,10 +14,10 @@ namespace Aerolt.Buttons
         public GameObject buttonPrefab;
         public GameObject buttonParent;
 
-        public TMP_Text ItemText;
+        public TMP_Text itemText;
         private ItemDef _itemDef;
 
-        private void OnEnable()
+        private void Awake()
         {
             foreach(var def in ContentManager._itemDefs)
             {
@@ -28,7 +31,7 @@ namespace Aerolt.Buttons
 
         public void SetItemDef(ItemDef def)
         {
-            ItemText.text = Language.GetString(def.nameToken);
+            itemText.text = Language.GetString(def.nameToken);
             _itemDef = def;
         }
 
@@ -36,7 +39,7 @@ namespace Aerolt.Buttons
         {
             for (int i = 0; i < amount; i++)
             {
-                var localUser = LocalUserManager.GetFirstLocalUser();
+                var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
                 if (localUser.cachedMasterController && localUser.cachedMasterController.master)
                 {
                     var body = localUser.cachedMasterController.master.GetBody();

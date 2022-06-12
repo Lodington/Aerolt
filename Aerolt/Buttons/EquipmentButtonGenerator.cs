@@ -1,5 +1,7 @@
-﻿using RoR2;
+﻿using Aerolt.Helpers;
+using RoR2;
 using RoR2.ContentManagement;
+using RoR2.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +16,7 @@ namespace Aerolt.Buttons
         public TMP_Text EquipmentText;
         private EquipmentDef _equipmentDef;
 
-        private void OnEnable()
+        private void Awake()
         {
             foreach (var def in ContentManager._equipmentDefs)
             {
@@ -32,14 +34,12 @@ namespace Aerolt.Buttons
         }
         public void dropEquipment(int amount = 1)
         {
+            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
+            var body = localUser.cachedMasterController.master.GetBody();
             for (int i = 0; i < amount; i++)
             {
-                var localUser = LocalUserManager.GetFirstLocalUser();
-                if (localUser.cachedMasterController && localUser.cachedMasterController.master)
-                {
-                    var body = localUser.cachedMasterController.master.GetBody();
-                    //PickupDropletController.CreatePickupDroplet(EquipmentCatalog.FindEquipmentIndex(def.nameToken.ToString()), body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);
-                }
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_equipmentDef.equipmentIndex), body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);
             }
         }
     }

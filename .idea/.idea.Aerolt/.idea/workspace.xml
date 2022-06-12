@@ -4,16 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fd47e60c-a267-4d4d-8287-b071d5008b1c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Aerolt/Buttons/EditItemButton.cs" afterDir="false" />
+    <list default="true" id="fd47e60c-a267-4d4d-8287-b071d5008b1c" name="Default Changelist" comment="added Currency Methods">
+      <change afterPath="$PROJECT_DIR$/Aerolt/Buttons/EditMonsterItemButton.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Aerolt/Buttons/EditPlayerItemButton.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Aerolt/Classes/LobbyManagerStrip.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Aerolt/Helpers/GetUser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Aerolt/Managers/BodyManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Aerolt/Managers/InteractableManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Aerolt/Managers/LobbyManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Aerolt/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Aerolt/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Aerolt/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Aerolt/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Aerolt/Buttons/EditItemButton.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Aerolt/Buttons/EquipmentButtonGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Buttons/EquipmentButtonGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Aerolt/Buttons/ItemButtonGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Buttons/ItemButtonGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Aerolt/Buttons/MonsterButtonGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Buttons/MonsterButtonGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aerolt/Classes/Esp.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Classes/Esp.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aerolt/Classes/Items.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aerolt/Classes/ToggleWindow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Helpers/ToggleWindow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aerolt/Helpers/ObjectPool.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Helpers/ObjectPool.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aerolt/Managers/PanelManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Managers/PanelManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Aerolt/Overrides/Hooks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/Overrides/Hooks.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Aerolt/bin/Debug/netstandard2.1/Aerolt.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/bin/Debug/netstandard2.1/Aerolt.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Aerolt/bin/Debug/netstandard2.1/Aerolt.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/bin/Debug/netstandard2.1/Aerolt.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Aerolt/obj/Debug/netstandard2.1/Aerolt.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Aerolt/obj/Debug/netstandard2.1/Aerolt.csproj.CoreCompileInputs.cache" afterDir="false" />
@@ -40,32 +45,45 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/6f/82de3047/ChestBehavior.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/fe/a79bc22e/CharacterMaster.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/54/92d4397c/PurchaseInteraction.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/67/18acd2db/TeamIndex.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/3f/8ce722e9/ItemInventoryDisplay.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/67/18acd2db/TeamIndex.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/d3/6fb5db8f/NetworkUser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/44AFB456-4E93-47CF-99A1-865351EA8F4A/06/f07756f5/NullReferenceException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/41/27daee08/ShopTerminalBehavior.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file:////192.168.1.5/storage/C#Projects/RorCheats/RoRCheats/Main.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2B2F3D50-00DF-48AE-8F94-A9B49E82D786/15/d6b904e2/BodyCatalog.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
       <option value="$PROJECT_DIR$/Aerolt/Buttons/CustomButton.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Aerolt.csproj" />
-      <option value="$PROJECT_DIR$/Aerolt/Buttons/EquipmentButtonGenerator.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Overrides/GetConsoleOutput.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Classes/PlayerOptions.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Classes/Player.cs" />
-      <option value="$PROJECT_DIR$/Aerolt/Overrides/Hooks.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Managers/EspHelper.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Helpers/OptionHelper.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Helpers/Colors.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Classes/Esp.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Classes/ToggleWindow.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Helpers/ToggleWindow.cs" />
-      <option value="$PROJECT_DIR$/Aerolt/Load.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Classes/Currency.cs" />
-      <option value="$PROJECT_DIR$/Aerolt/Buttons/ItemButtonGenerator.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Helpers/ObjectPool.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Managers/PanelManager.cs" />
-      <option value="$PROJECT_DIR$/Aerolt/Buttons/EditItemButton.cs" />
       <option value="$PROJECT_DIR$/Aerolt/Buttons/MonsterButtonGenerator.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Buttons/EditItemButton.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Classes/LobbyManagerStrip.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Helpers/ButtonHelper.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Managers/LobbyManager.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Buttons/EditPlayerItemButton.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Load.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Managers/BodyManager.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Helpers/GetUser.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Buttons/ItemButtonGenerator.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Buttons/EquipmentButtonGenerator.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Overrides/Hooks.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Buttons/EditMonsterItemButton.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Helpers/ButtonGenHelper.cs" />
+      <option value="$PROJECT_DIR$/Aerolt/Managers/InteractableManager.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="2A8WsRdm1TwQ3ltj47dLmZHT9dw" />
@@ -82,6 +100,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.smartKeys_rider" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/Aerolt/Buttons/EquipmentButtonGenerator.cs" />
@@ -139,7 +158,13 @@
       <workItem from="1654393861250" duration="6865000" />
       <workItem from="1654428316137" duration="25054000" />
       <workItem from="1654551846279" duration="6514000" />
-      <workItem from="1654558793214" duration="8485000" />
+      <workItem from="1654558793214" duration="9807000" />
+      <workItem from="1654649649238" duration="10842000" />
+      <workItem from="1654732623882" duration="4423000" />
+      <workItem from="1654819216574" duration="254000" />
+      <workItem from="1654823741278" duration="2000" />
+      <workItem from="1654907926045" duration="5091000" />
+      <workItem from="1654989259094" duration="6283000" />
     </task>
     <task id="LOCAL-00001" summary="Yep">
       <created>1654478026215</created>
@@ -148,7 +173,21 @@
       <option name="project" value="LOCAL" />
       <updated>1654478026215</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="monster view update">
+      <created>1654599227303</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1654599227303</updated>
+    </task>
+    <task id="LOCAL-00003" summary="added Currency Methods">
+      <created>1654599264009</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1654599264009</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -171,7 +210,9 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Yep" />
-    <option name="LAST_COMMIT_MESSAGE" value="Yep" />
+    <MESSAGE value="monster view update" />
+    <MESSAGE value="added Currency Methods" />
+    <option name="LAST_COMMIT_MESSAGE" value="added Currency Methods" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
