@@ -2,6 +2,7 @@
 using System.Security;
 using System.Security.Permissions;
 using Aerolt.Classes;
+using Aerolt.Helpers;
 using Aerolt.Overrides;
 using BepInEx;
 using BepInEx.Logging;
@@ -35,7 +36,7 @@ namespace Aerolt
 
             var path = System.IO.Path.GetDirectoryName(Info.Location);
                 _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
-
+            Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("AeroltUI");
 
             var harm = new Harmony(Info.Metadata.GUID);
@@ -59,6 +60,7 @@ namespace Aerolt
         {
             _ui = Instantiate(_co);
             DontDestroyOnLoad(_ui);
+            Tools.Log(Enums.LogLevel.Information, "Created UI");
         }
         
     }   

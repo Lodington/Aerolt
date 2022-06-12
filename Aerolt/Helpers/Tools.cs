@@ -3,7 +3,7 @@ using Aerolt.Enums;
 
 namespace Aerolt.Helpers
 {
-    public class Tools
+    public static class Tools
     {
         public static void Log(Enum level, object s)
         {

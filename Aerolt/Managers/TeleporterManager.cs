@@ -1,4 +1,5 @@
 using Aerolt.Helpers;
+using Rewired.Config;
 using RoR2;
 using UnityEngine;
 
