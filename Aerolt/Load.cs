@@ -23,24 +23,28 @@ namespace Aerolt
     [BepInPlugin(Guid, Name, Version)]
     public class Load : BaseUnityPlugin
     {
-        private const string Name = "Aerolt";
+        public const string Name = "Aerolt";
         private const string Guid = "com.Lodington." + Name;
-        private const string Version = "1.4.0";
+        public const string Version = "1.4.0";
         public static ManualLogSource Log;
         private static GameObject _co;
+        private static GameObject _op;
         private static AssetBundle _assets;
         private static GameObject _ui;
+        public static Load Instance;
 
         public static bool MenuOpen = false;
 
         public void Awake()
         {
+            Instance = this;
             Log = Logger;
 
             var path = System.IO.Path.GetDirectoryName(Info.Location);
             _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("AeroltUI");
+            _op = _assets.LoadAsset<GameObject>("SettingUI");
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
@@ -60,20 +64,38 @@ namespace Aerolt
             HUD.shouldHudDisplay += CreateHud;
         }
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F1) && aeroltUIs.Count == 0) SettingsToggle();
+        }
+
+        private void SettingsToggle()
+        {
+            if (!settingsUI)
+            {
+                settingsUI = Instantiate(_op);
+                DontDestroyOnLoad(settingsUI);
+            }
+
+            settingsUI.SetActive(!settingsUI.activeSelf);
+        }
+
         private void GameLoad()
         {
             // create settings menu;
             Tools.Log(Enums.LogLevel.Information, "Created UI");
         }
 
-        public static Dictionary<NetworkUser, GameObject> areoltUIs = new();
-        
+        public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
+        private static GameObject settingsUI;
+
         public static void CreateHud(HUD hud, ref bool shoulddisplay)
         {
             if (!hud.cameraRigController) return;
             var viewer = hud.cameraRigController.viewer;
 
-            if (areoltUIs.ContainsKey(viewer)) return;
+            if (aeroltUIs.ContainsKey(viewer)) return;
+            if (settingsUI && settingsUI.activeSelf) settingsUI.SetActive(false);
 
             var ui = Instantiate(_co, hud.mainContainer.transform, true);
             ui.GetComponentInChildren<ToggleWindow>().Init(viewer);
@@ -86,7 +108,7 @@ namespace Aerolt
             rect.offsetMin = Vector2.zero;
             ui.transform.localPosition = Vector3.zero;
             //rect.anchoredPosition = rect.GetParentSize() * 0.5f;
-            areoltUIs.Add(viewer, ui);
+            aeroltUIs.Add(viewer, ui);
         }
     }   
 }

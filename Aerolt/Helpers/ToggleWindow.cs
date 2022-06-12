@@ -6,18 +6,18 @@ namespace Aerolt.Classes
 {
     public class ToggleWindow : MonoBehaviour
     {
-        private bool _menuIsOpen = false;
+        private bool _menuIsOpen = true;
 
         public GameObject panel;
         public NetworkUser owner;
 
         public void Init(NetworkUser owner)
         {
-            
+            this.owner = owner;
         }
         public void Update()
         {
-           if (Input.GetKeyDown(KeyCode.F1)) WindowToggle();
+            if (Input.GetKeyDown(KeyCode.F1)) WindowToggle();
         }
         
         public void WindowToggle()
@@ -28,7 +28,7 @@ namespace Aerolt.Classes
 
         private void OnDestroy()
         {
-            Load.areoltUIs.Remove(owner);
+            Load.aeroltUIs.Remove(owner);
         }
     }
 }
