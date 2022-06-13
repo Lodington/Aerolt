@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Security.Permissions;
+using Aerolt.Buttons;
 using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Managers;
@@ -11,6 +12,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using MonoMod.RuntimeDetour;
+using Rewired;
 using RoR2;
 using RoR2.UI;
 using UnityEngine;
@@ -34,7 +36,9 @@ namespace Aerolt
         private static AssetBundle _assets;
         private static GameObject _ui;
         public static Load Instance;
-
+        public Dictionary<string, KeyCode> KeyBinds = new Dictionary<string, KeyCode>();
+        
+        
         public static bool MenuOpen = false;
 
         public void Awake()
@@ -51,6 +55,8 @@ namespace Aerolt
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
+            
+            KeyBinds.Add("OpenMenu", KeyCode.F1);
 
         }
         public void OnGUI()
@@ -69,15 +75,15 @@ namespace Aerolt
         
         public void Start()
         {
-            RoR2Application.onLoad += GameLoad;
             SceneDirector.onPostPopulateSceneServer += Hooks.GetEspData;
             HUD.shouldHudDisplay += CreateHud;
-            
+
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F1) && aeroltUIs.Count == 0) SettingsToggle();
+            if (Input.GetKeyDown(KeyBinds["OpenMenu"]) && aeroltUIs.Count == 0) SettingsToggle();
+
         }
 
         private void SettingsToggle()
@@ -90,12 +96,6 @@ namespace Aerolt
 
             settingsUI.SetActive(!settingsUI.activeSelf);
             
-        }
-
-        private void GameLoad()
-        {
-            // create settings menu;
-            Tools.Log(Enums.LogLevel.Information, "Created UI");
         }
 
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
@@ -121,6 +121,7 @@ namespace Aerolt
             ui.transform.localPosition = Vector3.zero;
             //rect.anchoredPosition = rect.GetParentSize() * 0.5f;
             aeroltUIs.Add(viewer, ui);
+            Tools.Log(Enums.LogLevel.Information, "Created UI");
         }
     }   
 }

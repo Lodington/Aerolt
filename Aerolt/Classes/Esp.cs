@@ -85,8 +85,6 @@ namespace Aerolt.Classes
             }
         }
         
-
-        
         private static void DrawBarrelInteractables()
         {
             foreach (BarrelInteraction barrel in BarrelInteractions)
@@ -166,8 +164,6 @@ namespace Aerolt.Classes
 
             return $"{friendlyName}\n${cost}\n{distance}m";
         }
-        
-        
         private static void ShowShop(ShopTerminalBehavior multiShop, PurchaseInteraction purchaseInteraction)
         {
             string boxText = GetDistance(purchaseInteraction);

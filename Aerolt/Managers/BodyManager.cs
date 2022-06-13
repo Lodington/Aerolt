@@ -37,6 +37,8 @@ namespace Aerolt.Managers
 
         public void SpawnAsBody()
         {
+            if (!_newBody)
+                Load.CallPopup("Error", $"No Body Selected! Please Select a body to spawn as", buttonParent.transform);
             if (_newBody)
             {
                 var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
