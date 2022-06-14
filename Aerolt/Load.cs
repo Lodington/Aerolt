@@ -22,6 +22,7 @@ using UnityEngine;
 namespace Aerolt 
 {
     [BepInPlugin(Guid, Name, Version)]
+    [BepInDependency("bubbet.zioconfigfile")]
     public class Load : BaseUnityPlugin
     {
         public const string Name = "Aerolt";
@@ -94,12 +95,14 @@ namespace Aerolt
 
         private void GameLoad()
         {
+            configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             // create settings menu;
             Tools.Log(Enums.LogLevel.Information, "Created UI");
         }
 
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
         private static GameObject settingsUI;
+        public ZioConfigFile.ZioConfigFile configFile;
 
         public static void CreateHud(HUD hud, ref bool shoulddisplay)
         {
@@ -122,5 +125,5 @@ namespace Aerolt
             //rect.anchoredPosition = rect.GetParentSize() * 0.5f;
             aeroltUIs.Add(viewer, ui);
         }
-    }   
+    }
 }
