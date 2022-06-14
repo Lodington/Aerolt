@@ -48,9 +48,8 @@ namespace Aerolt.Buttons
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var body = localUser.cachedMasterController.master.GetBody();
             for (int i = 0; i < amount; i++)
-            {
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_equipmentDef.equipmentIndex), body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);
-            }
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_equipmentDef.equipmentIndex),
+                    body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);
         }
     }
 }

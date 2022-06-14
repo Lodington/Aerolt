@@ -12,7 +12,7 @@ namespace Aerolt.Managers
         {
             if (!TeleporterInteraction.instance) return;
             typeof(HoldoutZoneController).GetProperty("charge")?.SetValue(TeleporterInteraction.instance.holdoutZoneController, 1f);
-            Tools.Log(Aerolt.Enums.LogLevel.Information, "Charged Teleporter");
+            Tools.Log(Enums.LogLevel.Information, "Charged Teleporter");
         }
         public void SkipStage()
         {
