@@ -16,6 +16,7 @@ using Rewired;
 using RoR2;
 using RoR2.UI;
 using UnityEngine;
+using ZioConfigFile;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
@@ -36,7 +37,7 @@ namespace Aerolt
         private static AssetBundle _assets;
         private static GameObject _ui;
         public static Load Instance;
-        public Dictionary<string, KeyCode> KeyBinds = new Dictionary<string, KeyCode>();
+        public Dictionary<string, ZioConfigEntry<KeyCode>> KeyBinds = new();
         
         
         public static bool MenuOpen = false;
@@ -55,9 +56,6 @@ namespace Aerolt
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
-            
-            KeyBinds.Add("OpenMenu", KeyCode.F1);
-
         }
         public void OnGUI()
         {
@@ -83,27 +81,28 @@ namespace Aerolt
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyBinds["OpenMenu"]) && aeroltUIs.Count == 0) SettingsToggle();
-
+            if (!settingsUI) return;
+            if (Input.GetKeyDown(KeyBinds["OpenMenu"].Value) && aeroltUIs.Count == 0) SettingsToggle();
         }
 
         private void SettingsToggle()
         {
-            if (!settingsUI)
-            {
-                settingsUI = Instantiate(_op);
-                DontDestroyOnLoad(settingsUI);
-            }
-
+            if (!settingsUI) return;
             settingsUI.SetActive(!settingsUI.activeSelf);
-            
         }
 
         private void GameLoad()
         {
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             // create settings menu;
-            Tools.Log(Enums.LogLevel.Information, "Created UI");
+            CreateKeyBindSettings();
+            settingsUI = Instantiate(_op);
+            DontDestroyOnLoad(settingsUI);
+        }
+
+        private void CreateKeyBindSettings()
+        {
+            KeyBinds.Add("OpenMenu", configFile.Bind("Keybinds", "OpenMenu", KeyCode.F1));
         }
 
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
