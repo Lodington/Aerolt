@@ -1,24 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Managers;
 using BepInEx.Bootstrap;
 using RiskOfOptions;
 using UnityEngine;
+using UnityEngine.UI;
 using ZioConfigFile;
 using ZioRiskOfOptions;
-using Image = UnityEngine.UI.Image;
 
 namespace Aerolt.Helpers
 {
-    [RequireComponent(typeof(Image))]
     public class ImageColorer : MonoBehaviour
     {
         public string catagory;
         public string name;
         public string description;
         private ZioConfigFile.ZioConfigFile configFile;
-        public Image image;
-        public ZioConfigEntry<Color> configEntry;
+        [NonSerialized] public Image image;
+        [NonSerialized] public ZioConfigEntry<Color> configEntry;
         public static List<ImageColorer> instances = new();
 
         public void Start()

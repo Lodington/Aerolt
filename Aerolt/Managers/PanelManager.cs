@@ -77,8 +77,8 @@ namespace Aerolt.Managers
             return _panelInstanceModels.Count;
         }
 
-        public NetworkUser owner;
-        public ZioConfigFile.ZioConfigFile configFile;
+        [NonSerialized] public NetworkUser owner;
+        [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
 
         private void Awake()
         {
