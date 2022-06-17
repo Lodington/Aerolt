@@ -148,6 +148,9 @@ namespace Aerolt.Classes
                 }
             }
         }
+        
+        
+        
         public static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
         {
             if (Instance.showChestAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))

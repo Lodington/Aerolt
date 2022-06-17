@@ -9,7 +9,7 @@ namespace Aerolt.Helpers
     {
         public void Awake()
         {
-            GetComponent<TextMeshProUGUI>().text = $"{Load.Name} v{Load.Version}";
+            GetComponent<TextMeshProUGUI>().text = $"v{Load.Version}";
         }
     }
 }
