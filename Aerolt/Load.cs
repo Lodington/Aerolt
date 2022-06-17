@@ -38,9 +38,6 @@ namespace Aerolt
         private static AssetBundle _assets;
         public static Load Instance;
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
-        
-        
-        public static bool MenuOpen = false;
 
         public void Awake()
         {
@@ -112,6 +109,7 @@ namespace Aerolt
             settingsUI = settingsRoot.transform.Find("SettingUIPanel").gameObject;
             settingsUI.SetActive(false);
             DontDestroyOnLoad(settingsRoot);
+            CallPopup($"Welcome To Aerolt {Version}", "The menu will be available in game! \nJoin my discord \nNow With controller support", settingsRoot.transform);
         }
 
         private void CreateKeyBindSettings()
