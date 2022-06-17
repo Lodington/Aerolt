@@ -25,6 +25,7 @@ using ZioRiskOfOptions;
 namespace Aerolt 
 {
     [BepInPlugin(Guid, Name, Version)]
+    [BepInDependency("bubbet.zioriskofoptions")]
     public class Load : BaseUnityPlugin
     {
         public const string Name = "Aerolt";

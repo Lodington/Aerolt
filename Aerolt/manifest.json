@@ -1,0 +1,13 @@
+{
+  "name": "Aerolt",
+  "authorName":"Lodington",
+  "website_url":"",
+  "displayName":"Aerolt",
+
+  "version_number": "2.0.0",
+  "description": "",
+  "dependencies": [
+    "bbepis-BepInExPack-5.4.1905",
+    "Bubbet-ZioRiskOfOptions-1.0.0"
+  ]
+}
