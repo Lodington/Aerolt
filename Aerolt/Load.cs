@@ -29,7 +29,7 @@ namespace Aerolt
     public class Load : BaseUnityPlugin
     {
         public const string Name = "Aerolt";
-        private const string Guid = "com.Lodington." + Name;
+        public const string Guid = "com.Lodington." + Name;
         public const string Version = "1.4.0";
         public static ManualLogSource Log;
         private static GameObject _co;
@@ -105,11 +105,18 @@ namespace Aerolt
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             // create settings menu;
             CreateKeyBindSettings();
+            Colors.InitColors();
             var settingsRoot = Instantiate(_op);
             settingsUI = settingsRoot.transform.Find("SettingUIPanel").gameObject;
             settingsUI.SetActive(false);
             DontDestroyOnLoad(settingsRoot);
-            CallPopup($"Welcome To Aerolt {Version}", "The menu will be available in game! \nJoin my discord \nNow With controller support", settingsRoot.transform);
+            var welcomeMessage = "The menu will be available in game! \nJoin my discord \nNow With controller support";
+            var config = configFile.Bind("DoNotTouch", "WelcomeMessage", "", "");
+            if (config.Value != welcomeMessage)
+            {
+                CallPopup($"Welcome To Aerolt v{Version}", welcomeMessage, settingsRoot.transform);
+                config.Value = welcomeMessage;
+            }
         }
 
         private void CreateKeyBindSettings()
