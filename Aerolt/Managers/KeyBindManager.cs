@@ -21,7 +21,7 @@ namespace Aerolt.Buttons
                 Event e = Event.current;
                 if (e.isKey)
                 {
-                    Load.Instance.KeyBinds[currentKey.buttonName].Value = e.keyCode;
+                    //Load.Instance.KeyBinds[currentKey.buttonName].Value = e.keyCode; Disabled for now;
                     OpenMenu.text = e.keyCode.ToString();
                     currentKey = null;
                 }
@@ -29,7 +29,7 @@ namespace Aerolt.Buttons
         }
         public void Awake()
         {
-            OpenMenu.text = Load.Instance.KeyBinds[ButtonNames.OpenMenu].Value.ToString();
+            //OpenMenu.text = Load.Instance.KeyBinds[ButtonNames.OpenMenu].Value.ToString(); Disabled for now;
         }
 
         public void UpdateKey(ButtonNameHelper clicked)

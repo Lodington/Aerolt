@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Managers;
+using BepInEx.Bootstrap;
+using RiskOfOptions;
 using UnityEngine;
 using ZioConfigFile;
+using ZioRiskOfOptions;
 using Image = UnityEngine.UI.Image;
 
 namespace Aerolt.Helpers
@@ -24,8 +27,15 @@ namespace Aerolt.Helpers
             configEntry = configFile.Bind(catagory, name, image.color, description);
             configEntry.SettingChanged += SettingChanged;
             SettingChanged(configEntry, null, false);
-            if (instances.All(x => x.configEntry != configEntry))
-                instances.Add(this);
+            if (instances.Any(x => x.configEntry == configEntry)) return;
+            instances.Add(this);
+            if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
+                MakeRiskOfOptions();
+        }
+
+        private void MakeRiskOfOptions()
+        {
+            ModSettingsManager.AddOption(new ZioColorOption(configEntry));
         }
 
         public void OnDestroy()

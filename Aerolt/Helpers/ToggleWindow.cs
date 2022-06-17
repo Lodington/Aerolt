@@ -25,7 +25,7 @@ namespace Aerolt.Classes
         }
         public void Update()
         {
-            if (LocalUserManager.GetFirstLocalUser() == owner.localUser && Input.GetKeyDown(Load.Instance.KeyBinds[ButtonNames.OpenMenu].Value))
+            if (LocalUserManager.GetFirstLocalUser() == owner.localUser && Load.GetKeyPressed(Load.KeyBinds[ButtonNames.OpenMenu]))
                 WindowToggle();
         }
         

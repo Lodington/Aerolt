@@ -7,12 +7,16 @@ using Aerolt.Helpers;
 using Aerolt.Managers;
 using Aerolt.Overrides;
 using BepInEx;
+using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using RiskOfOptions;
 using RoR2;
 using RoR2.UI;
 using UnityEngine;
 using ZioConfigFile;
+using ZioRiskOfOptions;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
@@ -32,7 +36,7 @@ namespace Aerolt
         private static GameObject _popup;
         private static AssetBundle _assets;
         public static Load Instance;
-        public Dictionary<ButtonNames, ZioConfigEntry<KeyCode>> KeyBinds = new();
+        public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
         
         
         public static bool MenuOpen = false;
@@ -77,7 +81,19 @@ namespace Aerolt
         private void Update()
         {
             if (!settingsUI) return;
-            if (Input.GetKeyDown(KeyBinds[ButtonNames.OpenMenu].Value) && aeroltUIs.Count == 0) SettingsToggle();
+            //if (GetKeyPressed(KeyBinds[ButtonNames.OpenMenu]) && aeroltUIs.Count == 0) SettingsToggle(); Disabled for now.
+        }
+
+        public static bool GetKeyPressed(ZioConfigEntry<KeyboardShortcut> entry)
+        {
+            foreach (var item in entry.Value.Modifiers)
+            {
+                if (!Input.GetKey(item))
+                {
+                    return false;
+                }
+            }
+            return Input.GetKeyDown(entry.Value.MainKey);
         }
 
         private void SettingsToggle()
@@ -91,13 +107,25 @@ namespace Aerolt
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             // create settings menu;
             CreateKeyBindSettings();
-            settingsUI = Instantiate(_op);
-            DontDestroyOnLoad(settingsUI);
+            var settingsRoot = Instantiate(_op);
+            settingsUI = settingsRoot.transform.Find("SettingUIPanel").gameObject;
+            settingsUI.SetActive(false);
+            DontDestroyOnLoad(settingsRoot);
         }
 
         private void CreateKeyBindSettings()
         {
-            KeyBinds.Add(ButtonNames.OpenMenu, configFile.Bind("Keybinds", "OpenMenu", KeyCode.F1));
+            KeyBinds.Add(ButtonNames.OpenMenu, configFile.Bind("Keybinds", "OpenMenu", new KeyboardShortcut(KeyCode.F1)));
+            if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
+                MakeRiskOfOptions();
+        }
+
+        private void MakeRiskOfOptions()
+        {
+            foreach (var value in KeyBinds.Values)
+            {
+                ModSettingsManager.AddOption(new ZioKeyBindOption(value));
+            }
         }
 
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
