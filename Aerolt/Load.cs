@@ -110,7 +110,13 @@ namespace Aerolt
             settingsUI = settingsRoot.transform.Find("SettingUIPanel").gameObject;
             settingsUI.SetActive(false);
             DontDestroyOnLoad(settingsRoot);
-            CallPopup($"Welcome To Aerolt {Version}", "The menu will be available in game! \nJoin my discord \nNow With controller support", settingsRoot.transform);
+            var welcomeMessage = "The menu will be available in game! \nJoin my discord \nNow With controller support";
+            var config = configFile.Bind("DoNotTouch", "WelcomeMessage", "", "");
+            if (config.Value != welcomeMessage)
+            {
+                CallPopup($"Welcome To Aerolt v{Version}", welcomeMessage, settingsRoot.transform);
+                config.Value = welcomeMessage;
+            }
         }
 
         private void CreateKeyBindSettings()
