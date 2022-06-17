@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Aerolt.Enums;
+using Aerolt.Helpers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +12,7 @@ namespace Aerolt.Buttons
     {
         public TMP_Text OpenMenu;
         
-        private GameObject currentKey;
+        private ButtonNameHelper currentKey;
 
         public void OnGUI()
         {
@@ -19,19 +21,18 @@ namespace Aerolt.Buttons
                 Event e = Event.current;
                 if (e.isKey)
                 {
-                    Load.Instance.KeyBinds[currentKey.name] = e.keyCode;
+                    Load.Instance.KeyBinds[currentKey.buttonName].Value = e.keyCode;
                     OpenMenu.text = e.keyCode.ToString();
                     currentKey = null;
                 }
             }
         }
-        
         public void Awake()
         {
-            OpenMenu.text = Load.Instance.KeyBinds["OpenMenu"].ToString();
+            OpenMenu.text = Load.Instance.KeyBinds[ButtonNames.OpenMenu].Value.ToString();
         }
 
-        public void UpdateKey(GameObject clicked)
+        public void UpdateKey(ButtonNameHelper clicked)
         {
             currentKey = clicked;
         }

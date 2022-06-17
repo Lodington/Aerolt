@@ -5,6 +5,7 @@ using System.Security;
 using System.Security.Permissions;
 using Aerolt.Buttons;
 using Aerolt.Classes;
+using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Managers;
 using Aerolt.Overrides;
@@ -35,9 +36,8 @@ namespace Aerolt
         private static GameObject _op;
         private static GameObject _popup;
         private static AssetBundle _assets;
-        private static GameObject _ui;
         public static Load Instance;
-        public Dictionary<string, ZioConfigEntry<KeyCode>> KeyBinds = new();
+        public Dictionary<ButtonNames, ZioConfigEntry<KeyCode>> KeyBinds = new();
         
         
         public static bool MenuOpen = false;
@@ -82,7 +82,7 @@ namespace Aerolt
         private void Update()
         {
             if (!settingsUI) return;
-            if (Input.GetKeyDown(KeyBinds["OpenMenu"].Value) && aeroltUIs.Count == 0) SettingsToggle();
+            if (Input.GetKeyDown(KeyBinds[ButtonNames.OpenMenu].Value) && aeroltUIs.Count == 0) SettingsToggle();
         }
 
         private void SettingsToggle()
@@ -102,7 +102,7 @@ namespace Aerolt
 
         private void CreateKeyBindSettings()
         {
-            KeyBinds.Add("OpenMenu", configFile.Bind("Keybinds", "OpenMenu", KeyCode.F1));
+            KeyBinds.Add(ButtonNames.OpenMenu, configFile.Bind("Keybinds", "OpenMenu", KeyCode.F1));
         }
 
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();

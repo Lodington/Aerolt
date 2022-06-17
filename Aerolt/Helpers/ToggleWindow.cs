@@ -1,4 +1,6 @@
 ﻿using System;
+using Aerolt.Enums;
+using Aerolt.Helpers;
 using RoR2;
 using UnityEngine;
 
@@ -18,7 +20,8 @@ namespace Aerolt.Classes
         }
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F1)) WindowToggle();
+            if (LocalUserManager.GetFirstLocalUser() == owner.localUser && Input.GetKeyDown(Load.Instance.KeyBinds[ButtonNames.OpenMenu].Value))
+                    WindowToggle();
         }
         
         public void WindowToggle()
