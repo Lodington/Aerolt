@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using BepInEx.Bootstrap;
+using RiskOfOptions;
 using UnityEngine;
 using ZioConfigFile;
+using ZioRiskOfOptions;
 
 namespace Aerolt.Helpers
 {
@@ -28,7 +31,14 @@ namespace Aerolt.Helpers
             
             color = Load.Instance.configFile.Bind("EspColors", identifier, (Color) DefaultColors[identifier], "");
             GlobalColors[identifier] = color;
+            if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
+                MakeRiskOfOptions(color);
             return color.Value;
+        }
+
+        private static void MakeRiskOfOptions(ZioConfigEntry<Color> value)
+        {
+            ModSettingsManager.AddOption(new ZioColorOption(value));
         }
 
         public static void SetColor(string id, Color32 c) => GlobalColors[id].Value = c;
@@ -37,6 +47,14 @@ namespace Aerolt.Helpers
         {
             string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
             return hex;
+        }
+
+        public static void InitColors()
+        {
+            foreach (var key in DefaultColors.Keys)
+            {
+                GetColor(key);
+            }
         }
     }
 }

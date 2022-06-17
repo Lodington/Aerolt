@@ -29,7 +29,7 @@ namespace Aerolt
     public class Load : BaseUnityPlugin
     {
         public const string Name = "Aerolt";
-        private const string Guid = "com.Lodington." + Name;
+        public const string Guid = "com.Lodington." + Name;
         public const string Version = "1.4.0";
         public static ManualLogSource Log;
         private static GameObject _co;
@@ -105,6 +105,7 @@ namespace Aerolt
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             // create settings menu;
             CreateKeyBindSettings();
+            Colors.InitColors();
             var settingsRoot = Instantiate(_op);
             settingsUI = settingsRoot.transform.Find("SettingUIPanel").gameObject;
             settingsUI.SetActive(false);
