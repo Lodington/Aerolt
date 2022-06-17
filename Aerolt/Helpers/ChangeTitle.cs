@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Aerolt.Helpers
 {
+    [RequireComponent(typeof(TextMeshProUGUI))]
     public class ChangeTitle : MonoBehaviour
     {
         public void Awake()
