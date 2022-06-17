@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Security;
 using System.Security.Permissions;
-using Aerolt.Buttons;
 using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
@@ -12,8 +9,6 @@ using Aerolt.Overrides;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using MonoMod.RuntimeDetour;
-using Rewired;
 using RoR2;
 using RoR2.UI;
 using UnityEngine;
@@ -118,7 +113,7 @@ namespace Aerolt
             if (settingsUI && settingsUI.activeSelf) settingsUI.SetActive(false);
 
             var ui = Instantiate(_co, hud.mainContainer.transform, true);
-            ui.GetComponentInChildren<ToggleWindow>().Init(viewer);
+            ui.GetComponent<PanelManager>().Initialize(viewer);
             ui.transform.localScale = Vector3.one;
             var rect = (RectTransform) ui.transform;
             rect.pivot = new Vector2(0.5f, 0.5f);

@@ -1,6 +1,4 @@
-﻿using System;
-using Aerolt.Enums;
-using Aerolt.Helpers;
+﻿using Aerolt.Enums;
 using RoR2;
 using UnityEngine;
 
@@ -16,12 +14,19 @@ namespace Aerolt.Classes
         public void Init(NetworkUser owner)
         {
             this.owner = owner;
+            var profile = owner.localUser?.userProfile;
+            if (profile == null)
+            {
+                // Delete ui objects that dont have a profile attached.
+                Destroy(transform.parent.gameObject);
+                return;
+            }
             WindowToggle();
         }
         public void Update()
         {
             if (LocalUserManager.GetFirstLocalUser() == owner.localUser && Input.GetKeyDown(Load.Instance.KeyBinds[ButtonNames.OpenMenu].Value))
-                    WindowToggle();
+                WindowToggle();
         }
         
         public void WindowToggle()

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Models;
+using RoR2;
 using UnityEngine;
 
 namespace Aerolt.Managers
@@ -72,6 +74,17 @@ namespace Aerolt.Managers
         public int GetAmountPanelsInQueue()
         {
             return _panelInstanceModels.Count;
+        }
+
+        public NetworkUser owner;
+        public ZioConfigFile.ZioConfigFile configFile;
+
+        public void Initialize(NetworkUser ownerIn)
+        {
+            owner = ownerIn;
+            GetComponentInChildren<ToggleWindow>().Init(owner);
+            if (ownerIn.localUser != null)
+                configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, $"/Aerolt/Profiles/{ownerIn.localUser.userProfile.fileName}.cfg", true);
         }
     }
 
