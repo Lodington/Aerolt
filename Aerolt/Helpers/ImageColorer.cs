@@ -10,6 +10,7 @@ using Image = UnityEngine.UI.Image;
 
 namespace Aerolt.Helpers
 {
+    [RequireComponent(typeof(Image))]
     public class ImageColorer : MonoBehaviour
     {
         public string catagory;
