@@ -130,6 +130,7 @@ namespace Aerolt
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
         private static GameObject settingsUI;
         public ZioConfigFile.ZioConfigFile configFile;
+        public static NetworkUser tempViewer;
 
         public static void CreateHud(HUD hud, ref bool shoulddisplay)
         {
@@ -139,8 +140,9 @@ namespace Aerolt
             if (aeroltUIs.ContainsKey(viewer)) return;
             if (settingsUI && settingsUI.activeSelf) settingsUI.SetActive(false);
 
+            tempViewer = viewer;
             var ui = Instantiate(_co, hud.mainContainer.transform, true);
-            ui.GetComponent<PanelManager>().Initialize(viewer);
+            tempViewer = null;
             ui.transform.localScale = Vector3.one;
             var rect = (RectTransform) ui.transform;
             rect.pivot = new Vector2(0.5f, 0.5f);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
@@ -79,10 +80,15 @@ namespace Aerolt.Managers
         public NetworkUser owner;
         public ZioConfigFile.ZioConfigFile configFile;
 
+        private void Awake()
+        {
+            Initialize(Load.tempViewer);
+        }
+
         public void Initialize(NetworkUser ownerIn)
         {
             owner = ownerIn;
-            GetComponentInChildren<ToggleWindow>().Init(owner);
+            transform.parent.GetComponentInChildren<ToggleWindow>().Init(owner);
             if (ownerIn.localUser != null)
                 configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, $"/Aerolt/Profiles/{ownerIn.localUser.userProfile.fileName}.cfg", true);
         }

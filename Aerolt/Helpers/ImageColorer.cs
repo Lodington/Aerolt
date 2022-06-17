@@ -21,13 +21,14 @@ namespace Aerolt.Helpers
         public ZioConfigEntry<Color> configEntry;
         public static List<ImageColorer> instances = new();
 
-        public void Awake()
+        public void Start()
         {
-            configFile = transform.parent ? GetComponentInParent<PanelManager>().configFile : GetComponent<PanelManager>().configFile;
+            var panelManager = transform.parent ? GetComponentInParent<PanelManager>() : GetComponent<PanelManager>(); 
+            configFile = panelManager ? panelManager.configFile : Load.Instance.configFile;
             image = GetComponent<Image>();
             configEntry = configFile.Bind(catagory, name, image.color, description);
             configEntry.SettingChanged += SettingChanged;
-            SettingChanged(configEntry, null, false);
+            SettingChanged(configEntry, default, false);
             if (instances.Any(x => x.configEntry == configEntry)) return;
             instances.Add(this);
             if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
@@ -47,7 +48,7 @@ namespace Aerolt.Helpers
         public void SettingChanged(ZioConfigEntryBase entryBase, object oldValue, bool ignoreSave)
         {
             var entry = (ZioConfigEntry<Color>) entryBase;
-            if (entry.Value == (Color) oldValue) return;
+            if (entry.Value.Equals(oldValue)) return;
             image.color = entry.Value;
         }
     }
