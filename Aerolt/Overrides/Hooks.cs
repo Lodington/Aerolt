@@ -13,11 +13,11 @@ namespace Aerolt.Overrides
     {
         public static void GetEspData(SceneDirector director)
         {
-            Esp.BarrelInteractions = UnityEngine.Object.FindObjectsOfType<BarrelInteraction>().ToList();
-            Esp.PurchaseInteractions = UnityEngine.Object.FindObjectsOfType<PurchaseInteraction>().ToList();
-            Esp.SecretButtons = UnityEngine.Object.FindObjectsOfType<PressurePlateController>().ToList();
-            Esp.Scrappers = UnityEngine.Object.FindObjectsOfType<ScrapperController>().ToList();
-            Esp.MultiShops = UnityEngine.Object.FindObjectsOfType<MultiShopController>().ToList();
+            Esp.BarrelInteractions = Object.FindObjectsOfType<BarrelInteraction>().ToList();
+            Esp.PurchaseInteractions = Object.FindObjectsOfType<PurchaseInteraction>().ToList();
+            Esp.SecretButtons = Object.FindObjectsOfType<PressurePlateController>().ToList();
+            Esp.Scrappers = Object.FindObjectsOfType<ScrapperController>().ToList();
+            Esp.MultiShops = Object.FindObjectsOfType<MultiShopController>().ToList();
             
             InteractableManager.Cards = director.GenerateInteractableCardSelection().choices.Where(x => x.value != null).Select(x => x.value.spawnCard).ToList();
             
