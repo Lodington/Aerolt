@@ -19,7 +19,6 @@ namespace Aerolt.Managers
         public GameObject stripParent;
         public GameObject stripPrefab;
         
-        public static Dictionary<ItemDef, int> ItemDef = new Dictionary<ItemDef, int>();
         private NetworkUser[] cachedUsers = {};
 
         public void OnEnable()

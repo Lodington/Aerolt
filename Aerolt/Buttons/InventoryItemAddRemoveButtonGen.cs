@@ -34,29 +34,59 @@ namespace Aerolt.Buttons
 			button.GetComponent<Image>().sprite = def.pickupIconSprite;
 			button.GetComponent<Button>().onClick.AddListener(!isDecrease ? Increase : Decrease);
 		}
-		public void Decrease()
+
+		private void Increase()
 		{
-			itemCounts[def]--;
+			Increase(1);
+		}
+
+		private void Decrease()
+		{
+			Decrease(1);
+		}
+
+		public void Decrease(int amount)
+		{
+			itemCounts[def]-=amount;
 			UpdateText();
 
 			if (itemCounts[def] != 0) return;
 			itemCounts.Remove(def);
 			GameObject.Destroy(button);
 		}
-		public void Increase()
+		public void Increase(int amount)
 		{
 			if (!itemCounts.ContainsKey(def))
 			{
 				countRemoveButton = new InventoryItemAddRemoveButtonGen(def, prefab, itemCounts, removeParent);
 				itemCounts.Add(def, 0);
 			}
-			itemCounts[def]++;
+			itemCounts[def] += amount;
 			UpdateText();
 		}
 		public void UpdateText()
 		{
 			var targetButton = isDecrease ? customButton : countRemoveButton.customButton;
 			targetButton.ButtonText.text = $"{Language.GetString(def.nameToken)} x{itemCounts[def]}";
+		}
+
+		public void SetAmount(int i)
+		{
+			if (!itemCounts.ContainsKey(def))
+			{
+				countRemoveButton = new InventoryItemAddRemoveButtonGen(def, prefab, itemCounts, removeParent);
+				itemCounts.Add(def, 0);
+				Increase(i);
+				return;
+			}
+			
+			if (i == 0)
+			{
+				itemCounts.Remove(def);
+				Object.Destroy(countRemoveButton.button.gameObject);
+				return;
+			}
+			Increase(itemCounts[def] - i);
 		}
 	}
 }

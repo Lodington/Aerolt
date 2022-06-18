@@ -1,9 +1,7 @@
-using System;
+using System.Collections.Generic;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
-using UnityEngine.UI;
-using LobbyManager = Aerolt.Managers.LobbyManager;
 
 namespace Aerolt.Buttons
 {
@@ -13,27 +11,34 @@ namespace Aerolt.Buttons
         public GameObject buttonParent;
 
         public GameObject itemListParent;
-        
-        private NetworkUser _user;
-        
-        public EditPlayerItemButton(NetworkUser user)
+
+        public static NetworkUser tempSetUser;
+        private Dictionary<ItemDef, int> itemDef;
+        private Dictionary<ItemDef, InventoryItemAddRemoveButtonGen> itemDefRef;
+        private NetworkUser user;
+
+        public void Awake()
         {
-            _user = user;
+            user = tempSetUser; 
+            foreach (var def in ContentManager._itemDefs)
+                itemDefRef[def] = new InventoryItemAddRemoveButtonGen(def, buttonPrefab, itemDef, itemListParent, buttonParent, false);
         }
 
-        private void OnEnable()
-        {
-            var inventory = _user.master.inventory;
-            //foreach (var def in inventory)
-           // {
-                
-          //  }
-        }
-
-        private void Awake()
+        public void OnEnable()
         {
             foreach (var def in ContentManager._itemDefs)
-                new InventoryItemAddRemoveButtonGen(def, buttonPrefab, LobbyManager.ItemDef, itemListParent, buttonParent, false);
+            {
+                itemDefRef[def].SetAmount(user.master.inventory.GetItemCount(def));
+            }
+        }
+
+        public void GiveItems()
+        {
+            var inv = user.master.inventory;
+            foreach (var pair in itemDef)
+            {
+                inv.GiveItem(pair.Key, inv.GetItemCount(pair.Key) - pair.Value);
+            }
         }
     }
 }
