@@ -5,6 +5,7 @@ using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Aerolt.Classes
@@ -14,6 +15,28 @@ namespace Aerolt.Classes
         private bool infiniteSkills;
         private NetworkUser owner;
         private ZioConfigFile.ZioConfigFile configFile;
+
+        public Toggle godModeToggle;
+        public Toggle infiniteSkillsToggle;
+        public Toggle noClipToggle;
+        public Toggle alwaysSprintToggle;
+        public Toggle doMassiveDamageToggle;
+        public Toggle disableMobSpawnsToggle;
+
+
+        public void InfiniteSkillsToggle()
+        {
+            
+        }
+
+        public void NoClipToggle()
+        {
+            
+        }
+        public void AlwaysSprintToggle(){}
+        public void DoMassiveDamageToggle(){}
+        public void DisableMobSpawnsToggle(){}
+        
 
         public void Awake()
         {
@@ -97,34 +120,16 @@ namespace Aerolt.Classes
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
-                if (networkUser.isLocalPlayer)
-                {
-                    foreach (var itemDef in ContentManager._itemDefs)
-                    {
-                        //plantonhit kills you when you pick it up
-                        // if (itemDef == RoR2Content.Items.PlantOnHit || itemDef == RoR2Content.Items.HealthDecay || itemDef == RoR2Content.Items.TonicAffliction || itemDef == RoR2Content.Items.BurnNearby || itemDef == RoR2Content.Items.CrippleWardOnLevel || itemDef == RoR2Content.Items.Ghost || itemDef == RoR2Content.Items.ExtraLifeConsumed)
-                        //   continue;
-                        //ResetItem sets quantity to 1, RemoveItem removes the last one.
-
-                        networkUser.master.inventory.GiveItem(itemDef, 1);
-                    }
-                }
+                if (!networkUser.isLocalPlayer) continue;
+                foreach (var itemDef in ContentManager._itemDefs)
+                    networkUser.master.inventory.GiveItem(itemDef, 1);
             }
         }
         public void GiveAllItemsToAll()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
-            {
-                foreach (var itemDef in ContentManager._itemDefs)
-                {
-                    //plantonhit kills you when you pick it up
-                    // if (itemDef == RoR2Content.Items.PlantOnHit || itemDef == RoR2Content.Items.HealthDecay || itemDef == RoR2Content.Items.TonicAffliction || itemDef == RoR2Content.Items.BurnNearby || itemDef == RoR2Content.Items.CrippleWardOnLevel || itemDef == RoR2Content.Items.Ghost || itemDef == RoR2Content.Items.ExtraLifeConsumed)
-                    //   continue;
-                    //ResetItem sets quantity to 1, RemoveItem removes the last one.
-
-                    networkUser.master.inventory.GiveItem(itemDef, 1);
-                }
-            }
+            foreach (var itemDef in ContentManager._itemDefs)
+                networkUser.master.inventory.GiveItem(itemDef, 1);
         }
         
         public void AimBot()
