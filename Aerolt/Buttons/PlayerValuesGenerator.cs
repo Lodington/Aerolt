@@ -15,11 +15,6 @@ namespace Aerolt.Buttons
         public GameObject parent;
         public GameObject playerValuePrefab;
 
-        public string[] stats = {
-            "baseRegen","baseMaxShield","baseMoveSpeed","baseAccelerat","baseJumpPower","baseDamage","baseAttackSpe","baseCrit","baseArmor"
-        };
-
-
         public void Awake()
         {
             var user = GetUser.FetchUser(GetComponentInParent<HUD>());

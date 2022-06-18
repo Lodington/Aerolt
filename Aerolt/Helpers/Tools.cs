@@ -5,6 +5,15 @@ namespace Aerolt.Helpers
 {
     public static class Tools
     {
+        
+        public static Boolean CursorIsVisible()
+        {
+            foreach (var mpeventSystem in RoR2.UI.MPEventSystem.readOnlyInstancesList)
+                if (mpeventSystem.isCursorVisible)
+                    return true;
+            return false;
+        }
+        
         public static void Log(Enum level, object s)
         {
             switch (level) 
