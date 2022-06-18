@@ -72,8 +72,8 @@ namespace Aerolt.Buttons
 
 		public void SetAmount(int i)
 		{
-			if (i == 0) return;
 			var prev = itemCounts.ContainsKey(def) ? itemCounts[def] : 0;
+			if (i == 0 && prev == 0) return;
 			Change(i - prev);
 		}
 	}
