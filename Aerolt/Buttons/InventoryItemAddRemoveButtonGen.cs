@@ -37,32 +37,32 @@ namespace Aerolt.Buttons
 
 		private void Increase()
 		{
-			Increase(1);
+			Change(1);
 		}
 
 		private void Decrease()
 		{
-			Decrease(1);
+			Change(-1);
 		}
 
-		public void Decrease(int amount)
+		public void Change(int relativeAmount)
 		{
-			itemCounts[def]-=amount;
-			UpdateText();
-
-			if (itemCounts[def] != 0) return;
-			itemCounts.Remove(def);
-			GameObject.Destroy(button);
-		}
-		public void Increase(int amount)
-		{
-			if (!itemCounts.ContainsKey(def))
+			if (countRemoveButton == null)
 			{
+				if (relativeAmount < 0) return;
+
 				countRemoveButton = new InventoryItemAddRemoveButtonGen(def, prefab, itemCounts, removeParent);
-				itemCounts.Add(def, 0);
+				countRemoveButton.countRemoveButton = this;
+				if (!itemCounts.ContainsKey(def))
+					itemCounts.Add(def, 0);
 			}
-			itemCounts[def] += amount;
+			
+			itemCounts[def] += relativeAmount;
 			UpdateText();
+
+			if (itemCounts[def] > 0) return;
+			GameObject.Destroy(button);
+			countRemoveButton.countRemoveButton = null;
 		}
 		public void UpdateText()
 		{
@@ -72,21 +72,9 @@ namespace Aerolt.Buttons
 
 		public void SetAmount(int i)
 		{
-			if (!itemCounts.ContainsKey(def))
-			{
-				countRemoveButton = new InventoryItemAddRemoveButtonGen(def, prefab, itemCounts, removeParent);
-				itemCounts.Add(def, 0);
-				Increase(i);
-				return;
-			}
-			
-			if (i == 0)
-			{
-				itemCounts.Remove(def);
-				Object.Destroy(countRemoveButton.button.gameObject);
-				return;
-			}
-			Increase(itemCounts[def] - i);
+			if (i == 0) return;
+			var prev = itemCounts.ContainsKey(def) ? itemCounts[def] : 0;
+			Change(i - prev);
 		}
 	}
 }

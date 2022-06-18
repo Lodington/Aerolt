@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Aerolt.Buttons;
+using Aerolt.Enums;
 using Aerolt.Managers;
 using JetBrains.Annotations;
 using RoR2;
@@ -67,8 +69,9 @@ namespace Aerolt.Classes
         public void OpenInventory()
         {
             var panelManager = GetComponentInParent<PanelManager>();
-            panelManager.ShowPanel("EditPlayerItemsView");
-            panelManager.objectPool.GetObjectFromPool("EditPlayerItemsView").GetComponent<EditPlayerItemButton>().Initialize(_user);
+            panelManager.ShowPanel("EditPlayerItemsView", PanelShowBehaviour.HIDE_PREVIOUS);
+            var instance = panelManager._panelInstanceModels.FirstOrDefault(x => x.PanelId == "EditPlayerItemsView");
+            instance?.PanelInstance.GetComponent<EditPlayerItemButton>().Initialize(_user);
         }
     }
 }

@@ -12,14 +12,14 @@ namespace Aerolt.Buttons
 
         public GameObject itemListParent;
         
-        private Dictionary<ItemDef, int> itemDef;
-        private Dictionary<ItemDef, InventoryItemAddRemoveButtonGen> itemDefRef;
+        private Dictionary<ItemDef, int> itemDef = new();
+        private Dictionary<ItemDef, InventoryItemAddRemoveButtonGen> itemDefRef = new();
         private NetworkUser user;
 
         public void Awake()
         {
             foreach (var def in ContentManager._itemDefs)
-                itemDefRef[def] = new InventoryItemAddRemoveButtonGen(def, buttonPrefab, itemDef, itemListParent, buttonParent, false);
+                itemDefRef[def] = new InventoryItemAddRemoveButtonGen(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
         }
 
         public void Initialize(NetworkUser userIn)
@@ -34,9 +34,9 @@ namespace Aerolt.Buttons
         public void GiveItems()
         {
             var inv = user.master.inventory;
-            foreach (var pair in itemDef)
+            foreach (var (key, value) in itemDef)
             {
-                inv.GiveItem(pair.Key, inv.GetItemCount(pair.Key) - pair.Value);
+                inv.GiveItem(key, value - inv.GetItemCount(key));
             }
         }
     }

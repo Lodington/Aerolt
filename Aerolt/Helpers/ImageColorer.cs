@@ -30,6 +30,7 @@ namespace Aerolt.Helpers
             configFile = panelManager ? panelManager.configFile : Load.Instance.configFile;
             who = panelManager ? Load.Name + " " + panelManager.owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
             image = GetComponent<Image>();
+            if (!image) throw new ArgumentNullException($"Missing Image Component on object {gameObject} for ImageColorer.");
             var def = catagory + name;
             var instanceKey = configFile.FilePath.ToString();
             if (!instances.TryGetValue(instanceKey, out var instance))
