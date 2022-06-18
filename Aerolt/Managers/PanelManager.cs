@@ -40,7 +40,10 @@ namespace Aerolt.Managers
                 });
             }
             else
+            {
                 Load.CallPopup("Error", $"Trying to use panelId = {panelId}, but this is not found in the ObjectPool", _objectPool.transform);
+                ShowPanel("Menu");
+            }
         }
 
         public void HideLastPanel()
