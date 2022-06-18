@@ -13,22 +13,22 @@ namespace Aerolt.Managers
     public class PanelManager : MonoBehaviour
     {
         private List<PanelInstanceModel> _panelInstanceModels = new List<PanelInstanceModel>();
-        private ObjectPool _objectPool;
+        public ObjectPool objectPool;
 
         private void Start()
         {
-            _objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
+            objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
             ShowPanel("Menu");
         }
 
         public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS)
         {
-            GameObject panelInstance = _objectPool.GetObjectFromPool(panelId);;
+            GameObject panelInstance = objectPool.GetObjectFromPool(panelId);;
             if (panelInstance != null)
             {
                 if (behaviour == PanelShowBehaviour.HIDE_PREVIOUS && GetAmountPanelsInQueue() > 0)
                 {
-                    panelInstance = _objectPool.GetObjectFromPool(panelId);
+                    panelInstance = objectPool.GetObjectFromPool(panelId);
                     var lastPanel = GetLastPanel();
                     lastPanel?.PanelInstance.SetActive(false);
                 }
@@ -41,7 +41,7 @@ namespace Aerolt.Managers
             }
             else
             {
-                Load.CallPopup("Error", $"Trying to use panelId = {panelId}, but this is not found in the ObjectPool", _objectPool.transform);
+                Load.CallPopup("Error", $"Trying to use panelId = {panelId}, but this is not found in the ObjectPool", objectPool.transform);
                 ShowPanel("Menu");
             }
         }
@@ -53,7 +53,7 @@ namespace Aerolt.Managers
                 var lastPanel = GetLastPanel();
 
                 _panelInstanceModels.Remove(lastPanel);
-                _objectPool.PoolObject(lastPanel.PanelInstance);
+                objectPool.PoolObject(lastPanel.PanelInstance);
 
                 if (GetAmountPanelsInQueue() > 0)
                 {

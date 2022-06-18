@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Aerolt.Buttons;
+using Aerolt.Managers;
+using JetBrains.Annotations;
 using RoR2;
 using RoR2.UI;
 using TMPro;
@@ -9,6 +12,7 @@ using UnityEngine.Networking;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using LobbyManager = Aerolt.Managers.LobbyManager;
+using Object = UnityEngine.Object;
 
 namespace Aerolt.Classes
 {
@@ -59,7 +63,12 @@ namespace Aerolt.Classes
             if (int.TryParse(moneyInputField.text, out int value)) _user.master.money = (uint) value;
             moneyInputField.text = String.Empty;
         }
-        
-        
+
+        public void OpenInventory()
+        {
+            var panelManager = GetComponentInParent<PanelManager>();
+            panelManager.ShowPanel("EditPlayerItemsView");
+            panelManager.objectPool.GetObjectFromPool("EditPlayerItemsView").GetComponent<EditPlayerItemButton>().Initialize(_user);
+        }
     }
 }

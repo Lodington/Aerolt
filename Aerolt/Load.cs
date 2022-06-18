@@ -35,7 +35,7 @@ namespace Aerolt
         private static GameObject _co;
         private static GameObject _op;
         private static GameObject _popup;
-        private static AssetBundle _assets;
+        public static AssetBundle _assets;
         public static Load Instance;
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
