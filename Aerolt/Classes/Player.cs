@@ -131,7 +131,15 @@ namespace Aerolt.Classes
             foreach (var itemDef in ContentManager._itemDefs)
                 networkUser.master.inventory.GiveItem(itemDef, 1);
         }
-        
+
+        public void ClearInventory()
+        {
+            
+        }
+        public void ClearInventoryAll()
+        {
+            
+        }
         public void AimBot()
         {
             if (Tools.CursorIsVisible())

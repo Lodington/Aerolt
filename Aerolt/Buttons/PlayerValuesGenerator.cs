@@ -17,8 +17,10 @@ namespace Aerolt.Buttons
 
         public void Awake()
         {
-
-
+            FieldInfo[] fields = typeof(CharacterBody).GetFields();
+            foreach (var field in fields)
+                if (field.FieldType == typeof(float))
+                    CreateNewStatPrefab(field);
         }
 
         private CharacterBody GetBody()
@@ -30,16 +32,13 @@ namespace Aerolt.Buttons
         private void CreateNewStatPrefab(FieldInfo field)
         {
             var prefab = Instantiate(playerValuePrefab, parent.transform);
-            prefab.GetComponent<TMP_Text>().text = field.Name;
-            var input = prefab.GetComponent<TMP_InputField>();
+            prefab.GetComponentInChildren<TextMeshProUGUI>().text = field.Name;
+            var input = prefab.GetComponentInChildren<TMP_InputField>();
             input.text = field.GetValue(GetBody()).ToString();
             input.m_OnEndEdit.AddListener(result =>
             {
                 var body = GetBody();
-                if (body && float.TryParse(result, out var flot))
-                {
-                    field.SetValue(body, flot);
-                }
+                if (body && float.TryParse(result, out var value)) field.SetValue(body, value);
             });
         }
 
