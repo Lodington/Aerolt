@@ -17,4 +17,10 @@
       <PackageReference Include="Zio" Version="0.7.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="LeanTween, Version=1.0.6223.20226, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\LeanTween.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

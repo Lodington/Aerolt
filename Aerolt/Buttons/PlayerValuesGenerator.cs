@@ -20,36 +20,29 @@ namespace Aerolt.Buttons
         };
 
 
-        public void Start()
+        public void Awake()
         {
             var user = GetUser.FetchUser(GetComponentInParent<HUD>());
             var body = user.cachedMaster.GetBody();
 
-            foreach (var type in typeof(CharacterBody).GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                if (!type.IsAbstract)
-                    continue;
-                
-                foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)) {
-                   
-                    CreateNewStatPrefab(field.Name, field.GetValue(null));
-                }
-                
-            }
+            CreateNewStatPrefab(stats[0], body.baseRegen);
+            CreateNewStatPrefab(stats[1], body.baseMaxHealth);
+            CreateNewStatPrefab(stats[2], body.baseMoveSpeed);
+            CreateNewStatPrefab(stats[3], body.baseAcceleration);
+            CreateNewStatPrefab(stats[4], body.baseJumpPower);
+            CreateNewStatPrefab(stats[5], body.baseDamage);
+            CreateNewStatPrefab(stats[6], body.baseAttackSpeed);
+            CreateNewStatPrefab(stats[7], body.baseCrit);
+            CreateNewStatPrefab(stats[8], body.baseArmor);
             
         }
 
-        private void CreateNewStatPrefab(string statName, object statValue)
+        private void CreateNewStatPrefab(string statName, float statValue)
         {
             var prefab = Instantiate(playerValuePrefab, parent.transform);
             prefab.GetComponent<TMP_Text>().text = statName;
-            //prefab.GetComponent<TMP_InputField>().text = statValue.ToString();
+            prefab.GetComponent<TMP_InputField>().text = statValue.ToString();
         }
-        
-        IEnumerable<FieldInfo> GetAllFields(Type type) {
-            return type.GetNestedTypes().SelectMany(GetAllFields)
-                .Concat(type.GetFields());
-        }
-        
+
     }
 }

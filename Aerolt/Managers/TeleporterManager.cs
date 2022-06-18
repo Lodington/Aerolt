@@ -12,31 +12,29 @@ namespace Aerolt.Managers
         {
             if (!TeleporterInteraction.instance) return;
             typeof(HoldoutZoneController).GetProperty("charge")?.SetValue(TeleporterInteraction.instance.holdoutZoneController, 1f);
-            Tools.Log(Enums.LogLevel.Information, "Charged Teleporter");
+            Chat.AddMessage("<color=yellow>Charged teleporter</color>");
         }
         public void SkipStage()
         {
             Run.instance.AdvanceStage(Run.instance.nextStageScene);
-            Tools.Log(Enums.LogLevel.Information, "Skipped Stage");
+            Chat.AddMessage("<color=yellow>Skipping Stage</color>");
         }
         public void AddMountain()
         {
             TeleporterInteraction.instance.AddShrineStack();
+            Chat.AddMessage("<color=yellow>Added Mountain stack</color>");
         }
         public void SpawnPortals(string portal)
         {
             switch (portal)
             {
                 case "gold":
-                    Chat.AddMessage("<color=yellow>Spawned Gold Portal</color>");
                     TeleporterInteraction.instance.shouldAttemptToSpawnGoldshoresPortal = true;
                     break;
                 case "newt":
-                    Chat.AddMessage("<color=blue>Spawned Newt Portal</color>");
                     TeleporterInteraction.instance.shouldAttemptToSpawnShopPortal = true;
                     break;
                 case "blue":
-                    Chat.AddMessage("<color=cyan>Spawned Celestial Portal</color>");
                     TeleporterInteraction.instance.shouldAttemptToSpawnMSPortal = true;
                     break;
                 case "all":
