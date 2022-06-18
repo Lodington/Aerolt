@@ -17,17 +17,30 @@ namespace Aerolt.Buttons
 
         public void Awake()
         {
-            var user = GetUser.FetchUser(GetComponentInParent<HUD>());
-            var body = user.cachedMaster.GetBody();
 
-            
+
         }
 
-        private void CreateNewStatPrefab(string statName, float statValue)
+        private CharacterBody GetBody()
+        {
+            var user = GetUser.FetchUser(GetComponentInParent<HUD>());
+            return user.cachedMaster.GetBody();
+        }
+
+        private void CreateNewStatPrefab(FieldInfo field)
         {
             var prefab = Instantiate(playerValuePrefab, parent.transform);
-            prefab.GetComponent<TMP_Text>().text = statName;
-            prefab.GetComponent<TMP_InputField>().text = statValue.ToString();
+            prefab.GetComponent<TMP_Text>().text = field.Name;
+            var input = prefab.GetComponent<TMP_InputField>();
+            input.text = field.GetValue(GetBody()).ToString();
+            input.m_OnEndEdit.AddListener(result =>
+            {
+                var body = GetBody();
+                if (body && float.TryParse(result, out var flot))
+                {
+                    field.SetValue(body, flot);
+                }
+            });
         }
 
     }
