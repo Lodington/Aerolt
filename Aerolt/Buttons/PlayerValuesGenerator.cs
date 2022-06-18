@@ -25,15 +25,6 @@ namespace Aerolt.Buttons
             var user = GetUser.FetchUser(GetComponentInParent<HUD>());
             var body = user.cachedMaster.GetBody();
 
-            CreateNewStatPrefab(stats[0], body.baseRegen);
-            CreateNewStatPrefab(stats[1], body.baseMaxHealth);
-            CreateNewStatPrefab(stats[2], body.baseMoveSpeed);
-            CreateNewStatPrefab(stats[3], body.baseAcceleration);
-            CreateNewStatPrefab(stats[4], body.baseJumpPower);
-            CreateNewStatPrefab(stats[5], body.baseDamage);
-            CreateNewStatPrefab(stats[6], body.baseAttackSpeed);
-            CreateNewStatPrefab(stats[7], body.baseCrit);
-            CreateNewStatPrefab(stats[8], body.baseArmor);
             
         }
 
