@@ -1,18 +1,27 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Helpers;
+using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Aerolt.Classes
 {
     public class Player : MonoBehaviour
     {
-        
+        private bool infiniteSkills;
+        private NetworkUser owner;
+        private ZioConfigFile.ZioConfigFile configFile;
+
+        public void Awake()
+        {
+            var panelManager = GetComponentInParent<PanelManager>();
+            owner = panelManager.owner;
+            configFile = panelManager.configFile;
+        }
+
         public void GodModeToggle()
         {
             bool hasNotYetRun = true;
@@ -41,11 +50,49 @@ namespace Aerolt.Classes
             
         }
 
-        public void skillToggle()
+        #region InfiniteSkills
+        public void SkillToggle()
         {
-            var skillLocator = LocalUserManager.GetFirstLocalUser().cachedBody.GetComponent<SkillLocator>();
-            skillLocator.ApplyAmmoPack();
+            var body = owner.GetCurrentBody();
+            if (!infiniteSkills)
+            {
+                owner.master.onBodyStart += MasterBodyStart;
+                owner.master.onBodyDestroyed += MasterDestroyBody;
+                if (body)
+                    body.onSkillActivatedServer += SkillActivated;
+                infiniteSkills = true;
+                return;
+            }
+            
+            owner.master.onBodyStart -= MasterBodyStart;
+            owner.master.onBodyDestroyed -= MasterDestroyBody;
+            if (body)
+                body.onSkillActivatedServer -= SkillActivated;
+            infiniteSkills = false;
         }
+
+        private void MasterBodyStart(CharacterBody obj)
+        {
+            if (infiniteSkills)
+            {
+                obj.onSkillActivatedServer += SkillActivated;
+            }
+        }
+
+        private void SkillActivated(GenericSkill obj)
+        {
+            obj.AddOneStock();
+        }
+
+        private void MasterDestroyBody(CharacterBody obj)
+        {
+            if (infiniteSkills)
+            {
+                obj.onSkillActivatedServer -= SkillActivated;
+            }
+        }
+        #endregion
+
         public void GiveAllItems()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
@@ -119,41 +166,17 @@ namespace Aerolt.Classes
             var body = controller.master.GetBody();
             if (body && !body.isSprinting && !localUser.inputPlayer.GetButton("Sprint"))
                 controller.sprintInputPressReceived = true;
-            
         }
 
         public void KillAllMobs()
         {
-            var localUser = LocalUserManager.GetFirstLocalUser();
-            var controller = localUser.cachedMasterController;
-            if (!controller)
-                return;
-        
-            var body = controller.master.GetBody();
-            if (!body)
-                return;
-
-            var bullseyeSearch = new BullseyeSearch
+            foreach (var characterMaster in CharacterMaster.instancesList.Where(x => x.teamIndex != owner.master.teamIndex))
             {
-                filterByLoS = false,
-                maxDistanceFilter = float.MaxValue,
-                maxAngleFilter = float.MaxValue
-            };
-
-            bullseyeSearch.RefreshCandidates();
-            var hurtBoxList = bullseyeSearch.GetResults();
-            foreach (var hurtbox in hurtBoxList)
-            {
-                var mob = HurtBox.FindEntityObject(hurtbox);
-                string mobName = mob.name.Replace("Body(Clone)", "");
-                if (ContentManager._survivorDefs.Any(x => x.cachedName.Equals(mobName)))
-                    continue;
-
-                var health = mob.GetComponent<HealthComponent>();
-                health.Suicide();
-                Chat.AddMessage($"<color=yellow>Killed {mobName} </color>");
+                var body = characterMaster.GetBody();
+                if (body)
+                    Chat.AddMessage($"<color=yellow>Killed {body.GetDisplayName()} </color>");
+                characterMaster.TrueKill();
             }
-            
         }
         
     }
