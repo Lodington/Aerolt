@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Helpers;
@@ -31,8 +32,22 @@ namespace Aerolt.Classes
 
         public void NoClipToggle()
         {
-            
+            noClipOn = !noClipOn;
+            ApplyNoclip();
         }
+
+        private void ApplyNoclip()
+        {
+            var body = GetBody();
+            if (!body) return;
+            
+            var behavior = body.GetComponent<NoclipBehavior>();
+            if (behavior && !noClipOn)
+                Destroy(behavior);
+            else if (noClipOn && !behavior)
+                body.gameObject.AddComponent<NoclipBehavior>();
+        }
+
         public void AlwaysSprintToggle(){}
         public void DoMassiveDamageToggle(){}
         public void DisableMobSpawnsToggle(){}
@@ -43,6 +58,44 @@ namespace Aerolt.Classes
             var panelManager = GetComponentInParent<PanelManager>();
             owner = panelManager.owner;
             configFile = panelManager.configFile;
+            owner.master.onBodyStart += MasterBodyStart;
+            owner.master.onBodyDestroyed += MasterDestroyBody;
+            
+            ApplyNoclip();
+            noClipToggle.SetIsOnWithoutNotify(noClipOn);
+            infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkills);
+            godModeToggle.SetIsOnWithoutNotify(PlayerCharacterMasterController.instances.Any(x=> x.master.godMode));
+        }
+
+        private void OnDestroy()
+        {
+            owner.master.onBodyStart -= MasterBodyStart;
+            owner.master.onBodyDestroyed -= MasterDestroyBody;
+        }
+
+        private CharacterBody _cachedBody;
+        private bool noClipOn;
+
+        public CharacterBody GetBody()
+        {
+            if (_cachedBody) return _cachedBody;
+            _cachedBody = owner.master.GetBody();
+            return _cachedBody;
+        }
+        
+        private void MasterBodyStart(CharacterBody obj)
+        {
+            if (infiniteSkills)
+            {
+                obj.onSkillActivatedServer += SkillActivated;
+            }
+        }
+        private void MasterDestroyBody(CharacterBody obj)
+        {
+            if (infiniteSkills)
+            {
+                obj.onSkillActivatedServer -= SkillActivated;
+            }
         }
 
         public void GodModeToggle()
@@ -79,40 +132,19 @@ namespace Aerolt.Classes
             var body = owner.GetCurrentBody();
             if (!infiniteSkills)
             {
-                owner.master.onBodyStart += MasterBodyStart;
-                owner.master.onBodyDestroyed += MasterDestroyBody;
                 if (body)
                     body.onSkillActivatedServer += SkillActivated;
                 infiniteSkills = true;
                 return;
             }
-            
-            owner.master.onBodyStart -= MasterBodyStart;
-            owner.master.onBodyDestroyed -= MasterDestroyBody;
             if (body)
                 body.onSkillActivatedServer -= SkillActivated;
             infiniteSkills = false;
         }
-
-        private void MasterBodyStart(CharacterBody obj)
-        {
-            if (infiniteSkills)
-            {
-                obj.onSkillActivatedServer += SkillActivated;
-            }
-        }
-
+        
         private void SkillActivated(GenericSkill obj)
         {
             obj.AddOneStock();
-        }
-
-        private void MasterDestroyBody(CharacterBody obj)
-        {
-            if (infiniteSkills)
-            {
-                obj.onSkillActivatedServer -= SkillActivated;
-            }
         }
         #endregion
 
