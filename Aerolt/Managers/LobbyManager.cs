@@ -20,7 +20,7 @@ namespace Aerolt.Managers
         public GameObject stripPrefab;
         
         private NetworkUser[] cachedUsers = {};
-
+        
         public void OnEnable()
         {
             GameObject StripPrefabInstantiated;

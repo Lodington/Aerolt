@@ -53,6 +53,7 @@ namespace Aerolt
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
+
         }
         public void OnGUI()
         {

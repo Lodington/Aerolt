@@ -38,11 +38,9 @@ namespace Aerolt.Buttons
 
         public void GiveItem(int amount)
         {
-            
             if (!_itemDef)
-            {
-                Load.CallPopup("Error", "Please Selection a item to spawn it", GetComponentInParent<PanelManager>().transform);
-            }
+                Load.CallPopup("Error", "Please Selection a item to spawn it",
+                    GetComponentInParent<PanelManager>().transform);
             var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var inventory = localUser.cachedMasterController.master.inventory;

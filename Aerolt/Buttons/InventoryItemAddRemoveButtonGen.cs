@@ -19,6 +19,11 @@ namespace Aerolt.Buttons
 		private GameObject removeParent;
 		private bool isDecrease;
 
+		
+		//fuck you bubbet i didnt do anything
+		
+		
+		
 		public InventoryItemAddRemoveButtonGen(ItemDef defIn, GameObject prefabIn, Dictionary<ItemDef, int> itemDefDictionary, GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
 		{
 			def = defIn;

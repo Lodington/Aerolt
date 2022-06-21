@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using Aerolt.Enums;
 using Aerolt.Helpers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace Aerolt.Buttons
+namespace Aerolt.Managers
 {
     public class KeyBindManager : MonoBehaviour
     {
