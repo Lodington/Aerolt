@@ -24,10 +24,9 @@ namespace Aerolt.Classes
         public Toggle doMassiveDamageToggle;
         public Toggle disableMobSpawnsToggle;
 
-
         public void InfiniteSkillsToggle()
         {
-            
+            SkillToggle();
         }
 
         public void NoClipToggle()
@@ -48,8 +47,24 @@ namespace Aerolt.Classes
                 body.gameObject.AddComponent<NoclipBehavior>();
         }
 
-        public void AlwaysSprintToggle(){}
-        public void DoMassiveDamageToggle(){}
+        public void AlwaysSprintToggle()
+        {
+            
+        }
+
+
+        private float localBaseDamage;
+        public void DoMassiveDamageToggle()
+        {
+            
+            if (doMassiveDamageToggle)
+            {
+                GetBody().baseDamage = 1000000;
+            }
+            
+            GetBody().baseDamage = localBaseDamage;
+
+        }
         public void DisableMobSpawnsToggle(){}
         
 
@@ -65,6 +80,8 @@ namespace Aerolt.Classes
             noClipToggle.SetIsOnWithoutNotify(noClipOn);
             infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkills);
             godModeToggle.SetIsOnWithoutNotify(PlayerCharacterMasterController.instances.Any(x=> x.master.godMode));
+            
+            localBaseDamage = GetBody().baseDamage;
         }
 
         private void OnDestroy()
@@ -166,11 +183,20 @@ namespace Aerolt.Classes
 
         public void ClearInventory()
         {
-            
+            foreach (var networkUser in NetworkUser.readOnlyInstancesList)
+            {
+                if (!networkUser.isLocalPlayer) continue;
+                foreach (var itemDef in ContentManager._itemDefs)
+                    networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
+            }
         }
         public void ClearInventoryAll()
         {
-            
+            foreach (var networkUser in NetworkUser.readOnlyInstancesList)
+            {
+                foreach (var itemDef in ContentManager._itemDefs)
+                    networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
+            }
         }
         public void AimBot()
         {
