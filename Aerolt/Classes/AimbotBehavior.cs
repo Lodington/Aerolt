@@ -9,16 +9,19 @@ namespace Aerolt.Classes
 	{
 		private CharacterBody body;
 		private InputBankTest inputBank;
+		private TeamIndex team;
 
 		private void Awake()
 		{
 			body = GetComponent<CharacterBody>();
 			inputBank = body.inputBank;
+			team = body.teamComponent.teamIndex;
 		}
 
 		private void FixedUpdate()
 		{
-			var targets = HurtBox.bullseyesList.Where(x => x.healthComponent && x.healthComponent.body && x.healthComponent.body.teamComponent && x.healthComponent.body.teamComponent.teamIndex != body.teamComponent.teamIndex).OrderBy(x => Vector3.Distance(x.transform.position, body.transform.position));
+			var pos = body.transform.position;
+			var targets = HurtBox.bullseyesList.Where(x => x.teamIndex != team).OrderBy(x => Vector3.Distance(x.transform.position, pos));
 			var target = targets.FirstOrDefault();
 			if (!target) return;
 			var aimRay = inputBank.GetAimRay();
