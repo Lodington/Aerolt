@@ -27,7 +27,17 @@ namespace Aerolt.Classes
 
         public void InfiniteSkillsToggle()
         {
-            
+            var body = GetBody();
+            if (!infiniteSkills)
+            {
+                if (body)
+                    body.onSkillActivatedServer += SkillActivated;
+                infiniteSkills = true;
+                return;
+            }
+            if (body)
+                body.onSkillActivatedServer -= SkillActivated;
+            infiniteSkills = false;
         }
 
         public void NoClipToggle()
@@ -49,8 +59,15 @@ namespace Aerolt.Classes
         }
 
         public void AlwaysSprintToggle(){}
-        public void DoMassiveDamageToggle(){}
-        public void DisableMobSpawnsToggle(){}
+        public void DoMassiveDamageToggle(){} // Do we still need this? the body stats do the same job
+
+        public void DisableMobSpawnsToggle()
+        {
+            foreach (var director in CombatDirector.instancesList)
+            {
+                director.monsterSpawnTimer = disableMobSpawnsToggle.isOn ? float.PositiveInfinity : 0f;
+            }
+        }
         
 
         public void Awake()
@@ -113,46 +130,28 @@ namespace Aerolt.Classes
 
         public void RollRandomItems()
         {
-            var localUser = LocalUserManager.GetFirstLocalUser();
+            var localUser = GetBody();
             WeightedSelection<List<PickupIndex>> weightedSelection = new WeightedSelection<List<PickupIndex>>(8);
             weightedSelection.AddChoice(Run.instance.availableTier1DropList, 80f);
             weightedSelection.AddChoice(Run.instance.availableTier2DropList, 19f);
             weightedSelection.AddChoice(Run.instance.availableTier3DropList, 1f);
             for (int i = 0; i < Random.Range(0, 100); i++)
             {
-                List<PickupIndex> list = weightedSelection.Evaluate(UnityEngine.Random.value);
-                localUser.cachedMaster.inventory.GiveItem(list[UnityEngine.Random.Range(0, list.Count)].itemIndex, Random.Range(0, 100));
+                List<PickupIndex> list = weightedSelection.Evaluate(Random.value);
+                var def = PickupCatalog.GetPickupDef(list[Random.Range(0, list.Count)]);
+                if (def == null) continue;
+                localUser.inventory.GiveItem(def.itemIndex, Random.Range(0, 100));
             }
             
         }
-
-        #region InfiniteSkills
-        public void SkillToggle()
-        {
-            var body = owner.GetCurrentBody();
-            if (!infiniteSkills)
-            {
-                if (body)
-                    body.onSkillActivatedServer += SkillActivated;
-                infiniteSkills = true;
-                return;
-            }
-            if (body)
-                body.onSkillActivatedServer -= SkillActivated;
-            infiniteSkills = false;
-        }
         
-        private void SkillActivated(GenericSkill obj)
-        {
-            obj.AddOneStock();
-        }
-        #endregion
+        private void SkillActivated(GenericSkill obj) => obj.AddOneStock();
 
         public void GiveAllItems()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
-                if (!networkUser.isLocalPlayer) continue;
+                if (!networkUser.isLocalPlayer) continue; // why
                 foreach (var itemDef in ContentManager._itemDefs)
                     networkUser.master.inventory.GiveItem(itemDef, 1);
             }
@@ -166,13 +165,24 @@ namespace Aerolt.Classes
 
         public void ClearInventory()
         {
-            
+            var stacks = owner.master.inventory.itemStacks;
+            for (var i = 0; i < stacks.Length; i++)
+            {
+                stacks[i] = 0; // I dont know if this works
+            }
         }
         public void ClearInventoryAll()
         {
-            
+            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+            {
+                var stacks = playerCharacterMasterController.master.inventory.itemStacks;
+                for (var i = 0; i < stacks.Length; i++)
+                {
+                    stacks[i] = 0;
+                }
+            }
         }
-        public void AimBot()
+        public void AimBot() // TODO turn this into a component
         {
             if (Tools.CursorIsVisible())
                 return;
@@ -203,7 +213,7 @@ namespace Aerolt.Classes
                 inputBank.aimDirection = direction;
             }
         }
-        public void AlwaysSprint()
+        public void AlwaysSprint() // TODO turn this into a component
         {
             var localUser = LocalUserManager.GetFirstLocalUser();
             if (localUser == null || localUser.cachedMasterController == null || localUser.cachedMasterController.master == null) return;
