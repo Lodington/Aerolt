@@ -134,18 +134,17 @@ namespace Aerolt.Classes
         }
         public static void DrawPurchaseInteractables()
         {
-            foreach (PurchaseInteraction purchaseInteraction in PurchaseInteractions)
+            foreach (var purchaseInteraction in PurchaseInteractions)
             {
-                if (purchaseInteraction.available)
-                {
-                    var chest = purchaseInteraction.GetComponent<ChestBehavior>();
-                    var multiShop = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
-                    if (chest && Instance.showChestToggle.isOn) 
-                        ShowChest(chest, purchaseInteraction);
+                if (!purchaseInteraction || !purchaseInteraction.available) continue;
+                
+                var chest = purchaseInteraction.GetComponent<ChestBehavior>();
+                var multiShop = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
+                if (chest && Instance.showChestToggle.isOn) 
+                    ShowChest(chest, purchaseInteraction);
 
-                    if (multiShop && Instance.showMultiShopToggle.isOn) 
-                        ShowShop(multiShop, purchaseInteraction);
-                }
+                if (multiShop && Instance.showMultiShopToggle.isOn) 
+                    ShowShop(multiShop, purchaseInteraction);
             }
         }
         

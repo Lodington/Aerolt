@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Aerolt.Helpers;
 using RoR2;
@@ -10,22 +11,45 @@ namespace Aerolt.Classes
 		private CharacterBody body;
 		private InputBankTest inputBank;
 		private TeamIndex team;
+		private Vector3 direction;
+		private BullseyeSearch search;
 
 		private void Awake()
 		{
 			body = GetComponent<CharacterBody>();
 			inputBank = body.inputBank;
 			team = body.teamComponent.teamIndex;
+			search = new BullseyeSearch
+			{
+				teamMaskFilter = TeamMask.AllExcept(team),
+				viewer = body
+			};
 		}
 
 		private void FixedUpdate()
 		{
+			var ray = inputBank.GetAimRay();
+			search.searchOrigin = ray.origin;
+			search.searchDirection = ray.direction;
+			search.RefreshCandidates();
+			search.candidatesEnumerable = search.candidatesEnumerable.OrderBy(x => -x.dot * x.distanceSqr + (x.hurtBox.isSniperTarget ? -100 : 0));
+			var target = search.GetResults().FirstOrDefault();
+			if (!target) return;
+			direction = target.transform.position - ray.origin;
+		}
+		/*
+		private void FixedUpdate()
+		{
 			var pos = body.transform.position;
-			var targets = HurtBox.bullseyesList.Where(x => x.teamIndex != team).OrderBy(x => Vector3.Distance(x.transform.position, pos));
+			var targets = HurtBox.bullseyesList.Where(x => x.teamIndex != team).OrderBy(x => Vector3.Distance(x.transform.position, pos) + (x.isSniperTarget ? -1000 : 0));
 			var target = targets.FirstOrDefault();
 			if (!target) return;
 			var aimRay = inputBank.GetAimRay();
-			var direction = target.transform.position - aimRay.origin;
+			direction = target.transform.position - aimRay.origin;
+		}*/
+
+		private void Update()
+		{
 			inputBank.aimDirection = direction;
 		}
 
