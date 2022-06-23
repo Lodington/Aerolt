@@ -16,7 +16,7 @@ namespace Aerolt.Classes
 			inputBank = body.inputBank;
 		}
 
-		private void Update()
+		private void FixedUpdate()
 		{
 			var targets = HurtBox.bullseyesList.Where(x => x.healthComponent && x.healthComponent.body && x.healthComponent.body.teamComponent && x.healthComponent.body.teamComponent.teamIndex != body.teamComponent.teamIndex).OrderBy(x => Vector3.Distance(x.transform.position, body.transform.position));
 			var target = targets.FirstOrDefault();
