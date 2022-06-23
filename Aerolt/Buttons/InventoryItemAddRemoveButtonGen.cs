@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Rewired;
 using RoR2;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,11 +20,6 @@ namespace Aerolt.Buttons
 		private GameObject removeParent;
 		private bool isDecrease;
 
-		
-		//fuck you bubbet i didnt do anything
-		
-		
-		
 		public InventoryItemAddRemoveButtonGen(ItemDef defIn, GameObject prefabIn, Dictionary<ItemDef, int> itemDefDictionary, GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
 		{
 			def = defIn;
@@ -39,14 +35,25 @@ namespace Aerolt.Buttons
 			button.GetComponent<Image>().sprite = def.pickupIconSprite;
 			button.GetComponent<Button>().onClick.AddListener(!isDecrease ? Increase : Decrease);
 		}
-
+		
+		
 		private void Increase()
 		{
+			if (Input.GetKey(KeyCode.LeftShift))
+			{
+				Change(5);
+				return;
+			}
 			Change(1);
 		}
 
 		private void Decrease()
 		{
+			if (Input.GetKey(KeyCode.LeftShift))
+			{
+				Change(-itemCounts[def]);
+				return;
+			}
 			Change(-1);
 		}
 

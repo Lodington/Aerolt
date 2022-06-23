@@ -24,7 +24,6 @@ namespace Aerolt.Classes
         public Toggle doMassiveDamageToggle;
         public Toggle disableMobSpawnsToggle;
 
-
         public void InfiniteSkillsToggle()
         {
             var body = GetBody();
@@ -59,8 +58,19 @@ namespace Aerolt.Classes
         }
 
         public void AlwaysSprintToggle(){}
-        public void DoMassiveDamageToggle(){} // Do we still need this? the body stats do the same job
+        
+        private float localBaseDamage;
+        public void DoMassiveDamageToggle() // Do we still need this? the body stats do the same job
+        {
+            
+            if (doMassiveDamageToggle)
+            {
+                GetBody().baseDamage = 1000000;
+            }
+            
+            GetBody().baseDamage = localBaseDamage;
 
+        }
         public void DisableMobSpawnsToggle()
         {
             foreach (var director in CombatDirector.instancesList)
@@ -82,6 +92,8 @@ namespace Aerolt.Classes
             noClipToggle.SetIsOnWithoutNotify(noClipOn);
             infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkills);
             godModeToggle.SetIsOnWithoutNotify(PlayerCharacterMasterController.instances.Any(x=> x.master.godMode));
+            
+            localBaseDamage = GetBody().baseDamage;
         }
 
         private void OnDestroy()
@@ -165,21 +177,19 @@ namespace Aerolt.Classes
 
         public void ClearInventory()
         {
-            var stacks = owner.master.inventory.itemStacks;
-            for (var i = 0; i < stacks.Length; i++)
+            foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
-                stacks[i] = 0; // I dont know if this works
+                if (!networkUser.isLocalPlayer) continue;
+                foreach (var itemDef in ContentManager._itemDefs)
+                    networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
             }
         }
         public void ClearInventoryAll()
         {
-            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+            foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
-                var stacks = playerCharacterMasterController.master.inventory.itemStacks;
-                for (var i = 0; i < stacks.Length; i++)
-                {
-                    stacks[i] = 0;
-                }
+                foreach (var itemDef in ContentManager._itemDefs)
+                    networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
             }
         }
         public void AimBot() // TODO turn this into a component
