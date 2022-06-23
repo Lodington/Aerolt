@@ -23,6 +23,7 @@ namespace Aerolt.Classes
         public Toggle alwaysSprintToggle;
         public Toggle doMassiveDamageToggle;
         public Toggle disableMobSpawnsToggle;
+        public Toggle aimbotToggle;
 
         public void InfiniteSkillsToggle()
         {
@@ -57,15 +58,34 @@ namespace Aerolt.Classes
                 body.gameObject.AddComponent<NoclipBehavior>();
         }
 
+        public void AimbotToggle()
+        {
+            aimbotOn = !aimbotOn;
+            ApplyAimbot();
+        }
+
+        public void ApplyAimbot()
+        {
+            var body = GetBody();
+            if (!body) return;
+            
+            var behavior = body.GetComponent<AimbotBehavior>();
+            if (behavior && !aimbotOn)
+                Destroy(behavior);
+            else if (aimbotOn && !behavior)
+                body.gameObject.AddComponent<AimbotBehavior>();
+        }
+
         public void AlwaysSprintToggle(){}
         
         private float localBaseDamage;
         public void DoMassiveDamageToggle() // Do we still need this? the body stats do the same job
         {
             
-            if (doMassiveDamageToggle)
+            if (doMassiveDamageToggle.isOn)
             {
                 GetBody().baseDamage = 1000000;
+                return;
             }
             
             GetBody().baseDamage = localBaseDamage;
@@ -74,9 +94,7 @@ namespace Aerolt.Classes
         public void DisableMobSpawnsToggle()
         {
             foreach (var director in CombatDirector.instancesList)
-            {
                 director.monsterSpawnTimer = disableMobSpawnsToggle.isOn ? float.PositiveInfinity : 0f;
-            }
         }
         
 
@@ -90,6 +108,8 @@ namespace Aerolt.Classes
             
             ApplyNoclip();
             noClipToggle.SetIsOnWithoutNotify(noClipOn);
+            ApplyAimbot();
+            aimbotToggle.SetIsOnWithoutNotify(aimbotOn);
             infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkills);
             godModeToggle.SetIsOnWithoutNotify(PlayerCharacterMasterController.instances.Any(x=> x.master.godMode));
             
@@ -104,6 +124,7 @@ namespace Aerolt.Classes
 
         private CharacterBody _cachedBody;
         private bool noClipOn;
+        private bool aimbotOn;
 
         public CharacterBody GetBody()
         {
@@ -190,37 +211,6 @@ namespace Aerolt.Classes
             {
                 foreach (var itemDef in ContentManager._itemDefs)
                     networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
-            }
-        }
-        public void AimBot() // TODO turn this into a component
-        {
-            if (Tools.CursorIsVisible())
-                return;
-            var localUser = LocalUserManager.GetFirstLocalUser();
-            var controller = localUser.cachedMasterController;
-            if (!controller)
-                return;
-            var body = controller.master.GetBody();
-            if (!body)
-                return;
-            var inputBank = body.GetComponent<InputBankTest>();
-            var aimRay = new Ray(inputBank.aimOrigin, inputBank.aimDirection);
-            var bullseyeSearch = new BullseyeSearch();
-            var team = body.GetComponent<TeamComponent>();
-            bullseyeSearch.teamMaskFilter = TeamMask.all;
-            bullseyeSearch.teamMaskFilter.RemoveTeam(team.teamIndex);
-            bullseyeSearch.filterByLoS = true;
-            bullseyeSearch.searchOrigin = aimRay.origin;
-            bullseyeSearch.searchDirection = aimRay.direction;
-            bullseyeSearch.sortMode = BullseyeSearch.SortMode.Distance;
-            bullseyeSearch.maxDistanceFilter = float.MaxValue;
-            bullseyeSearch.maxAngleFilter = 20f;// ;// float.MaxValue;
-            bullseyeSearch.RefreshCandidates();
-            var hurtBox = bullseyeSearch.GetResults().FirstOrDefault();
-            if (hurtBox)
-            {
-                Vector3 direction = hurtBox.transform.position - aimRay.origin;
-                inputBank.aimDirection = direction;
             }
         }
         public void AlwaysSprint() // TODO turn this into a component
