@@ -18,7 +18,6 @@ namespace Aerolt.Helpers
 		{
 			targetTransform = (RectTransform) transform;
 			var panelManager = targetTransform.parent ? GetComponentInParent<PanelManager>() : GetComponent<PanelManager>();
-			if (!panelManager) throw new Exception($"Panel manager not found for object {this}");
 			var configFile = panelManager ? panelManager.configFile : Load.Instance.configFile;
 			configEntry = configFile.Bind("Window Positions", windowName, (Vector2) targetTransform.localPosition, "Stored position of this window.");
 			targetTransform.localPosition = configEntry.Value;
