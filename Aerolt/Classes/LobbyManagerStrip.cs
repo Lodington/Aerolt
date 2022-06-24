@@ -75,7 +75,7 @@ namespace Aerolt.Classes
         public void OpenInventory()
         {
             var panelManager = GetComponentInParent<PanelManager>();
-            panelManager.ShowPanel("EditPlayerItemsView", PanelShowBehaviour.HIDE_PREVIOUS, true);
+            panelManager.ShowPanel("EditPlayerItemsView", PanelShowBehaviour.HIDE_PREVIOUS, false);
             var instance = panelManager._panelInstanceModels.FirstOrDefault(x => x.PanelId == "EditPlayerItemsView");
             instance?.PanelInstance.GetComponent<EditPlayerItemButton>().Initialize(_user);
         }
