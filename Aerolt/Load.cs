@@ -42,7 +42,7 @@ namespace Aerolt
         public static Load Instance;
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
-        public async void Awake()
+        public void Awake()
         {
             Instance = this;
             Log = Logger;

@@ -13,6 +13,7 @@ using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Console = RoR2.Console;
 using LobbyManager = Aerolt.Managers.LobbyManager;
 using Object = UnityEngine.Object;
 
@@ -77,6 +78,22 @@ namespace Aerolt.Classes
             panelManager.ShowPanel("EditPlayerItemsView", PanelShowBehaviour.HIDE_PREVIOUS);
             var instance = panelManager._panelInstanceModels.FirstOrDefault(x => x.PanelId == "EditPlayerItemsView");
             instance?.PanelInstance.GetComponent<EditPlayerItemButton>().Initialize(_user);
+        }
+        
+        public void KickPlayer()
+        {
+            Console.instance.RunClientCmd(_user, "kick_steam", new string[]
+            {
+                _user.Network_id.steamId.ToString()
+            });
+        }
+
+        public void BanPlayer()
+        {
+            Console.instance.RunClientCmd(_user, "ban_steam", new string[]
+            {
+                _user.Network_id.steamId.ToString()
+            });
         }
     }
 }

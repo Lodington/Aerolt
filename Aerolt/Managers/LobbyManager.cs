@@ -48,7 +48,7 @@ namespace Aerolt.Managers
             cachedUsers = array;
         }
         
-        public NetworkUser GetNetUserFromString(string playerString)
+        public static NetworkUser GetNetUserFromString(string playerString)
         {
             if (playerString != "")
                 
@@ -69,21 +69,7 @@ namespace Aerolt.Managers
             return null;
         }
 
-        public void KickPlayer(TMP_Text playerName)
-        {
-            Console.instance.RunClientCmd(_localPlayer, "kick_steam", new string[]
-            {
-                GetNetUserFromString(playerName.text).Network_id.steamId.ToString()
-            });
-        }
 
-        public void BanPlayer(TMP_Text playerName)
-        {
-            Console.instance.RunClientCmd(_localPlayer, "ban_steam", new string[]
-            {
-                GetNetUserFromString(playerName.text).Network_id.steamId.ToString()
-            });
-        }
 
     }
 }
