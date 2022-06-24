@@ -1,4 +1,5 @@
-﻿using Aerolt.Enums;
+﻿using System;
+using Aerolt.Enums;
 using RoR2;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace Aerolt.Classes
         private bool _menuIsOpen = true;
 
         public GameObject panel;
-        public NetworkUser owner;
+        [NonSerialized] public NetworkUser owner;
 
         public void Init(NetworkUser owner)
         {

@@ -13,7 +13,7 @@ namespace Aerolt.Managers
     public class PanelManager : MonoBehaviour
     {
         public List<PanelInstanceModel> _panelInstanceModels = new List<PanelInstanceModel>();
-        public ObjectPool objectPool;
+        [NonSerialized] public ObjectPool objectPool;
 
         private void Start()
         {
