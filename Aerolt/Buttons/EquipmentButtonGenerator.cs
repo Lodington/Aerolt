@@ -39,7 +39,7 @@ namespace Aerolt.Buttons
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>();
 
-            inventory.GiveEquipmentString(_equipmentDef.name);
+            inventory.SetEquipmentIndex(_equipmentDef.equipmentIndex);
         }
         
         public void DropEquipment(int amount = 1)
