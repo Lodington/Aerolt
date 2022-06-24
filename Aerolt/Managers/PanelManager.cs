@@ -18,7 +18,7 @@ namespace Aerolt.Managers
         private void Start()
         {
             objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
-            ShowPanel("Menu");
+            ShowPanel("Menu", showBack: false);
         }
 
         public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS, bool showBack = true)
