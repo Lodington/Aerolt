@@ -32,14 +32,17 @@ namespace Aerolt
         public const string Guid = "com.Lodington." + Name;
         public const string Version = "1.4.0";
         public static ManualLogSource Log;
-        private static GameObject _co;
+        public static GameObject _co;
         private static GameObject _op;
         private static GameObject _popup;
         public static AssetBundle _assets;
+
+        public static GameObject settingsRoot;
+        
         public static Load Instance;
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
-        public void Awake()
+        public async void Awake()
         {
             Instance = this;
             Log = Logger;
@@ -54,6 +57,7 @@ namespace Aerolt
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
 
+            
         }
         public void OnGUI()
         {
@@ -107,17 +111,18 @@ namespace Aerolt
             // create settings menu;
             CreateKeyBindSettings();
             Colors.InitColors();
-            var settingsRoot = Instantiate(_op);
+            settingsRoot = Instantiate(_op);
             settingsUI = settingsRoot.transform.Find("SettingUIPanel").gameObject;
             settingsUI.SetActive(false);
             DontDestroyOnLoad(settingsRoot);
-            var welcomeMessage = "The menu will be available in game! \nJoin my discord \nNow With controller support";
+            var welcomeMessage = DailyMessage.GetMessage();
             var config = configFile.Bind("DoNotTouch", "WelcomeMessage", "", "");
             if (config.Value != welcomeMessage)
             {
                 CallPopup($"Welcome To Aerolt v{Version}", welcomeMessage, settingsRoot.transform);
                 config.Value = welcomeMessage;
             }
+            
         }
 
         private void CreateKeyBindSettings()
