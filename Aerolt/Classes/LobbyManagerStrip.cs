@@ -44,8 +44,13 @@ namespace Aerolt.Classes
             lunarCoinsInputField.m_OnEndEdit.AddListener(UpdateLunarCoin);
             voidMarkersInputField.m_OnEndEdit.AddListener(UpdateVoidMarkers);
         }
-        
-        
+
+        public void FixedUpdate()
+        {
+            ((TextMeshProUGUI) moneyInputField.placeholder).text = _user.master.money.ToString();
+            ((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = _user.lunarCoins.ToString();
+            ((TextMeshProUGUI) voidMarkersInputField.placeholder).text = _user.master.voidCoins.ToString();
+        }
 
         private void UpdateVoidMarkers(string arg0)
         {
