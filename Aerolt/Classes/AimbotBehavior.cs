@@ -32,7 +32,7 @@ namespace Aerolt.Classes
 			search.searchOrigin = ray.origin;
 			search.searchDirection = ray.direction;
 			search.RefreshCandidates();
-			search.candidatesEnumerable = search.candidatesEnumerable.OrderBy(x => -x.dot * x.distanceSqr + (x.hurtBox.isSniperTarget ? -100 : 0));
+			search.candidatesEnumerable = search.candidatesEnumerable.OrderBy(x => -x.dot * x.distanceSqr + (x.hurtBox.isSniperTarget ? -10000 : 0));
 			var target = search.GetResults().FirstOrDefault();
 			if (!target) return;
 			direction = target.transform.position - ray.origin;

@@ -21,7 +21,7 @@ namespace Aerolt.Managers
             ShowPanel("Menu");
         }
 
-        public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS)
+        public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS, bool showBack = true)
         {
             GameObject panelInstance = objectPool.GetObjectFromPool(panelId);;
             if (panelInstance != null)
@@ -32,6 +32,8 @@ namespace Aerolt.Managers
                     var lastPanel = GetLastPanel();
                     lastPanel?.PanelInstance.SetActive(false);
                 }
+
+                backButton.SetActive(showBack);
 
                 _panelInstanceModels.Add(new PanelInstanceModel
                 {
@@ -82,6 +84,7 @@ namespace Aerolt.Managers
 
         [NonSerialized] public NetworkUser owner;
         [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
+        public GameObject backButton;
 
         private void Awake()
         {
