@@ -23,6 +23,7 @@ namespace Aerolt.Helpers
         [NonSerialized] public ZioConfigEntry<Color> configEntry;
         public static Dictionary<string, Dictionary<string, ZioConfigEntry<Color>>> instances = new();
         private string who;
+        private ZioConfigEntry<Color> globalEntry;
 
         public void Start()
         {
@@ -39,6 +40,18 @@ namespace Aerolt.Helpers
                 instances.Add(instanceKey, instance);
             }
 
+            if (!instance.TryGetValue("globalcolor", out globalEntry))
+            {
+                globalEntry = configFile.Bind("Global Color", "Global Color", (Color) new Color32(35, 180, 151, 255), description);
+                instance.Add("globalcolor", globalEntry);
+                globalEntry.SettingChanged += (_, _, _) =>
+                {
+                    foreach(var config in instance.Values) config.Value = globalEntry.Value;
+                };  
+                if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
+                    MakeRiskOfOptionsGlobal();
+            }
+            
             if (!instance.TryGetValue(def, out configEntry))
             {
                 configEntry = configFile.Bind(catagory, name, image.color, description);
@@ -48,6 +61,11 @@ namespace Aerolt.Helpers
             }
             configEntry.SettingChanged += SettingChanged;
             SettingChanged(configEntry, default, false);
+        }
+
+        private void MakeRiskOfOptionsGlobal()
+        {
+            ModSettingsManager.AddOption(new ZioColorOption(globalEntry),who, who);
         }
 
         private void OnDestroy()
