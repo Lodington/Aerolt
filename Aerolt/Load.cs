@@ -71,7 +71,10 @@ namespace Aerolt
             GameObject popup = Instantiate(_popup, parent);
             popup.GetComponent<PopupManager>().SetupPopup(title, message);
         }
-        
+        public static void CallPopup(string title, string body)
+        {
+            CallPopup(title,body, settingsRoot.transform);
+        }
         
         public void Start()
         {
