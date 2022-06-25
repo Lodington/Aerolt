@@ -14,11 +14,13 @@ namespace Aerolt.Classes
         {
             try
             {
-                var json = new WebClient().DownloadString("http://170.187.136.238:3000");
+
+                var json = new WebClient().DownloadString("https://panel.lodington.dev");
                 var message = JsonConvert.DeserializeObject<Message>(json);
 
                 return message.message;
                 //Tools.Log(LogLevel.Debug, message.message);
+
             }
             catch (Exception e)
             {
