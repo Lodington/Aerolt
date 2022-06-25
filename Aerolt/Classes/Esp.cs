@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Aerolt.Helpers;
 using Aerolt.Managers;
 using AK.Wwise;
@@ -24,6 +25,7 @@ namespace Aerolt.Classes
         public Toggle showChestToggle;
         public Toggle showChestAdvancedToggle;
         public Toggle showMultiShopToggle;
+        public Toggle showShopAdvancedToggle;
         public Toggle showBarrelToggle;
         public Toggle showScrapperToggle;
         public Toggle ShowSecretToggle;
@@ -34,14 +36,58 @@ namespace Aerolt.Classes
         {
             if (Instance.showTeleporterToggle.isOn)
                 ShowTeleporter();
-            if (Instance.showChestToggle.isOn || Instance.showMultiShopToggle.isOn)
+            if (Instance.showChestToggle.isOn)
                 DrawPurchaseInteractables();
+            if (Instance.showMultiShopToggle.isOn)
+                DrawShops();
             if (Instance.showBarrelToggle.isOn)
                 DrawBarrelInteractables();
             if (Instance.showScrapperToggle.isOn)
                 DrawScrapperInteractables();
             if (Instance.ShowSecretToggle.isOn)
                 DrawSecretInteractables();
+        }
+
+        private static void DrawShops()
+        {
+            var str = new StringBuilder();
+            foreach (var multiShopController in MultiShops)
+            {
+                str.Clear();
+                var transform1 = multiShopController.transform;
+                var position = transform1.position + transform1.up * 1.5f;
+                var distanceToObject = Mathf.RoundToInt(Vector3.Distance(Camera.main.transform.position, position));
+                var advanced = CheckCursorPosition(position) || Instance.showShopAdvancedToggle && Instance.showShopAdvancedToggle.isOn;
+                if (advanced)
+                    str.AppendLine("Multi Shop Terminal"); // TODO use lang token
+                var costSet = false;
+                foreach (var o in multiShopController.terminalGameObjects)
+                {
+                    var shop = o.GetComponent<ShopTerminalBehavior>();
+                    var pickupDef = PickupCatalog.GetPickupDef(shop.pickupIndex);
+                    if (pickupDef == null) continue;
+                    if (!costSet)
+                    {
+                        costSet = true;
+                        if (advanced)
+                        {
+                            str.Append(distanceToObject + "m ");
+                            str.AppendLine("$" + shop.GetComponent<PurchaseInteraction>().cost);
+                        }
+                        else
+                        {
+                            str.AppendLine("+");
+                            break;
+                        }
+                    }
+                    if (pickupDef.itemIndex != ItemIndex.None)
+                        str.AppendLine("- " + Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken));
+                    if (pickupDef.equipmentIndex != EquipmentIndex.None)
+                        str.AppendLine("- " + Language.GetString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).nameToken));
+                }
+                if (!costSet) continue;
+                Helper.DrawESPLabel(position, Colors.GetColor("Shop"), Color.clear, str.ToString());
+            }
         }
 
         public void Start()
@@ -139,12 +185,14 @@ namespace Aerolt.Classes
                 if (!purchaseInteraction || !purchaseInteraction.available) continue;
                 
                 var chest = purchaseInteraction.GetComponent<ChestBehavior>();
-                var multiShop = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
+                //var multiShop = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
                 if (chest && Instance.showChestToggle.isOn) 
                     ShowChest(chest, purchaseInteraction);
 
+                /*
                 if (multiShop && Instance.showMultiShopToggle.isOn) 
                     ShowShop(multiShop, purchaseInteraction);
+                    */
             }
         }
         

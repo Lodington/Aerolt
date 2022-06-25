@@ -13,6 +13,7 @@ namespace Aerolt.Helpers
         public static readonly Dictionary<string, Color32> DefaultColors = new Dictionary<string, Color32>()
         {
             {"Chest", Color.red},
+            {"Shop", Color.red},
             {"Secret_Plates", Color.cyan},
             {"Barrels", new Color32(255, 128, 0, 255)},
             {"Scrappers", Color.blue}
