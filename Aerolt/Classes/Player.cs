@@ -187,6 +187,7 @@ namespace Aerolt.Classes
             foreach (var playerInstance in PlayerCharacterMasterController.instances)
             {
                 playerInstance.master.godMode = godModeEntry.Value;
+                playerInstance.master.UpdateBodyGodMode();
             }
         }
 
