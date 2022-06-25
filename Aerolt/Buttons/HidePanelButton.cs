@@ -12,7 +12,6 @@ namespace Aerolt.Buttons
             _panelManager = GetComponentInParent<PanelManager>();
         }
 
-
         public void DoHidePanel()
         {
             _panelManager.HideLastPanel();
