@@ -46,7 +46,12 @@ namespace Aerolt.Classes
 					distanceSqr = vector.sqrMagnitude
 				};
 				return info;
-			}).Where(x => x.hurtBox.teamIndex != team).OrderByDescending(x => -x.dot * x.distanceSqr + (x.hurtBox.isSniperTarget ? 10000 : 0));
+			}).Where(x =>
+			{
+				var dir = x.hurtBox.transform.position - ray.origin;
+				var passesLos = !Physics.Raycast(ray.origin, dir, out _, dir.magnitude, LayerIndex.world.mask, QueryTriggerInteraction.UseGlobal);
+				return x.hurtBox.teamIndex != team && passesLos;
+			}).OrderByDescending(x => -x.dot * 10 * x.distanceSqr + (x.hurtBox.isSniperTarget ? 10000 : 0));
 			//var targets = search.candidatesEnumerable;
 			var target = targets.FirstOrDefault();
 			if (target.Equals(default) || !target.hurtBox)
