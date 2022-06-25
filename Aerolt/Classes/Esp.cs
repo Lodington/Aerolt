@@ -8,6 +8,7 @@ using RoR2;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using ZioConfigFile;
 
 namespace Aerolt.Classes
 {
@@ -31,6 +32,14 @@ namespace Aerolt.Classes
         public Toggle ShowSecretToggle;
         
         public static Esp Instance;
+        private ZioConfigEntry<bool> teleporterEntry;
+        private ZioConfigEntry<bool> chestEntry;
+        private ZioConfigEntry<bool> shopEntry;
+        private ZioConfigEntry<bool> chestAdvancedEntry;
+        private ZioConfigEntry<bool> shopAdvancedEntry;
+        private ZioConfigEntry<bool> barrelEntry;
+        private ZioConfigEntry<bool> scrapperEntry;
+        private ZioConfigEntry<bool> secretEntry;
 
         public static void Draw()
         {
@@ -92,7 +101,33 @@ namespace Aerolt.Classes
 
         public void Start()
         {
+            var configFile = Load.Instance.configFile;
+            teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");
+            showTeleporterToggle.Set(teleporterEntry.Value);
+            chestEntry = configFile.Bind("ESP", "showChest", false, "");
+            showChestToggle.Set(chestEntry.Value);
+            shopEntry = configFile.Bind("ESP", "showShop", false, "");
+            showMultiShopToggle.Set(shopEntry.Value);
+            chestAdvancedEntry = configFile.Bind("ESP", "showChestAdvanced", false, "");
+            showChestAdvancedToggle.Set(chestAdvancedEntry.Value);
+            shopAdvancedEntry = configFile.Bind("ESP", "showShopAdvanced", false, "");
+            showShopAdvancedToggle.Set(shopAdvancedEntry.Value);
+            barrelEntry = configFile.Bind("ESP", "showBarrel", false, "");
+            showBarrelToggle.Set(barrelEntry.Value);
+            scrapperEntry = configFile.Bind("ESP", "showScrapper", false, "");
+            showScrapperToggle.Set(scrapperEntry.Value);
+            secretEntry = configFile.Bind("ESP", "showSecret", false, "");
+            ShowSecretToggle.Set(secretEntry.Value);
+            if (Instance) return;
             Instance = this;
+            showTeleporterToggle.onValueChanged.AddListener(val => teleporterEntry.Value = val);
+            showChestToggle.onValueChanged.AddListener(val => chestEntry.Value = val);
+            showMultiShopToggle.onValueChanged.AddListener(val => shopEntry.Value = val);
+            showChestAdvancedToggle.onValueChanged.AddListener(val => chestAdvancedEntry.Value = val);
+            showShopAdvancedToggle.onValueChanged.AddListener(val => shopAdvancedEntry.Value = val);
+            showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
+            showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
+            ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
         }
 
         private static void ShowTeleporter()
