@@ -11,7 +11,7 @@ namespace Aerolt.Classes
 		private CharacterBody body;
 		private InputBankTest inputBank;
 		private TeamIndex team;
-		private Vector3 direction;
+		private Vector3? direction;
 		private BullseyeSearch search;
 
 		private void Awake()
@@ -19,23 +19,41 @@ namespace Aerolt.Classes
 			body = GetComponent<CharacterBody>();
 			inputBank = body.inputBank;
 			team = body.teamComponent.teamIndex;
+			/*
 			search = new BullseyeSearch
 			{
 				teamMaskFilter = TeamMask.AllExcept(team),
 				viewer = body,
 				sortMode = BullseyeSearch.SortMode.DistanceAndAngle // required for dot to be populated
-			};
+			};*/
 		}
 
 		private void FixedUpdate()
 		{
 			var ray = inputBank.GetAimRay();
-			search.searchOrigin = ray.origin;
-			search.searchDirection = ray.direction;
-			search.RefreshCandidates();
-			search.candidatesEnumerable = search.candidatesEnumerable.OrderBy(x => -x.dot * x.distanceSqr + (x.hurtBox.isSniperTarget ? -10000 : 0));
-			var target = search.candidatesEnumerable.FirstOrDefault();
-			if (target.Equals(default)) return;
+			//search.searchOrigin = ray.origin;
+			//search.searchDirection = ray.direction;
+			//search.RefreshCandidates();
+			var targets = HurtBox.sniperTargetsList.Union(HurtBox.bullseyesList).Select(x =>
+			{
+				var position = x.transform.position;
+				var vector = position - ray.origin;
+				var info = new BullseyeSearch.CandidateInfo
+				{
+					hurtBox = x,
+					position = position,
+					dot = Vector3.Dot(ray.direction, vector.normalized),
+					distanceSqr = vector.sqrMagnitude
+				};
+				return info;
+			}).Where(x => x.hurtBox.teamIndex != team).OrderByDescending(x => -x.dot * x.distanceSqr + (x.hurtBox.isSniperTarget ? 10000 : 0));
+			//var targets = search.candidatesEnumerable;
+			var target = targets.FirstOrDefault();
+			if (target.Equals(default) || !target.hurtBox)
+			{
+				direction = null;
+				return;
+			}
 			direction = target.hurtBox.transform.position - ray.origin;
 		}
 		/*
@@ -51,7 +69,8 @@ namespace Aerolt.Classes
 
 		private void Update()
 		{
-			inputBank.aimDirection = direction;
+			if (direction is not null)
+				inputBank.aimDirection = direction.Value;
 		}
 
 		private void UpdateOld()
