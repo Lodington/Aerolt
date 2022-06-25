@@ -225,7 +225,8 @@ namespace Aerolt.Classes
 
         public void KillAllMobs()
         {
-            foreach (var characterMaster in CharacterMaster.instancesList.Where(x => x.teamIndex != owner.master.teamIndex))
+            var mobs = CharacterMaster.instancesList.Where(x => x && x.teamIndex != owner.master.teamIndex).ToArray();
+            foreach (var characterMaster in mobs)
             {
                 var body = characterMaster.GetBody();
                 if (body)
