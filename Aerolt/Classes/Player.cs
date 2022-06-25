@@ -1,19 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Aerolt.Helpers;
 using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
 using UnityEngine.UI;
+using ZioConfigFile;
 using Random = UnityEngine.Random;
 
 namespace Aerolt.Classes
 {
     public class Player : MonoBehaviour
     {
-        private bool infiniteSkills;
         private NetworkUser owner;
         private ZioConfigFile.ZioConfigFile configFile;
 
@@ -21,28 +19,31 @@ namespace Aerolt.Classes
         public Toggle infiniteSkillsToggle;
         public Toggle noClipToggle;
         public Toggle alwaysSprintToggle;
-        public Toggle doMassiveDamageToggle;
         public Toggle disableMobSpawnsToggle;
         public Toggle aimbotToggle;
 
         public void InfiniteSkillsToggle()
         {
+            infiniteSkillsEntry.Value = !infiniteSkillsEntry.Value;
+            ApplyInfiniteSkills();
+        }
+
+        public void ApplyInfiniteSkills()
+        {
             var body = GetBody();
-            if (!infiniteSkills)
+            if (infiniteSkillsEntry.Value)
             {
                 if (body)
                     body.onSkillActivatedServer += SkillActivated;
-                infiniteSkills = true;
                 return;
             }
             if (body)
                 body.onSkillActivatedServer -= SkillActivated;
-            infiniteSkills = false;
         }
 
         public void NoClipToggle()
         {
-            noClipOn = !noClipOn;
+            noclipEntry.Value = !noclipEntry.Value;
             ApplyNoclip();
         }
 
@@ -52,15 +53,15 @@ namespace Aerolt.Classes
             if (!body) return;
             
             var behavior = body.GetComponent<NoclipBehavior>();
-            if (behavior && !noClipOn)
+            if (behavior && !noclipEntry.Value)
                 Destroy(behavior);
-            else if (noClipOn && !behavior)
+            else if (noclipEntry.Value && !behavior)
                 body.gameObject.AddComponent<NoclipBehavior>();
         }
 
         public void AimbotToggle()
         {
-            aimbotOn = !aimbotOn;
+            aimbotEntry.Value = !aimbotEntry.Value;
             ApplyAimbot();
         }
 
@@ -70,31 +71,40 @@ namespace Aerolt.Classes
             if (!body) return;
             
             var behavior = body.GetComponent<AimbotBehavior>();
-            if (behavior && !aimbotOn)
+            if (behavior && !aimbotEntry.Value)
                 Destroy(behavior);
-            else if (aimbotOn && !behavior)
+            else if (aimbotEntry.Value && !behavior)
                 body.gameObject.AddComponent<AimbotBehavior>();
         }
 
-        public void AlwaysSprintToggle(){}
-        
-        private float localBaseDamage;
-        public void DoMassiveDamageToggle() // Do we still need this? the body stats do the same job
+        public void AlwaysSprintToggle()
         {
-            
-            if (doMassiveDamageToggle.isOn)
-            {
-                GetBody().baseDamage = 1000000;
-                return;
-            }
-            
-            GetBody().baseDamage = localBaseDamage;
-
+            alwaysSprintEntry.Value = !alwaysSprintEntry.Value;
+            ApplySprint();
         }
+
+        private void ApplySprint()
+        {
+            var body = GetBody();
+            if (!body) return;
+            
+            var behavior = body.GetComponent<AlwaysSprintBehavior>();
+            if (behavior && !alwaysSprintEntry.Value)
+                Destroy(behavior);
+            else if (alwaysSprintEntry.Value && !behavior)
+                body.gameObject.AddComponent<AlwaysSprintBehavior>();
+        }
+
         public void DisableMobSpawnsToggle()
         {
+            mobSpawnsEntry.Value = !mobSpawnsEntry.Value;
+            ApplyMobSpawns();
+        }
+
+        public void ApplyMobSpawns()
+        {
             foreach (var director in CombatDirector.instancesList)
-                director.monsterSpawnTimer = disableMobSpawnsToggle.isOn ? float.PositiveInfinity : 0f;
+                director.monsterSpawnTimer = mobSpawnsEntry.Value ? float.PositiveInfinity : 0f;
         }
         
 
@@ -105,15 +115,28 @@ namespace Aerolt.Classes
             configFile = panelManager.configFile;
             owner.master.onBodyStart += MasterBodyStart;
             owner.master.onBodyDestroyed += MasterDestroyBody;
+
+            noclipEntry = configFile.Bind("PlayerMenu", "Noclip", false, "");
+            aimbotEntry = configFile.Bind("PlayerMenu", "Aimbot", false, "");
+            infiniteSkillsEntry = configFile.Bind("PlayerMenu", "InfiniteSkills", false, "");
+            alwaysSprintEntry = configFile.Bind("PlayerMenu", "AlwaysSprint", false, "");
+            // Shared Values
+            godModeEntry = Load.Instance.configFile.Bind("PlayerMenu", "GodMode", false, "");
+            mobSpawnsEntry = Load.Instance.configFile.Bind("PlayerMenu", "MobSpawns", false, "");
+
+            ApplyMobSpawns();
+            godModeEntry.Value = PlayerCharacterMasterController.instances.Any(x => x && x.master && x.master.godMode);
+            godModeToggle.SetIsOnWithoutNotify(godModeEntry.Value);
+            ApplyGodMode();
+            alwaysSprintToggle.SetIsOnWithoutNotify(alwaysSprintEntry.Value);
+            disableMobSpawnsToggle.SetIsOnWithoutNotify(mobSpawnsEntry.Value);
             
             ApplyNoclip();
-            noClipToggle.SetIsOnWithoutNotify(noClipOn);
+            noClipToggle.SetIsOnWithoutNotify(noclipEntry.Value);
             ApplyAimbot();
-            aimbotToggle.SetIsOnWithoutNotify(aimbotOn);
-            infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkills);
-            godModeToggle.SetIsOnWithoutNotify(PlayerCharacterMasterController.instances.Any(x=> x.master.godMode));
-            
-            localBaseDamage = GetBody().baseDamage;
+            aimbotToggle.SetIsOnWithoutNotify(aimbotEntry.Value);
+            ApplyInfiniteSkills();
+            infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkillsEntry.Value);
         }
 
         private void OnDestroy()
@@ -123,8 +146,13 @@ namespace Aerolt.Classes
         }
 
         private CharacterBody _cachedBody;
-        private bool noClipOn;
-        private bool aimbotOn;
+        
+        private ZioConfigEntry<bool> noclipEntry;
+        private ZioConfigEntry<bool> aimbotEntry;
+        private ZioConfigEntry<bool> infiniteSkillsEntry;
+        private ZioConfigEntry<bool> godModeEntry;
+        private ZioConfigEntry<bool> mobSpawnsEntry;
+        private ZioConfigEntry<bool> alwaysSprintEntry;
 
         public CharacterBody GetBody()
         {
@@ -135,14 +163,14 @@ namespace Aerolt.Classes
         
         private void MasterBodyStart(CharacterBody obj)
         {
-            if (infiniteSkills)
+            if (infiniteSkillsEntry.Value)
             {
                 obj.onSkillActivatedServer += SkillActivated;
             }
         }
         private void MasterDestroyBody(CharacterBody obj)
         {
-            if (infiniteSkills)
+            if (infiniteSkillsEntry.Value)
             {
                 obj.onSkillActivatedServer -= SkillActivated;
             }
@@ -150,14 +178,15 @@ namespace Aerolt.Classes
 
         public void GodModeToggle()
         {
-            bool hasNotYetRun = true;
+            godModeEntry.Value = !godModeEntry.Value;
+            ApplyGodMode();
+        }
+
+        public void ApplyGodMode()
+        {
             foreach (var playerInstance in PlayerCharacterMasterController.instances)
             {
-                playerInstance.master.ToggleGod();
-                if (hasNotYetRun)
-                {
-                    hasNotYetRun = false;
-                }
+                playerInstance.master.godMode = godModeEntry.Value;
             }
         }
 
@@ -213,16 +242,6 @@ namespace Aerolt.Classes
                     networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
             }
         }
-        public void AlwaysSprint() // TODO turn this into a component
-        {
-            var localUser = LocalUserManager.GetFirstLocalUser();
-            if (localUser == null || localUser.cachedMasterController == null || localUser.cachedMasterController.master == null) return;
-            var controller = localUser.cachedMasterController;
-            var body = controller.master.GetBody();
-            if (body && !body.isSprinting && !localUser.inputPlayer.GetButton("Sprint"))
-                controller.sprintInputPressReceived = true;
-        }
-
         public void KillAllMobs()
         {
             var mobs = CharacterMaster.instancesList.Where(x => x && x.teamIndex != owner.master.teamIndex).ToArray();
