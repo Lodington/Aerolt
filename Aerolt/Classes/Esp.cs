@@ -232,8 +232,7 @@ namespace Aerolt.Classes
                     */
             }
         }
-        
-        
+       
         
         public static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
         {
@@ -251,17 +250,7 @@ namespace Aerolt.Classes
 
             return $"{friendlyName}\n${cost}\n{distance}m";
         }
-        private static void ShowShop(ShopTerminalBehavior multiShop, PurchaseInteraction purchaseInteraction)
-        {
-            string boxText = GetDistance(purchaseInteraction);
-
-            if (CheckCursorPosition(purchaseInteraction.transform.position))
-                Helper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, boxText);
-            else
-                Helper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
-
-            
-        }
+        
 
         public static bool CheckCursorPosition(Vector3 worldPos)
         {

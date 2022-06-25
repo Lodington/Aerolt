@@ -17,7 +17,7 @@ namespace Aerolt.Classes
 		public void Awake()
 		{
 			body = GetComponent<CharacterBody>();
-			inputBank = body.inputBank;
+			inputBank = body.inputBank; 
 
 			motor = body.characterMotor;
 			if (!motor)
