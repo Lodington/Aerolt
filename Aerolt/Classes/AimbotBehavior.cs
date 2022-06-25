@@ -22,7 +22,8 @@ namespace Aerolt.Classes
 			search = new BullseyeSearch
 			{
 				teamMaskFilter = TeamMask.AllExcept(team),
-				viewer = body
+				viewer = body,
+				sortMode = BullseyeSearch.SortMode.DistanceAndAngle // required for dot to be populated
 			};
 		}
 
@@ -33,9 +34,9 @@ namespace Aerolt.Classes
 			search.searchDirection = ray.direction;
 			search.RefreshCandidates();
 			search.candidatesEnumerable = search.candidatesEnumerable.OrderBy(x => -x.dot * x.distanceSqr + (x.hurtBox.isSniperTarget ? -10000 : 0));
-			var target = search.GetResults().FirstOrDefault();
-			if (!target) return;
-			direction = target.transform.position - ray.origin;
+			var target = search.candidatesEnumerable.FirstOrDefault();
+			if (target.Equals(default)) return;
+			direction = target.hurtBox.transform.position - ray.origin;
 		}
 		/*
 		private void FixedUpdate()
