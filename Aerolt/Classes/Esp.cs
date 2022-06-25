@@ -111,7 +111,8 @@ namespace Aerolt.Classes
             chestAdvancedEntry = configFile.Bind("ESP", "showChestAdvanced", false, "");
             showChestAdvancedToggle.Set(chestAdvancedEntry.Value);
             shopAdvancedEntry = configFile.Bind("ESP", "showShopAdvanced", false, "");
-            showShopAdvancedToggle.Set(shopAdvancedEntry.Value);
+            if (showShopAdvancedToggle) // fucking lodington not updating the asset bundle
+                showShopAdvancedToggle.Set(shopAdvancedEntry.Value);
             barrelEntry = configFile.Bind("ESP", "showBarrel", false, "");
             showBarrelToggle.Set(barrelEntry.Value);
             scrapperEntry = configFile.Bind("ESP", "showScrapper", false, "");
@@ -124,7 +125,8 @@ namespace Aerolt.Classes
             showChestToggle.onValueChanged.AddListener(val => chestEntry.Value = val);
             showMultiShopToggle.onValueChanged.AddListener(val => shopEntry.Value = val);
             showChestAdvancedToggle.onValueChanged.AddListener(val => chestAdvancedEntry.Value = val);
-            showShopAdvancedToggle.onValueChanged.AddListener(val => shopAdvancedEntry.Value = val);
+            if (showShopAdvancedToggle) // fucking lodington not updating the asset bundle
+                showShopAdvancedToggle.onValueChanged.AddListener(val => shopAdvancedEntry.Value = val);
             showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
             showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
             ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
