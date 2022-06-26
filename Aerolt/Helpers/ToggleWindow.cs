@@ -22,7 +22,7 @@ namespace Aerolt.Classes
                 Destroy(transform.parent.gameObject);
                 return;
             }
-            WindowToggle();
+            Invoke(nameof(WindowToggle), 0.01f);
         }
         public void Update()
         {
