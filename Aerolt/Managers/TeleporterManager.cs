@@ -1,13 +1,44 @@
+using System;
+using System.Linq;
+using Aerolt.Buttons;
 using Aerolt.Helpers;
 using Rewired.Config;
 using RoR2;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 namespace Aerolt.Managers
 {
+
+    
     public class TeleporterManager : MonoBehaviour
     {
+        public GameObject buttonPrefab;
+        public GameObject buttonParent;
+        
+        public void Start()
+        {
+            foreach (var scene in SceneCatalog.allSceneDefs.OrderByDescending(x => x.sceneType))
+            {
+                if(!scene)
+                    continue;
+                
+                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform); 
+                
+                newButton.GetComponent<CustomButton>().ButtonText.text = !string.IsNullOrEmpty(scene.nameToken) ? Language.GetString(scene.nameToken) : scene.cachedName;
+                if(scene.previewTexture)
+                    newButton.GetComponent<Image>().sprite = Sprite.Create((Texture2D)scene.previewTexture, new Rect(0, 0,scene.previewTexture.width, scene.previewTexture.height), new Vector2(0.5f, 0.5f));
+                newButton.GetComponent<Button>().onClick.AddListener(() => SetScene(scene));
+            }
+        }
+
+        public void SetScene(SceneDef scene)
+        {
+            Run.instance.AdvanceStage(scene);
+        }
+        
+        
         public void InstaTeleporter()
         {
             if (!TeleporterInteraction.instance) return;

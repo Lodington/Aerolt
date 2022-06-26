@@ -49,7 +49,7 @@ namespace Aerolt.Buttons
             _body = body;
             
         }
-        public void SpawnMonster(int amount = 1)
+        public void SpawnMonster(int teamIndex)
         {
             var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
             if(localUser == null || !localUser.cachedBody)
@@ -67,12 +67,11 @@ namespace Aerolt.Buttons
                 foreach (var item in ItemDef)
                     master.inventory.GiveItem(item.Key, item.Value);
             
-            for (var i = 0; i < amount; i++)
-            {
-                NetworkServer.Spawn(bodyGameObject);
-                master.bodyPrefab = body;
-                master.SpawnBody(localUser.cachedBody.transform.position, Quaternion.identity);
-            }
+
+            NetworkServer.Spawn(bodyGameObject);
+            master.bodyPrefab = body;
+            master.SpawnBody(localUser.cachedBody.transform.position, Quaternion.identity);
+            
         }
         
     }
