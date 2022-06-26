@@ -99,7 +99,7 @@ namespace Aerolt.Classes
             }
         }
 
-        public void Start()
+        public void Awake()
         {
             var configFile = Load.Instance.configFile;
             teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");
