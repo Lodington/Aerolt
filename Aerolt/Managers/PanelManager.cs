@@ -15,7 +15,7 @@ namespace Aerolt.Managers
         public List<PanelInstanceModel> _panelInstanceModels = new List<PanelInstanceModel>();
         [NonSerialized] public ObjectPool objectPool;
 
-        private void Start()
+        private void StartLate()
         {
             objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
             foreach (var obj in objectPool.prefabsForPool)
@@ -93,7 +93,7 @@ namespace Aerolt.Managers
         private void Awake()
         {
             Initialize(Load.tempViewer);
-
+            StartLate();
         }
 
         public void Initialize(NetworkUser ownerIn)
