@@ -70,7 +70,8 @@ namespace Aerolt.Helpers
 
         private void OnDestroy()
         {
-            configEntry.SettingChanged -= SettingChanged;
+            if (configEntry != null)
+                configEntry.SettingChanged -= SettingChanged;
         }
 
         private void MakeRiskOfOptions()
