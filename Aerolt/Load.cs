@@ -119,6 +119,9 @@ namespace Aerolt
             settingsUI.SetActive(false);
             DontDestroyOnLoad(settingsRoot);
             var welcomeMessage = DailyMessage.GetMessage();
+            var stringConverter = TomlTypeConverter.GetConverter(typeof(string));
+            welcomeMessage = (string) stringConverter.ConvertToObject(welcomeMessage, typeof(string));
+            
             var config = configFile.Bind("DoNotTouch", "WelcomeMessage", "", "");
             if (config.Value != welcomeMessage)
             {
