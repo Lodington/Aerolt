@@ -24,7 +24,7 @@ namespace Aerolt.Managers
         public static Dictionary<SpawnCard, GameObject> interactableButtons = new();
         private List<SpawnCard> cachedCards = new();
 
-        private void OnEnable()
+        private void Awake()
         {
             if (!Cards.Any())
                 return;
@@ -62,7 +62,7 @@ namespace Aerolt.Managers
         
         public void SpawnInteractable()
         {
-            var user = GetUser.FetchUser(GetComponentInParent<HUD>());
+            var user = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
             
             var master = user.cachedMaster;
             if (!master)
