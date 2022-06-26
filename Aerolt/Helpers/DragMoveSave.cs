@@ -14,20 +14,21 @@ namespace Aerolt.Helpers
 		private ZioConfigEntry<Vector2> configEntry;
 		public string windowName;
 
-		public void Awake()
+		public void Start()
 		{
 			targetTransform = (RectTransform) transform;
 			var panelManager = targetTransform.parent ? GetComponentInParent<PanelManager>() : GetComponent<PanelManager>();
 			var configFile = panelManager ? panelManager.configFile : Load.Instance.configFile;
 			configEntry = configFile.Bind("Window Positions", windowName, (Vector2) targetTransform.localPosition, "Stored position of this window.");
-			targetTransform.localPosition = configEntry.Value;
+			targetTransform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0);
 		}
 
 		public void OnEndDrag(PointerEventData eventData)
 		{
 			if (!targetTransform) return;
 			if (eventData.button != PointerEventData.InputButton.Left) return;
-			configEntry.Value = targetTransform.localPosition;
+			var localPosition = targetTransform.localPosition;
+			configEntry.Value = new Vector2(localPosition.x, localPosition.y);
 		}
 	}
 }
