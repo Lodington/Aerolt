@@ -131,7 +131,7 @@ namespace Aerolt.Classes
             mobSpawnsEntry = Load.Instance.configFile.Bind("PlayerMenu", "MobSpawns", false, "");
 
             ApplyMobSpawns();
-            godModeEntry.Value = PlayerCharacterMasterController.instances.Any(x => x && x.master && x.master.godMode);
+            //godModeEntry.Value = PlayerCharacterMasterController.instances.Any(x => x && x.master && x.master.godMode);
             godModeToggle.SetIsOnWithoutNotify(godModeEntry.Value);
             ApplyGodMode();
             alwaysSprintToggle.SetIsOnWithoutNotify(alwaysSprintEntry.Value);
