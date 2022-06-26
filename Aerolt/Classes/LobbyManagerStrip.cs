@@ -29,18 +29,15 @@ namespace Aerolt.Classes
         public TMP_InputField lunarCoinsInputField;
         public TMP_InputField voidMarkersInputField;
         public ItemInventoryDisplay itemInventoryDisplay;
+        private bool setup;
 
         public void Init(NetworkUser user, LobbyManager lobbyManager)
         {
-            CharacterBody body = user.master.GetBody();
-
             _user = user;
 
             itemInventoryDisplay.SetSubscribedInventory(user.master.inventory);
             
-            icon.sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));;
             userName.text = user.userName;
-
             moneyInputField.m_OnEndEdit.AddListener(UpdateMoney);
             lunarCoinsInputField.m_OnEndEdit.AddListener(UpdateLunarCoin);
             voidMarkersInputField.m_OnEndEdit.AddListener(UpdateVoidMarkers);
@@ -51,6 +48,11 @@ namespace Aerolt.Classes
             ((TextMeshProUGUI) moneyInputField.placeholder).text = _user.master.money.ToString();
             ((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = _user.lunarCoins.ToString();
             ((TextMeshProUGUI) voidMarkersInputField.placeholder).text = _user.master.voidCoins.ToString();
+            if (setup) return;
+            var body = _user.master.GetBody();
+            if (!body) return;
+            icon.sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));;
+            setup = true;
         }
 
         private void UpdateVoidMarkers(string arg0)

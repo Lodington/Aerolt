@@ -30,7 +30,7 @@ namespace Aerolt
     {
         public const string Name = "Aerolt";
         public const string Guid = "com.Lodington." + Name;
-        public const string Version = "2.0.0";
+        public const string Version = "2.0.1";
         public static ManualLogSource Log;
         public static GameObject _co;
         private static GameObject _op;
