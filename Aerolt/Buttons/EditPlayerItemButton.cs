@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
@@ -20,6 +21,13 @@ namespace Aerolt.Buttons
         {
             foreach (var def in ContentManager._itemDefs)
                 itemDefRef[def] = new InventoryItemAddRemoveButtonGen(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
+            Sort();
+        }
+
+        private void Sort()
+        {
+            var sorted = itemDefRef.Values.OrderByDescending(x => x.def.tier);
+            foreach (var buttonGen in sorted) buttonGen.button.transform.SetSiblingIndex(0);
         }
 
         public void Initialize(NetworkUser userIn)

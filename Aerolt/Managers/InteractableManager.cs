@@ -29,20 +29,22 @@ namespace Aerolt.Managers
             if (!Cards.Any())
                 return;
 
-            var newCards = Cards.Except(cachedCards).ToArray();
-            if (newCards.Any())
+            //var newCards = Cards.Except(cachedCards).ToArray();
+            //if (newCards.Any())
             {
                 // add new buttons
-                foreach (var card in newCards)
+                foreach (var card in Cards)//newCards)
                 {
                     GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                    newButton.GetComponent<CustomButton>().ButtonText.text = Language.GetString(card.name);
+                    var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
+                    newButton.GetComponent<CustomButton>().ButtonText.text = provider != null ? provider.GetDisplayName() : card.name; // Language.GetString(card.name);
                     newButton.GetComponent<Image>().sprite = PingIndicator.GetInteractableIcon(card.prefab);
                     newButton.GetComponent<Button>().onClick.AddListener(() => SetInteractable(card));
-                    interactableButtons.Add(card, newButton);
+                    //interactableButtons.Add(card, newButton);
                 }
             }
 
+            /*
             var removedCards = cachedCards.Except(Cards).ToArray();
             if (removedCards.Any())
             {
@@ -55,6 +57,7 @@ namespace Aerolt.Managers
             }
 
             cachedCards = Cards;
+            */
         }
         
         public void SpawnInteractable()
@@ -94,7 +97,9 @@ namespace Aerolt.Managers
 
         public void SetInteractable(SpawnCard card)
         {
-            interactableText.text = card.name;
+            var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
+            interactableText.text = provider != null ? provider.GetDisplayName() : card.name; 
+            //interactableText.text = card.name;
             _spawnCard = card;
         }
         

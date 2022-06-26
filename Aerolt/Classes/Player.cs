@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Managers;
+using BepInEx.Bootstrap;
+using RiskOfOptions;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using ZioConfigFile;
+using ZioRiskOfOptions;
 using Random = UnityEngine.Random;
 
 namespace Aerolt.Classes
@@ -56,7 +59,10 @@ namespace Aerolt.Classes
             if (behavior && !noclipEntry.Value)
                 Destroy(behavior);
             else if (noclipEntry.Value && !behavior)
-                body.gameObject.AddComponent<NoclipBehavior>();
+            {
+                var noclip = body.gameObject.AddComponent<NoclipBehavior>();
+                noclip.shouldUseInteractForDown = noclipInteractDown.Value;
+            }
         }
 
         public void AimbotToggle()
@@ -131,18 +137,41 @@ namespace Aerolt.Classes
             alwaysSprintToggle.SetIsOnWithoutNotify(alwaysSprintEntry.Value);
             disableMobSpawnsToggle.SetIsOnWithoutNotify(mobSpawnsEntry.Value);
             
-            ApplyNoclip();
             noClipToggle.SetIsOnWithoutNotify(noclipEntry.Value);
             ApplyAimbot();
             aimbotToggle.SetIsOnWithoutNotify(aimbotEntry.Value);
             ApplyInfiniteSkills();
             infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkillsEntry.Value);
+
+            noclipInteractDown = configFile.Bind("PlayerMenu", "NoclipInteractDown", true, "Should holding interact move you down when noclipping.");
+            noclipInteractDown.SettingChanged += NoclipInteractChanged;
+            if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions")) MakeRiskOfOptions();
+            ApplyNoclip();
+        }
+        
+        private void NoclipInteractChanged(ZioConfigEntryBase z, object o, bool b)
+        {
+            var body = GetBody();
+            if (!body) return;
+            var noclip = body.GetComponent<NoclipBehavior>();
+            if (noclip) noclip.shouldUseInteractForDown = noclipInteractDown.Value;
+        }
+
+        private void MakeRiskOfOptions()
+        {
+            var who = Load.Name + " " + owner.GetNetworkPlayerName().GetResolvedName();
+            if (!riskOfOptions.Contains(who))
+            {
+                ModSettingsManager.AddOption(new ZioCheckBoxOption(noclipInteractDown), who, who);
+                riskOfOptions.Add(who);
+            }
         }
 
         private void OnDestroy()
         {
             owner.master.onBodyStart -= MasterBodyStart;
             owner.master.onBodyDestroyed -= MasterDestroyBody;
+            noclipInteractDown.SettingChanged -= NoclipInteractChanged;
         }
 
         private CharacterBody _cachedBody;
@@ -153,6 +182,8 @@ namespace Aerolt.Classes
         private ZioConfigEntry<bool> godModeEntry;
         private ZioConfigEntry<bool> mobSpawnsEntry;
         private ZioConfigEntry<bool> alwaysSprintEntry;
+        private ZioConfigEntry<bool> noclipInteractDown;
+        private static List<string> riskOfOptions = new();
 
         public CharacterBody GetBody()
         {

@@ -1,4 +1,5 @@
-﻿using Aerolt.Helpers;
+﻿using System.Linq;
+using Aerolt.Helpers;
 using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
@@ -19,14 +20,13 @@ namespace Aerolt.Buttons
 
         private void Awake()
         {
-            foreach(var def in ContentManager._itemDefs)
+            foreach(var def in ContentManager._itemDefs.OrderBy(x => x.tier))
             {
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 newButton.GetComponent<CustomButton>().ButtonText.text = Language.GetString(def.nameToken);
                 newButton.GetComponent<Image>().sprite = def.pickupIconSprite;
                 newButton.GetComponent<Button>().onClick.AddListener(() => SetItemDef(def));
             }
-            
         }
 
         public void SetItemDef(ItemDef def)

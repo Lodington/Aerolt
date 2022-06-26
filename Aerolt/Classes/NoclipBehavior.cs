@@ -13,6 +13,7 @@ namespace Aerolt.Classes
 		private bool useGravity;
 		private bool isFlying;
 		private int collisionMask;
+		public bool shouldUseInteractForDown = true;
 
 		public void Awake()
 		{
@@ -47,7 +48,7 @@ namespace Aerolt.Classes
 
 		public void FixedUpdate()
 		{
-			var vertical = inputBank.jump.down ? Vector3.up : inputBank.interact.down ? Vector3.down : Vector3.zero; // Todo config for should interact move you down.
+			var vertical = inputBank.jump.down ? Vector3.up : shouldUseInteractForDown && inputBank.interact.down ? Vector3.down : Vector3.zero;
 			if (motor)
 			{
 				motor.AddDisplacement(inputBank.moveVector + vertical);
