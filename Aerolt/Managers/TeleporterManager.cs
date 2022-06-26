@@ -68,11 +68,46 @@ namespace Aerolt.Managers
                 case "blue":
                     TeleporterInteraction.instance.shouldAttemptToSpawnMSPortal = true;
                     break;
+                case "void":
+                    var portals = TeleporterInteraction.instance.portalSpawners.FirstOrDefault(x => x.spawnMessageToken == "PORTAL_VOID_OPEN");
+                    if (portals != default)
+                    {
+                        if (!Run.instance.IsExpansionEnabled(portals.requiredExpansion)) return;
+                        portals.NetworkwillSpawn = true;
+                        if (!string.IsNullOrEmpty(portals.spawnPreviewMessageToken))
+                        {
+                            Chat.SendBroadcastChat(new Chat.SimpleChatMessage
+                            {
+                                baseToken = portals.spawnPreviewMessageToken
+                            });
+                        }
+                        if (portals.previewChild)
+                        {
+                            portals.previewChild.SetActive(true);
+                        }
+                    }
+                    break;
                 case "all":
                     Chat.AddMessage("<color=red>Spawned All Portal</color>");
                     TeleporterInteraction.instance.shouldAttemptToSpawnGoldshoresPortal = true;
                     TeleporterInteraction.instance.shouldAttemptToSpawnShopPortal = true;
                     TeleporterInteraction.instance.shouldAttemptToSpawnMSPortal = true;
+                    foreach (var spawner in TeleporterInteraction.instance.portalSpawners)
+                    {
+                        if (!Run.instance.IsExpansionEnabled(spawner.requiredExpansion)) continue;
+                        spawner.NetworkwillSpawn = true;
+                        if (!string.IsNullOrEmpty(spawner.spawnPreviewMessageToken))
+                        {
+                            Chat.SendBroadcastChat(new Chat.SimpleChatMessage
+                            {
+                                baseToken = spawner.spawnPreviewMessageToken
+                            });
+                        }
+                        if (spawner.previewChild)
+                        {
+                            spawner.previewChild.SetActive(true);
+                        }
+                    }
                     break;
             }
         }
