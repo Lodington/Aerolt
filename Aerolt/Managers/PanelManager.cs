@@ -18,12 +18,18 @@ namespace Aerolt.Managers
         private void Start()
         {
             objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
-            ShowPanel("Menu", showBack: false);
+            foreach (var obj in objectPool.prefabsForPool)
+            {
+                ShowPanel(obj.gameObject.name, PanelShowBehaviour.HIDE_PREVIOUS);
+                HideLastPanel();
+            }
+
+            ShowPanel("Menu",PanelShowBehaviour.HIDE_PREVIOUS, showBack: false);
         }
 
         public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS, bool showBack = true)
         {
-            GameObject panelInstance = objectPool.GetObjectFromPool(panelId);;
+            GameObject panelInstance = objectPool.GetObjectFromPool(panelId);
             if (panelInstance != null)
             {
                 if (behaviour == PanelShowBehaviour.HIDE_PREVIOUS && GetAmountPanelsInQueue() > 0)
@@ -32,14 +38,12 @@ namespace Aerolt.Managers
                     var lastPanel = GetLastPanel();
                     lastPanel?.PanelInstance.SetActive(false);
                 }
-
-                backButton.SetActive(showBack);
-
                 _panelInstanceModels.Add(new PanelInstanceModel
                 {
                     PanelId = panelId,
                     PanelInstance = panelInstance
                 });
+                backButton.SetActive(showBack);
             }
             else
             {
@@ -89,6 +93,7 @@ namespace Aerolt.Managers
         private void Awake()
         {
             Initialize(Load.tempViewer);
+
         }
 
         public void Initialize(NetworkUser ownerIn)
