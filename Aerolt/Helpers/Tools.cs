@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Aerolt.Enums;
 
 namespace Aerolt.Helpers
@@ -12,6 +14,16 @@ namespace Aerolt.Helpers
                 if (mpeventSystem.isCursorVisible)
                     return true;
             return false;
+        }
+        public static T[] FindMatches<T>(T[] toMatch, Func<T, string> toString, string filter)
+        {
+            Regex filterRegex = new Regex(filter, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            List<T> matches = new List<T>();
+            foreach (T obj in toMatch)
+            {
+                if (filterRegex.IsMatch(toString(obj))) matches.Add(obj);
+            }
+            return matches.ToArray();
         }
         
         public static void Log(Enum level, object s)
