@@ -41,7 +41,7 @@ namespace Aerolt.Buttons
             if (!_itemDef)
                 Load.CallPopup("Error", "Please Selection a item to spawn it",
                     GetComponentInParent<PanelManager>().transform);
-            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var inventory = localUser.cachedMasterController.master.inventory;
 
@@ -50,7 +50,7 @@ namespace Aerolt.Buttons
         
         public void DropItem(int amount)
         {
-            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var body = localUser.cachedMasterController.master.GetBody();
             

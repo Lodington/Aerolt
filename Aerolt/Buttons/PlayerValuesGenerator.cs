@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Aerolt.Helpers;
+using Aerolt.Managers;
 using RoR2;
 using RoR2.UI;
 using TMPro;
@@ -25,7 +26,7 @@ namespace Aerolt.Buttons
 
         private CharacterBody GetBody()
         {
-            var user = GetUser.FetchUser(GetComponentInParent<HUD>());
+            var user = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
             return user.cachedMaster.GetBody();
         }
 

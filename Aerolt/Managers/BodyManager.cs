@@ -41,7 +41,7 @@ namespace Aerolt.Managers
                 Load.CallPopup("Error", $"No Body Selected! Please Select a body to spawn as", buttonParent.transform);
             if (_newBody)
             {
-                var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+                var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
                 if (localUser.cachedMasterController && localUser.cachedMasterController.master)
                 {
                     var master = localUser.cachedMaster;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Helpers;
+using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
 using RoR2.UI;
@@ -51,7 +52,7 @@ namespace Aerolt.Buttons
         }
         public void SpawnMonster(int teamIndex)
         {
-            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
             if(localUser == null || !localUser.cachedBody)
                 return;
             

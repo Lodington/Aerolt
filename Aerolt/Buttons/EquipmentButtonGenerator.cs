@@ -1,4 +1,5 @@
 ﻿using Aerolt.Helpers;
+using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
 using RoR2.UI;
@@ -35,7 +36,7 @@ namespace Aerolt.Buttons
 
         public void GiveEquipment()
         {
-            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>();
 
@@ -44,7 +45,7 @@ namespace Aerolt.Buttons
         
         public void DropEquipment(int amount = 1)
         {
-            var localUser = GetUser.FetchUser(GetComponentInParent<HUD>());
+            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
             if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
             var body = localUser.cachedMasterController.master.GetBody();
             for (int i = 0; i < amount; i++)

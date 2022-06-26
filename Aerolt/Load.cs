@@ -150,6 +150,7 @@ namespace Aerolt
         private static GameObject settingsUI;
         public ZioConfigFile.ZioConfigFile configFile;
         public static NetworkUser tempViewer;
+        public static HUD tempHud;
 
         public static void CreateHud(HUD hud, ref bool shoulddisplay)
         {
@@ -160,8 +161,13 @@ namespace Aerolt
             if (settingsUI && settingsUI.activeSelf) settingsUI.SetActive(false);
 
             tempViewer = viewer;
-            var ui = Instantiate(_co, hud.mainContainer.transform, true);
+            tempHud = hud;
+            var ui = Instantiate(_co);
+            ui.AddComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
+            ui.transform.GetChild(0).gameObject.SetActive(true);
             tempViewer = null;
+            tempHud = null;
+            /*
             ui.transform.localScale = Vector3.one;
             var rect = (RectTransform) ui.transform;
             rect.pivot = new Vector2(0.5f, 0.5f);
@@ -171,6 +177,7 @@ namespace Aerolt
             rect.offsetMin = Vector2.zero;
             ui.transform.localPosition = Vector3.zero;
             //rect.anchoredPosition = rect.GetParentSize() * 0.5f;
+            */
             aeroltUIs.Add(viewer, ui);
             Tools.Log(Enums.LogLevel.Information, "Created UI");
         }

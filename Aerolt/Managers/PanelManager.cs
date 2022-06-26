@@ -5,6 +5,7 @@ using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Models;
 using RoR2;
+using RoR2.UI;
 using UnityEngine;
 
 namespace Aerolt.Managers
@@ -89,10 +90,12 @@ namespace Aerolt.Managers
         [NonSerialized] public NetworkUser owner;
         [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
         public GameObject backButton;
+        public HUD hud;
 
         private void Awake()
         {
             Initialize(Load.tempViewer);
+            hud = Load.tempHud;
             StartLate();
         }
 
