@@ -29,6 +29,7 @@ namespace Aerolt.Buttons
         public static Dictionary<ItemDef, int> ItemDef = new Dictionary<ItemDef, int>();
         private List<string> options = new List<string>();
         private Dictionary<string, EquipmentIndex> eliteMap;
+        private Toggle brainDead;
 
         private void Awake()
         {
@@ -80,7 +81,8 @@ namespace Aerolt.Buttons
                     master.inventory.GiveItem(item.Key, item.Value);
             if (eliteIndexDropDown && eliteIndexDropDown.value != (int) EliteIndex.None)
                 master.inventory.SetEquipmentIndex(eliteMap[eliteIndexDropDown.options[eliteIndexDropDown.value].text]);
-            
+            if (brainDead && brainDead.isOn) foreach (var masterAIComponent in master.aiComponents) Destroy(masterAIComponent);
+
 
             NetworkServer.Spawn(bodyGameObject);
             master.bodyPrefab = body;
