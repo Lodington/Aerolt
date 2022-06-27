@@ -31,7 +31,7 @@ namespace Aerolt.Classes
 
 		private void FixedUpdate()
 		{
-			if (!body.isPlayerControlled || inputBank.interact.down) return;
+			if (!body.isPlayerControlled) return;
 			var ray = inputBank.GetAimRay();
 			ray.direction = (body.master.playerCharacterMasterController.networkUser.cameraRigController.crosshairWorldPosition - ray.origin).normalized;
 			//search.searchOrigin = ray.origin;
@@ -64,7 +64,7 @@ namespace Aerolt.Classes
 			var dotMax = targets.Max(x => x.dot);
 			var distMax = targets.Max(x => x.distanceSqr);
 			//weight = 0.5f; // 0 weighted 100% to distance; 1 weighted 100% to angle
-			targets = targets.OrderByDescending(x => x.dot / dotMax * weight - x.distanceSqr / distMax * (1 - weight) + (x.hurtBox.isSniperTarget ? 1 : 0)).ToArray();
+			targets = targets.OrderByDescending(x => x.dot / dotMax * weight - x.distanceSqr / distMax * (1 - weight) + (x.hurtBox.isSniperTarget ? 10 : 0)).ToArray();
 			//var targets = search.candidatesEnumerable;
 			var target = targets.FirstOrDefault();
 			if (target.Equals(default) || !target.hurtBox)
@@ -87,6 +87,7 @@ namespace Aerolt.Classes
 
 		private void Update()
 		{
+			if (inputBank.interact.down) return;
 			if (direction is not null)
 				inputBank.aimDirection = direction.Value;
 		}
