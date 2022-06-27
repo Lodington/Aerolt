@@ -26,6 +26,8 @@ namespace Aerolt.Classes
         public Toggle disableMobSpawnsToggle;
         public Toggle aimbotToggle;
 
+        public Slider aimbotWeightSlider;
+        
         public void InfiniteSkillsToggle()
         {
             infiniteSkillsEntry.Value = !infiniteSkillsEntry.Value;
@@ -130,8 +132,25 @@ namespace Aerolt.Classes
             // Shared Values
             godModeEntry = Load.Instance.configFile.Bind("PlayerMenu", "GodMode", false, "");
             mobSpawnsEntry = Load.Instance.configFile.Bind("PlayerMenu", "MobSpawns", false, "");
+            aimbotWeightEntry = configFile.Bind("PlayerMenu", "AimbotWeight", 0.5f, "0 is weighted entirely to distance, while 1 is entirely to angle.");
+            aimbotWeightEntry.SettingChanged += AimbotWeightEntryChanged;
+            aimbotWeightSlider.onValueChanged.AddListener(AimbotWeightChanged);
 
             Apply();
+        }
+
+        private void AimbotWeightChanged(float arg0)
+        {
+            if (aimbotWeightSlider.isPointerDown) return; // hopefully this escapes the live updates without killing all updates.
+            aimbotWeightEntry.Value = arg0;
+        }
+
+        private void AimbotWeightEntryChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        {
+            var body = GetBody();
+            if (!body) return;
+            var aimbot = body.GetComponent<AimbotBehavior>();
+            if (aimbot) aimbot.weight = aimbotWeightEntry.Value;
         }
 
         private void Apply()
@@ -145,6 +164,9 @@ namespace Aerolt.Classes
             ApplySprint();
             alwaysSprintToggle.SetIsOnWithoutNotify(alwaysSprintEntry.Value);
             ApplyAimbot();
+            if (aimbotWeightSlider)
+                aimbotWeightSlider.SetValueWithoutNotify(aimbotWeightEntry.Value);
+            AimbotWeightEntryChanged(null, null, false);
             aimbotToggle.SetIsOnWithoutNotify(aimbotEntry.Value);
             ApplyInfiniteSkills();
             infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkillsEntry.Value);
@@ -188,6 +210,7 @@ namespace Aerolt.Classes
             owner.master.onBodyStart -= MasterBodyStart;
             owner.master.onBodyDestroyed -= MasterDestroyBody;
             noclipInteractDown.SettingChanged -= NoclipInteractChanged;
+            aimbotWeightEntry.SettingChanged -= AimbotWeightEntryChanged;
         }
 
         private CharacterBody _cachedBody;
@@ -201,6 +224,7 @@ namespace Aerolt.Classes
         private ZioConfigEntry<bool> noclipInteractDown;
         private static List<string> riskOfOptions = new();
         private bool setup;
+        private ZioConfigEntry<float> aimbotWeightEntry;
 
         public CharacterBody GetBody()
         {

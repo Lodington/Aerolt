@@ -13,6 +13,7 @@ namespace Aerolt.Classes
 		private TeamIndex team;
 		private Vector3? direction;
 		private BullseyeSearch search;
+		public float weight = 0.5f;
 
 		private void Awake()
 		{
@@ -30,7 +31,9 @@ namespace Aerolt.Classes
 
 		private void FixedUpdate()
 		{
+			if (!body.isPlayerControlled) return;
 			var ray = inputBank.GetAimRay();
+			ray.direction = (body.master.playerCharacterMasterController.networkUser.cameraRigController.crosshairWorldPosition - ray.origin).normalized;
 			//search.searchOrigin = ray.origin;
 			//search.searchDirection = ray.direction;
 			//search.RefreshCandidates();
@@ -49,9 +52,19 @@ namespace Aerolt.Classes
 			}).Where(x =>
 			{
 				var dir = x.hurtBox.transform.position - ray.origin;
-				var passesLos = !Physics.Raycast(ray.origin, dir, out _, dir.magnitude, LayerIndex.world.mask, QueryTriggerInteraction.UseGlobal);
+				var passesLos = !Physics.Raycast(ray.origin, dir, out _, dir.magnitude, LayerIndex.world.mask,
+					QueryTriggerInteraction.UseGlobal);
 				return x.hurtBox.teamIndex != team && passesLos;
-			}).OrderByDescending(x => -x.dot * 10 * x.distanceSqr + (x.hurtBox.isSniperTarget ? 10000 : 0));
+			}).ToArray();
+			if (!targets.Any())
+			{
+				direction = null;
+				return;
+			};
+			var dotMax = targets.Max(x => x.dot);
+			var distMax = targets.Max(x => x.distanceSqr);
+			//weight = 0.5f; // 0 weighted 100% to distance; 1 weighted 100% to angle
+			targets = targets.OrderByDescending(x => x.dot / dotMax * weight - x.distanceSqr / distMax * (1 - weight) + (x.hurtBox.isSniperTarget ? 1 : 0)).ToArray();
 			//var targets = search.candidatesEnumerable;
 			var target = targets.FirstOrDefault();
 			if (target.Equals(default) || !target.hurtBox)
