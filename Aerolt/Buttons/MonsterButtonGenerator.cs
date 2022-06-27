@@ -20,6 +20,7 @@ namespace Aerolt.Buttons
         public GameObject buttonParent;
 
         public TMP_Dropdown teamIndexDropDown;
+        public TMP_Dropdown eliteIndexDropDown;
         
         public TMP_Text monsterText;
         private CharacterBody _body;
@@ -27,6 +28,8 @@ namespace Aerolt.Buttons
         
         public static Dictionary<ItemDef, int> ItemDef = new Dictionary<ItemDef, int>();
         private List<string> options = new List<string>();
+        private Dictionary<string, EquipmentIndex> eliteMap;
+
         private void Awake()
         {
             foreach (var master in MasterCatalog.allAiMasters)
@@ -41,6 +44,14 @@ namespace Aerolt.Buttons
             foreach (string team in Enum.GetNames(typeof(TeamIndex))) options.Add(team);
             teamIndexDropDown.AddOptions(options);
 
+            eliteMap = new Dictionary<string, EquipmentIndex> {{"none", EquipmentIndex.None}};
+            foreach (var eliteDef in EliteCatalog.eliteDefs)
+            {
+                if (eliteDef.eliteEquipmentDef)
+                    eliteMap[Language.GetString(eliteDef.modifierToken)] = eliteDef.eliteEquipmentDef.equipmentIndex;
+            }
+            if(eliteIndexDropDown)
+                eliteIndexDropDown.AddOptions(eliteMap.Keys.ToList());
         }
 
         public void SetMonsterName(CharacterBody body, CharacterMaster master)
@@ -67,6 +78,8 @@ namespace Aerolt.Buttons
             if (ItemDef.Any())
                 foreach (var item in ItemDef)
                     master.inventory.GiveItem(item.Key, item.Value);
+            if (eliteIndexDropDown && eliteIndexDropDown.value != (int) EliteIndex.None)
+                master.inventory.SetEquipmentIndex(eliteMap[eliteIndexDropDown.options[eliteIndexDropDown.value].text]);
             
 
             NetworkServer.Spawn(bodyGameObject);
