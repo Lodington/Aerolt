@@ -45,7 +45,9 @@ namespace Aerolt.Buttons
 					break;
 				case BuffDef buffDef:
 					customButton.ButtonText.text = buffDef.name;
-					button.GetComponent<Image>().sprite = buffDef.iconSprite;
+					var image = button.GetComponent<Image>();
+					image.sprite = buffDef.iconSprite;
+					image.color = buffDef.buffColor;
 					break;
 			}
 		}
