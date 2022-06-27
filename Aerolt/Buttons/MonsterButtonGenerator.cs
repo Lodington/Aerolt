@@ -29,7 +29,7 @@ namespace Aerolt.Buttons
         public static Dictionary<ItemDef, int> ItemDef = new Dictionary<ItemDef, int>();
         private List<string> options = new List<string>();
         private Dictionary<string, EquipmentIndex> eliteMap;
-        private Toggle brainDead;
+        public Toggle brainDead;
 
         private void Awake()
         {
