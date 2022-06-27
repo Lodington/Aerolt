@@ -136,19 +136,20 @@ namespace Aerolt.Classes
 
         private void Apply()
         {
-            ApplyMobSpawns();
             //godModeEntry.Value = PlayerCharacterMasterController.instances.Any(x => x && x.master && x.master.godMode);
             godModeToggle.SetIsOnWithoutNotify(godModeEntry.Value);
             ApplyGodMode();
-            alwaysSprintToggle.SetIsOnWithoutNotify(alwaysSprintEntry.Value);
             disableMobSpawnsToggle.SetIsOnWithoutNotify(mobSpawnsEntry.Value);
+            ApplyMobSpawns();
             
-            noClipToggle.SetIsOnWithoutNotify(noclipEntry.Value);
+            ApplySprint();
+            alwaysSprintToggle.SetIsOnWithoutNotify(alwaysSprintEntry.Value);
             ApplyAimbot();
             aimbotToggle.SetIsOnWithoutNotify(aimbotEntry.Value);
             ApplyInfiniteSkills();
             infiniteSkillsToggle.SetIsOnWithoutNotify(infiniteSkillsEntry.Value);
 
+            noClipToggle.SetIsOnWithoutNotify(noclipEntry.Value);
             noclipInteractDown = configFile.Bind("PlayerMenu", "NoclipInteractDown", true, "Should holding interact move you down when noclipping.");
             noclipInteractDown.SettingChanged += NoclipInteractChanged;
             if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions")) MakeRiskOfOptions();
