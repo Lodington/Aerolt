@@ -46,7 +46,7 @@ namespace Aerolt.Classes
         public void FixedUpdate()
         {
             ((TextMeshProUGUI) moneyInputField.placeholder).text = _user.master.money.ToString();
-            ((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = _user.lunarCoins.ToString();
+            ((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = _user.NetworknetLunarCoins.ToString();
             ((TextMeshProUGUI) voidMarkersInputField.placeholder).text = _user.master.voidCoins.ToString();
             if (setup) return;
             var body = _user.master.GetBody();
@@ -63,7 +63,18 @@ namespace Aerolt.Classes
 
         private void UpdateLunarCoin(string arg0)
         {
-            if (int.TryParse(lunarCoinsInputField.text, out int value)) _user.NetworknetLunarCoins = (uint) value;
+            if (int.TryParse(lunarCoinsInputField.text, out int value))
+            {
+                var val = value - _user.NetworknetLunarCoins;
+                if (val < 0)
+                {
+                    _user.DeductLunarCoins((uint) Math.Abs(val));
+                }
+                else
+                {
+                    _user.AwardLunarCoins((uint) val);
+                }
+            }
             lunarCoinsInputField.text = string.Empty;
         }
 
