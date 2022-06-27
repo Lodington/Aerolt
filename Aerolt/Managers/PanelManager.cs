@@ -17,6 +17,11 @@ namespace Aerolt.Managers
         public List<PanelInstanceModel> _panelInstanceModels = new List<PanelInstanceModel>();
         [NonSerialized] public ObjectPool objectPool;
 
+        [NonSerialized] public NetworkUser owner;
+        [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
+        public HUD hud;
+        private Canvas parentCanvas;
+        
         private void StartLate()
         {
             parentCanvas = GetComponentInParent<Canvas>();
@@ -27,8 +32,6 @@ namespace Aerolt.Managers
                 ShowPanel(obj.gameObject.name, PanelShowBehaviour.HIDE_PREVIOUS);
                 HideLastPanel();
             }
-
-            ShowPanel("Menu",PanelShowBehaviour.HIDE_PREVIOUS, showBack: false);
         }
 
         private void OnDestroy()
@@ -47,7 +50,7 @@ namespace Aerolt.Managers
             }
         }
 
-        public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS, bool showBack = true)
+        public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS)
         {
             GameObject panelInstance = objectPool.GetObjectFromPool(panelId);
             if (panelInstance != null)
@@ -63,7 +66,6 @@ namespace Aerolt.Managers
                     PanelId = panelId,
                     PanelInstance = panelInstance
                 });
-                backButton.SetActive(showBack);
             }
             else
             {
@@ -105,13 +107,6 @@ namespace Aerolt.Managers
         {
             return _panelInstanceModels.Count;
         }
-
-        [NonSerialized] public NetworkUser owner;
-        [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
-        public GameObject backButton;
-        public HUD hud;
-        private Canvas parentCanvas;
-
         private void Awake()
         {
             Initialize(Load.tempViewer);

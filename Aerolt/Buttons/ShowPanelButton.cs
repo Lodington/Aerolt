@@ -7,7 +7,6 @@ namespace Aerolt.Buttons
     public class ShowPanelButton : MonoBehaviour
     {
         public string PanelId;
-        public bool showBack = true;
 
         public PanelShowBehaviour Behaviour;
 
@@ -20,7 +19,7 @@ namespace Aerolt.Buttons
 
         public void DoShowPanel()
         {
-            _panelManager.ShowPanel(PanelId, Behaviour, showBack);
+            _panelManager.ShowPanel(PanelId, Behaviour);
         }
     }
 }
