@@ -6,13 +6,8 @@ using UnityEngine.UI;
 
 namespace Aerolt.Buttons
 {
-	
 	public class AddRemoveButtonGen<T>
 	{
-		public static AddRemoveButtonGen<T> Create(T def1, GameObject gameObject, Dictionary<T,int> dictionary, GameObject o)
-		{
-			return new(def1, gameObject, dictionary, o);
-		}
 		public readonly T def;
 		private GameObject prefab;
 		private Dictionary<T, int> itemCounts;
@@ -81,8 +76,8 @@ namespace Aerolt.Buttons
 			if (countRemoveButton == null)
 			{
 				if (relativeAmount < 0) return;
-
-				countRemoveButton = Create(def, prefab, itemCounts, removeParent);
+				
+				countRemoveButton = new AddRemoveButtonGen<T>(def, prefab, itemCounts, removeParent);
 				countRemoveButton.countRemoveButton = this;
 				if (!itemCounts.ContainsKey(def))
 					itemCounts.Add(def, 0);
