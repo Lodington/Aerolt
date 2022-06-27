@@ -140,8 +140,7 @@ namespace Aerolt.Classes
 
         public void AimbotWeightChanged(float arg0)
         {
-            if (aimbotWeightSlider.isPointerDown) return; // hopefully this escapes the live updates without killing all updates.
-            aimbotWeightEntry.Value = arg0;
+            aimbotWeightDirty = true;
         }
 
         private void AimbotWeightEntryChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
@@ -179,6 +178,11 @@ namespace Aerolt.Classes
 
         private void Update()
         {
+            if (aimbotWeightDirty && !aimbotWeightSlider.isPointerDown)
+            {
+                aimbotWeightEntry.Value = aimbotWeightSlider.value;
+                aimbotWeightDirty = false;
+            }
             if (setup) return;
             var body = GetBody();
             if (!body) return;
@@ -224,6 +228,7 @@ namespace Aerolt.Classes
         private static List<string> riskOfOptions = new();
         private bool setup;
         private ZioConfigEntry<float> aimbotWeightEntry;
+        private bool aimbotWeightDirty;
 
         public CharacterBody GetBody()
         {
