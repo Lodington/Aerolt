@@ -14,13 +14,13 @@ namespace Aerolt.Buttons
         public GameObject itemListParent;
         
         private Dictionary<ItemDef, int> itemDef = new();
-        private Dictionary<ItemDef, InventoryItemAddRemoveButtonGen> itemDefRef = new();
+        private Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
         private NetworkUser user;
 
         public void Awake()
         {
             foreach (var def in ContentManager._itemDefs)
-                itemDefRef[def] = new InventoryItemAddRemoveButtonGen(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
+                itemDefRef[def] = new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
             Sort();
         }
 

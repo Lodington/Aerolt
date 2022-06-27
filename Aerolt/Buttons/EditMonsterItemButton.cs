@@ -1,3 +1,4 @@
+using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace Aerolt.Buttons
         private void Awake()
         {
             foreach (var def in ContentManager._itemDefs)
-                new InventoryItemAddRemoveButtonGen(def, buttonPrefab, MonsterButtonGenerator.ItemDef, buttonParent, itemListParent, false);
+                new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, MonsterButtonGenerator.ItemDef, buttonParent, itemListParent, false);
         }
     }
 }
