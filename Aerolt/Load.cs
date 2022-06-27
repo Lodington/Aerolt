@@ -163,8 +163,7 @@ namespace Aerolt
             tempViewer = viewer;
             tempHud = hud;
             var ui = Instantiate(_co);
-            ui.AddComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
-            ui.transform.GetChild(0).gameObject.SetActive(true);
+            ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
             tempViewer = null;
             tempHud = null;
             /*
