@@ -31,7 +31,7 @@ namespace Aerolt.Classes
 
 		private void FixedUpdate()
 		{
-			if (!body.isPlayerControlled) return;
+			if (!body.isPlayerControlled || inputBank.interact.down) return;
 			var ray = inputBank.GetAimRay();
 			ray.direction = (body.master.playerCharacterMasterController.networkUser.cameraRigController.crosshairWorldPosition - ray.origin).normalized;
 			//search.searchOrigin = ray.origin;
