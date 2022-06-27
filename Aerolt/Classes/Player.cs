@@ -134,7 +134,6 @@ namespace Aerolt.Classes
             mobSpawnsEntry = Load.Instance.configFile.Bind("PlayerMenu", "MobSpawns", false, "");
             aimbotWeightEntry = configFile.Bind("PlayerMenu", "AimbotWeight", 0.5f, "0 is weighted entirely to distance, while 1 is entirely to angle.");
             aimbotWeightEntry.SettingChanged += AimbotWeightEntryChanged;
-            aimbotWeightSlider.onValueChanged.AddListener(AimbotWeightChanged);
 
             Apply();
         }

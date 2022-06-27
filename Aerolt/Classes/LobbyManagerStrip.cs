@@ -108,5 +108,25 @@ namespace Aerolt.Classes
                 _user.Network_id.steamId.ToString()
             });
         }
+
+        public void RevivePlayer()
+        {
+            var gameover = FindObjectOfType<GameOverController>();
+            if (gameover)
+            {
+                foreach (var gameEndReportPanelController in gameover.reportPanels)
+                {
+                    Destroy(gameEndReportPanelController.Value.gameObject);
+                }
+                Destroy(gameover.gameObject);
+            }
+            if (NetworkClient.active && !_user.master.isServer)
+                _user.master.CmdRespawn(_user.master.bodyPrefab.name);
+            else
+            {
+                Run.instance.isGameOverServer = false;
+                Stage.instance.RespawnCharacter(_user.master);
+            }
+        }
     }
 }
