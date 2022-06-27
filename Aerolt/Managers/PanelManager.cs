@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Aerolt.Classes;
 using Aerolt.Enums;
@@ -18,6 +19,8 @@ namespace Aerolt.Managers
 
         private void StartLate()
         {
+            parentCanvas = GetComponentInParent<Canvas>();
+            PauseManager.onPauseStartGlobal += FuckingUnitySorting;
             objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
             foreach (var obj in objectPool.prefabsForPool)
             {
@@ -26,6 +29,22 @@ namespace Aerolt.Managers
             }
 
             ShowPanel("Menu",PanelShowBehaviour.HIDE_PREVIOUS, showBack: false);
+        }
+
+        private void OnDestroy()
+        {
+            PauseManager.onPauseStartGlobal -= FuckingUnitySorting;
+        }
+
+        private void FuckingUnitySorting()
+        {
+            StartCoroutine(Example());
+            
+            IEnumerator Example()
+            {
+                yield return new WaitForSecondsRealtime(0.01f);
+                parentCanvas.sortingOrder = 1000; // something keeps fucking setting this back to 0
+            }
         }
 
         public void ShowPanel(string panelId, PanelShowBehaviour behaviour = PanelShowBehaviour.KEEP_PREVIOUS, bool showBack = true)
@@ -91,6 +110,7 @@ namespace Aerolt.Managers
         [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
         public GameObject backButton;
         public HUD hud;
+        private Canvas parentCanvas;
 
         private void Awake()
         {
