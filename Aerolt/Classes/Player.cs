@@ -138,7 +138,7 @@ namespace Aerolt.Classes
             Apply();
         }
 
-        private void AimbotWeightChanged(float arg0)
+        public void AimbotWeightChanged(float arg0)
         {
             if (aimbotWeightSlider.isPointerDown) return; // hopefully this escapes the live updates without killing all updates.
             aimbotWeightEntry.Value = arg0;

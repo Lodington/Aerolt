@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Aerolt.Classes
 {
-    public class DailyMessage
+    public class DailyMessage : MonoBehaviour
     {
         public static string GetMessage()
         {
