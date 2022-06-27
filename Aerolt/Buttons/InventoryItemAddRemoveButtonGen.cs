@@ -6,21 +6,26 @@ using UnityEngine.UI;
 
 namespace Aerolt.Buttons
 {
-	public class InventoryItemAddRemoveButtonGen
+	
+	public class AddRemoveButtonGen<T>
 	{
-		public readonly ItemDef def;
+		public static AddRemoveButtonGen<T> Create(T def1, GameObject gameObject, Dictionary<T,int> dictionary, GameObject o)
+		{
+			return new(def1, gameObject, dictionary, o);
+		}
+		public readonly T def;
 		private GameObject prefab;
-		private Dictionary<ItemDef, int> itemCounts;
+		private Dictionary<T, int> itemCounts;
 		
 		public GameObject button;
-		public InventoryItemAddRemoveButtonGen countRemoveButton;
+		public AddRemoveButtonGen<T> countRemoveButton;
 		public CustomButton customButton;
 		
 		private GameObject parent;
 		private GameObject removeParent;
 		private bool isDecrease;
 
-		public InventoryItemAddRemoveButtonGen(ItemDef defIn, GameObject prefabIn, Dictionary<ItemDef, int> itemDefDictionary, GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
+		public AddRemoveButtonGen(T defIn, GameObject prefabIn, Dictionary<T, int> itemDefDictionary, GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
 		{
 			def = defIn;
 			prefab = prefabIn;
@@ -31,9 +36,23 @@ namespace Aerolt.Buttons
 			
 			button = GameObject.Instantiate(prefabIn, parentIn.transform);
 			customButton = button.GetComponent<CustomButton>();
-			customButton.ButtonText.text = Language.GetString(def.nameToken);
-			button.GetComponent<Image>().sprite = def.pickupIconSprite;
 			button.GetComponent<Button>().onClick.AddListener(!isDecrease ? Increase : Decrease);
+
+			switch (defIn) // Generics are fucked
+			{
+				case ItemDef itemDef:
+					customButton.ButtonText.text = Language.GetString(itemDef.nameToken);
+					button.GetComponent<Image>().sprite = itemDef.pickupIconSprite;
+					break;
+				case EquipmentDef eqDef:
+					customButton.ButtonText.text = Language.GetString(eqDef.nameToken);
+					button.GetComponent<Image>().sprite = eqDef.pickupIconSprite;
+					break;
+				case BuffDef buffDef:
+					customButton.ButtonText.text = buffDef.name;
+					button.GetComponent<Image>().sprite = buffDef.iconSprite;
+					break;
+			}
 		}
 		
 		
@@ -63,7 +82,7 @@ namespace Aerolt.Buttons
 			{
 				if (relativeAmount < 0) return;
 
-				countRemoveButton = new InventoryItemAddRemoveButtonGen(def, prefab, itemCounts, removeParent);
+				countRemoveButton = Create(def, prefab, itemCounts, removeParent);
 				countRemoveButton.countRemoveButton = this;
 				if (!itemCounts.ContainsKey(def))
 					itemCounts.Add(def, 0);
@@ -76,10 +95,17 @@ namespace Aerolt.Buttons
 			GameObject.Destroy(button);
 			countRemoveButton.countRemoveButton = null;
 		}
+
 		public void UpdateText()
 		{
 			var targetButton = isDecrease ? customButton : countRemoveButton.customButton;
-			targetButton.ButtonText.text = $"{Language.GetString(def.nameToken)} x{itemCounts[def]}";
+			targetButton.ButtonText.text = def switch // Generics are fucked
+			{
+				ItemDef itemDef => $"{Language.GetString(itemDef.nameToken)} x{itemCounts[def]}",
+				EquipmentDef eqDef => $"{Language.GetString(eqDef.nameToken)} x{itemCounts[def]}",
+				BuffDef buffDef => $"{buffDef.name} x{itemCounts[def]}",
+				_ => targetButton.ButtonText.text
+			};
 		}
 
 		public void SetAmount(int i)
