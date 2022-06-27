@@ -45,11 +45,11 @@ namespace Aerolt.Buttons
             foreach (string team in Enum.GetNames(typeof(TeamIndex))) options.Add(team);
             teamIndexDropDown.AddOptions(options);
 
-            eliteMap = new Dictionary<string, EquipmentIndex> {{"none", EquipmentIndex.None}};
+            eliteMap = new Dictionary<string, EquipmentIndex> {{"None", EquipmentIndex.None}};
             foreach (var eliteDef in EliteCatalog.eliteDefs)
             {
                 if (eliteDef.eliteEquipmentDef)
-                    eliteMap[Language.GetString(eliteDef.modifierToken)] = eliteDef.eliteEquipmentDef.equipmentIndex;
+                    eliteMap[Language.GetStringFormatted(eliteDef.modifierToken, "Monster")] = eliteDef.eliteEquipmentDef.equipmentIndex;
             }
             if(eliteIndexDropDown)
                 eliteIndexDropDown.AddOptions(eliteMap.Keys.ToList());
