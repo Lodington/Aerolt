@@ -63,6 +63,7 @@ namespace Aerolt.Classes
             foreach (var multiShopController in MultiShops)
             {
                 str.Clear();
+                if (!multiShopController) continue;
                 var transform1 = multiShopController.transform;
                 var position = transform1.position + transform1.up * 1.5f;
                 var distanceToObject = Mathf.RoundToInt(Vector3.Distance(Camera.main.transform.position, position));
@@ -172,6 +173,7 @@ namespace Aerolt.Classes
         {
             foreach (BarrelInteraction barrel in BarrelInteractions)
             {
+                if (!barrel) continue;
                 if (!barrel.Networkopened)
                 {
                     string friendlyName = "Barrel";

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Managers;
@@ -37,11 +38,11 @@ namespace Aerolt.Classes
             if (infiniteSkillsEntry.Value)
             {
                 if (body)
-                    body.onSkillActivatedServer += SkillActivated;
+                    body.onSkillActivatedAuthority += SkillActivated;
                 return;
             }
             if (body)
-                body.onSkillActivatedServer -= SkillActivated;
+                body.onSkillActivatedAuthority -= SkillActivated;
         }
 
         public void NoClipToggle()
@@ -130,6 +131,11 @@ namespace Aerolt.Classes
             godModeEntry = Load.Instance.configFile.Bind("PlayerMenu", "GodMode", false, "");
             mobSpawnsEntry = Load.Instance.configFile.Bind("PlayerMenu", "MobSpawns", false, "");
 
+            Apply();
+        }
+
+        private void Apply()
+        {
             ApplyMobSpawns();
             //godModeEntry.Value = PlayerCharacterMasterController.instances.Any(x => x && x.master && x.master.godMode);
             godModeToggle.SetIsOnWithoutNotify(godModeEntry.Value);
@@ -148,7 +154,16 @@ namespace Aerolt.Classes
             if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions")) MakeRiskOfOptions();
             ApplyNoclip();
         }
-        
+
+        private void Update()
+        {
+            if (setup) return;
+            var body = GetBody();
+            if (!body) return;
+            Apply();
+            setup = true;
+        }
+
         private void NoclipInteractChanged(ZioConfigEntryBase z, object o, bool b)
         {
             var body = GetBody();
@@ -184,6 +199,7 @@ namespace Aerolt.Classes
         private ZioConfigEntry<bool> alwaysSprintEntry;
         private ZioConfigEntry<bool> noclipInteractDown;
         private static List<string> riskOfOptions = new();
+        private bool setup;
 
         public CharacterBody GetBody()
         {
@@ -196,14 +212,14 @@ namespace Aerolt.Classes
         {
             if (infiniteSkillsEntry.Value)
             {
-                obj.onSkillActivatedServer += SkillActivated;
+                obj.onSkillActivatedAuthority += SkillActivated;
             }
         }
         private void MasterDestroyBody(CharacterBody obj)
         {
             if (infiniteSkillsEntry.Value)
             {
-                obj.onSkillActivatedServer -= SkillActivated;
+                obj.onSkillActivatedAuthority -= SkillActivated;
             }
         }
 

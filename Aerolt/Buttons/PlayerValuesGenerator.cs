@@ -15,18 +15,25 @@ namespace Aerolt.Buttons
     {
         public GameObject parent;
         public GameObject playerValuePrefab;
+        private bool setup;
 
-        public void Awake()
+        public void Update()
         {
+            if (setup) return;
+            var body = GetBody();
+            if (!body) return;
             FieldInfo[] fields = typeof(CharacterBody).GetFields();
             foreach (var field in fields)
                 if (field.FieldType == typeof(float))
                     CreateNewStatPrefab(field);
+            setup = true;
         }
 
         private CharacterBody GetBody()
         {
-            var user = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
+            var panel = GetComponentInParent<PanelManager>();
+            if (!panel) return null;
+            var user = GetUser.FetchUser(panel.hud);
             return user.cachedMaster.GetBody();
         }
 
