@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Buttons;
 using Aerolt.Helpers;
+using JetBrains.Annotations;
 using RoR2;
 using RoR2.UI;
 using TMPro;
@@ -33,11 +34,13 @@ namespace Aerolt.Managers
             //if (newCards.Any())
             {
                 // add new buttons
-                foreach (var card in Cards)//newCards)
+                foreach (var card in cards) //newCards)
                 {
+                    if (card.Equals(null) || card.Equals(default)) continue;
                     GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                     var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
-                    newButton.GetComponent<CustomButton>().ButtonText.text = provider != null ? provider.GetDisplayName() : card.name; // Language.GetString(card.name);
+                    newButton.GetComponent<CustomButton>().ButtonText.text =
+                        provider != null ? provider.GetDisplayName() : card.name; // Language.GetString(card.name);
                     newButton.GetComponent<Image>().sprite = PingIndicator.GetInteractableIcon(card.prefab);
                     newButton.GetComponent<Button>().onClick.AddListener(() => SetInteractable(card));
                     //interactableButtons.Add(card, newButton);
@@ -59,7 +62,15 @@ namespace Aerolt.Managers
             cachedCards = Cards;
             */
         }
-        
+
+        static InteractableManager()
+        {
+            Run.onRunStartGlobal += _ => _spawnCards = null; // clear the spawncards so they can be filled if you disable/enable expansions
+        }
+
+        [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
+        public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).ToArray();
+
         public void SpawnInteractable()
         {
             var user = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
