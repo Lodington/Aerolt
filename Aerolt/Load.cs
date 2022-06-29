@@ -56,8 +56,7 @@ namespace Aerolt
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
-
-            
+            NetworkManager.Initialize();
         }
         public void OnGUI()
         {

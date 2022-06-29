@@ -8,6 +8,7 @@ using RoR2;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace Aerolt.Managers
@@ -27,9 +28,6 @@ namespace Aerolt.Managers
 
         private void Awake()
         {
-            if (!Cards.Any())
-                return;
-
             //var newCards = Cards.Except(cachedCards).ToArray();
             //if (newCards.Any())
             {
@@ -91,19 +89,16 @@ namespace Aerolt.Managers
 
             var position = body.transform.position;
             var aimRay = body.inputBank.GetAimRay().direction * 1.6f;
+
             
-            _spawnCard.DoSpawn(position + aimRay, new Quaternion(), new DirectorSpawnRequest(
-                _spawnCard,
-                new DirectorPlacementRule
-                {
-                    placementMode = DirectorPlacementRule.PlacementMode.NearestNode,
-                    maxDistance = 100f,
-                    minDistance = 20f,
-                    position = position + aimRay,
-                    preventOverhead = true
-                },
-                RoR2Application.rng)
-            );
+            if (NetworkServer.active)
+            {
+                Spawn((uint) Array.IndexOf(cards, _spawnCard), position + aimRay);
+            }
+            else
+            {
+                ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage((uint) Array.IndexOf(cards, _spawnCard), position + aimRay));
+            }
         }
 
         public void SetInteractable(SpawnCard card)
@@ -113,7 +108,23 @@ namespace Aerolt.Managers
             //interactableText.text = card.name;
             _spawnCard = card;
         }
-        
+
+        public static void Spawn(uint index, Vector3 position)
+        {
+            var spawnCard = cards[index];
+            spawnCard.DoSpawn(position, new Quaternion(), new DirectorSpawnRequest(
+                spawnCard,
+                new DirectorPlacementRule
+                {
+                    placementMode = DirectorPlacementRule.PlacementMode.NearestNode,
+                    maxDistance = 100f,
+                    minDistance = 20f,
+                    position = position,
+                    preventOverhead = true
+                },
+                RoR2Application.rng)
+            );
+        }
     }
 
 }
