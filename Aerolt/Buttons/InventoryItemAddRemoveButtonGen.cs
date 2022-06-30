@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Rewired;
 using RoR2;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,6 +30,7 @@ namespace Aerolt.Buttons
 			
 			button = GameObject.Instantiate(prefabIn, parentIn.transform);
 			customButton = button.GetComponent<CustomButton>();
+			//customButton.onRightClick.AddListener(isDecrease ? Increase : Decrease); There is a bug with this, when decreasing on the left side it can destroy the left side button
 			button.GetComponent<Button>().onClick.AddListener(!isDecrease ? Increase : Decrease);
 
 			switch (defIn) // Generics are fucked
@@ -55,7 +55,7 @@ namespace Aerolt.Buttons
 		
 		private void Increase()
 		{
-			if (Input.GetKey(KeyCode.LeftShift))
+			if (customButton.EventSystem.player.GetButton(9)) // action 9 is shift by default //(Input.GetKey(KeyCode.LeftShift))
 			{
 				Change(5);
 				return;
@@ -65,7 +65,7 @@ namespace Aerolt.Buttons
 
 		private void Decrease()
 		{
-			if (Input.GetKey(KeyCode.LeftShift))
+			if (customButton.EventSystem.player.GetButton(9)) //Input.GetKey(KeyCode.LeftShift))
 			{
 				Change(-itemCounts[def]);
 				return;
