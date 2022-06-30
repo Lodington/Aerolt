@@ -39,7 +39,7 @@ namespace Aerolt.Managers
             PauseManager.onPauseStartGlobal -= FuckingUnitySorting;
         }
 
-        private void FuckingUnitySorting()
+        public void FuckingUnitySorting()
         {
             StartCoroutine(Example());
             
@@ -117,7 +117,7 @@ namespace Aerolt.Managers
         public void Initialize(NetworkUser ownerIn)
         {
             owner = ownerIn;
-            transform.parent.GetComponentInChildren<ToggleWindow>().Init(owner);
+            transform.parent.GetComponentInChildren<ToggleWindow>().Init(owner, this);
             if (ownerIn.localUser != null)
                 configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, $"/Aerolt/Profiles/{ownerIn.localUser.userProfile.fileName}.cfg", true);
         }

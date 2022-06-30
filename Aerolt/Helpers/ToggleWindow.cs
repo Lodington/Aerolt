@@ -1,5 +1,6 @@
 ﻿using System;
 using Aerolt.Enums;
+using Aerolt.Managers;
 using RoR2;
 using UnityEngine;
 
@@ -11,10 +12,12 @@ namespace Aerolt.Classes
 
         public GameObject panel;
         [NonSerialized] public NetworkUser owner;
+        private PanelManager panelManager;
 
-        public void Init(NetworkUser owner)
+        public void Init(NetworkUser owner, PanelManager pm)
         {
             this.owner = owner;
+            panelManager = pm;
             var profile = owner.localUser?.userProfile;
             if (profile == null)
             {
@@ -36,6 +39,7 @@ namespace Aerolt.Classes
         {
             _menuIsOpen = !_menuIsOpen;
             panel.SetActive(_menuIsOpen);
+            panelManager.FuckingUnitySorting();
         }
 
         private void OnDestroy()
