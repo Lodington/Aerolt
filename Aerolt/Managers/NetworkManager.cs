@@ -14,6 +14,8 @@ namespace Aerolt.Managers
 		{
 			NetworkManagerSystem.onStartServerGlobal += RegisterMessages;
 			NetworkManagerSystem.onStartClientGlobal += RegisterMessages;
+
+			RegisteredMessages = typeof(AeroltMessageBase).Assembly.GetTypes().Where(x => typeof(AeroltMessageBase).IsAssignableFrom(x) && x != typeof(AeroltMessageBase)).ToArray();
 		}
 
 		private static void RegisterMessages()
@@ -34,19 +36,12 @@ namespace Aerolt.Managers
 
 		public static void SendAerolt<T>(this NetworkConnection connection, T message) where T : AeroltMessageBase
 		{
-			var typ = registeredMessages.First(registeredMessage => registeredMessage.Value == typeof(T)).Key;
+			var typ = (uint) Array.IndexOf(RegisteredMessages, typeof(T));
 			var mes = new AeroltMessage {Type = typ, message = message};
 			connection.Send(2004, mes);
 		}
 
-		public static Dictionary<MessageType, Type> registeredMessages = new()
-		{
-			{MessageType.InteractableSpawn, typeof(InteractableSpawnMessage)}
-		};
-		public enum MessageType
-		{
-			InteractableSpawn
-		}
+		public static Type[] RegisteredMessages;
 	}
 
 	public class AeroltMessageBase : MessageBase
@@ -57,21 +52,21 @@ namespace Aerolt.Managers
 
 	class AeroltMessage : MessageBase
 	{
-		public NetworkManager.MessageType Type;
+		public uint Type;
 		public AeroltMessageBase message;
 
 		public override void Serialize(NetworkWriter writer)
 		{
 			base.Serialize(writer);
-			writer.WritePackedUInt32((uint) Type);
+			writer.WritePackedUInt32(Type);
 			writer.Write(message);
 		}
 
 		public override void Deserialize(NetworkReader reader)
 		{
 			base.Deserialize(reader);
-			Type = (NetworkManager.MessageType) reader.ReadPackedUInt32();
-			var tmsg = (AeroltMessageBase) Activator.CreateInstance(NetworkManager.registeredMessages[Type]);
+			Type = reader.ReadPackedUInt32();
+			var tmsg = (AeroltMessageBase) Activator.CreateInstance(NetworkManager.RegisteredMessages[Type]);
 			tmsg.Deserialize(reader);
 			message = tmsg;
 		}
