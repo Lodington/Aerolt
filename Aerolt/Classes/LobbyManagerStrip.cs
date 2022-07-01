@@ -85,7 +85,7 @@ namespace Aerolt.Classes
             var panelManager = GetComponentInParent<PanelManager>();
             panelManager.ShowPanel("EditPlayerItemsView", PanelShowBehaviour.HIDE_PREVIOUS);
             var instance = panelManager._panelInstanceModels.FirstOrDefault(x => x.PanelId == "EditPlayerItemsView");
-            instance?.PanelInstance.GetComponent<EditPlayerItemButton>().Initialize(_user);
+            instance?.PanelInstance.GetComponent<EditPlayerItemButton>().Initialize(_user, panelManager.configFile);
         }
         
         public void KickPlayer()
