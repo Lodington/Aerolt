@@ -78,9 +78,7 @@ namespace Aerolt
         public void Start()
         {
             RoR2Application.onLoad += GameLoad;
-            SceneDirector.onPostPopulateSceneServer += Hooks.GetEspData;
             HUD.shouldHudDisplay += CreateHud;
-
         }
 
         private void Update()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Aerolt.Helpers;
 using Aerolt.Managers;
@@ -9,18 +10,19 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using ZioConfigFile;
+using Object = UnityEngine.Object;
 
 namespace Aerolt.Classes
 {
     public class Esp : MonoBehaviour
     {
-        private static readonly EspHelper Helper = new EspHelper();
+        private static readonly EspHelper Helper = new EspHelper(); // why lodington
         
-        public static List<PurchaseInteraction> PurchaseInteractions = new List<PurchaseInteraction>();
-        public static List<BarrelInteraction> BarrelInteractions = new List<BarrelInteraction>();
-        public static List<PressurePlateController> SecretButtons = new List<PressurePlateController>();
-        public static List<ScrapperController> Scrappers = new List<ScrapperController>();
-        public static List<MultiShopController> MultiShops = new List<MultiShopController>();
+        public static List<PurchaseInteraction> PurchaseInteractions;
+        public static List<BarrelInteraction> BarrelInteractions;
+        public static List<PressurePlateController> SecretButtons;
+        public static List<ScrapperController> Scrappers;
+        public static List<MultiShopController> MultiShops;
 
         public Toggle showTeleporterToggle;
         public Toggle showChestToggle;
@@ -131,6 +133,16 @@ namespace Aerolt.Classes
             showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
             showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
             ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
+            GatherObjects(); // these objects should exist by hud awake
+        }
+
+        private void GatherObjects()
+        {
+            BarrelInteractions = FindObjectsOfType<BarrelInteraction>().ToList();
+            PurchaseInteractions = FindObjectsOfType<PurchaseInteraction>().ToList();
+            SecretButtons = FindObjectsOfType<PressurePlateController>().ToList();
+            Scrappers = FindObjectsOfType<ScrapperController>().ToList();
+            MultiShops = FindObjectsOfType<MultiShopController>().ToList();
         }
 
         private static void ShowTeleporter()
