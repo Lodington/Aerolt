@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Managers;
+using Aerolt.Messages;
 using BepInEx.Bootstrap;
 using RiskOfOptions;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 using ZioConfigFile;
 using ZioRiskOfOptions;
@@ -274,14 +276,23 @@ namespace Aerolt.Classes
             weightedSelection.AddChoice(Run.instance.availableTier1DropList, 80f);
             weightedSelection.AddChoice(Run.instance.availableTier2DropList, 19f);
             weightedSelection.AddChoice(Run.instance.availableTier3DropList, 1f);
+            var items = new Dictionary<ItemDef, int>();
             for (int i = 0; i < Random.Range(0, 100); i++)
             {
                 List<PickupIndex> list = weightedSelection.Evaluate(Random.value);
                 var def = PickupCatalog.GetPickupDef(list[Random.Range(0, list.Count)]);
                 if (def == null) continue;
-                localUser.inventory.GiveItem(def.itemIndex, Random.Range(0, 100));
+                var item = ItemCatalog.GetItemDef(def.itemIndex);
+                if (!items.ContainsKey(item)) items[item] = localUser.inventory.GetItemCount(item);
+                items[item] += Random.Range(0, 100);
             }
-            
+
+            if (NetworkServer.active)
+                foreach (var item in items)
+                    localUser.inventory.GiveItem(item.Key, item.Value);
+            else
+                new SetItemCountMessage(localUser.inventory, items).SendToServer();
+
         }
         
         private void SkillActivated(GenericSkill obj) => obj.AddOneStock();
@@ -291,15 +302,33 @@ namespace Aerolt.Classes
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
                 if (!networkUser.isLocalPlayer) continue; // why
-                foreach (var itemDef in ContentManager._itemDefs)
-                    networkUser.master.inventory.GiveItem(itemDef, 1);
+                GiveAllItemsTo(networkUser);
             }
         }
+
+        private void GiveAllItemsTo(NetworkUser networkUser)
+        {
+            if (NetworkServer.active) foreach (var item in ContentManager.itemDefs) networkUser.master.inventory.GiveItem(item);
+            else
+            {
+                var items = ContentManager.itemDefs.ToDictionary(x => x, def => networkUser.master.inventory.GetItemCount(def) + 1);
+                new SetItemCountMessage(networkUser.master.inventory, items).SendToServer();
+            }
+        }
+        private void ClearItemsTo(NetworkUser networkUser)
+        {
+            if (NetworkServer.active) foreach (var item in ContentManager.itemDefs) networkUser.master.inventory.RemoveItem(item, networkUser.master.inventory.GetItemCount(item));
+            else
+            {
+                var items = ContentManager.itemDefs.ToDictionary(x => x, _ => 0);
+                new SetItemCountMessage(networkUser.master.inventory, items).SendToServer();
+            }
+        }
+
         public void GiveAllItemsToAll()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
-            foreach (var itemDef in ContentManager._itemDefs)
-                networkUser.master.inventory.GiveItem(itemDef, 1);
+                GiveAllItemsTo(networkUser);
         }
 
         public void ClearInventory()
@@ -307,16 +336,14 @@ namespace Aerolt.Classes
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
                 if (!networkUser.isLocalPlayer) continue;
-                foreach (var itemDef in ContentManager._itemDefs)
-                    networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
+                ClearItemsTo(networkUser);
             }
         }
         public void ClearInventoryAll()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
-                foreach (var itemDef in ContentManager._itemDefs)
-                    networkUser.master.inventory.RemoveItem(itemDef, networkUser.master.inventory.GetItemCount(itemDef));
+                ClearItemsTo(networkUser);
             }
         }
         public void KillAllMobs()

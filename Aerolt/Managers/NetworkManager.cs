@@ -48,6 +48,11 @@ namespace Aerolt.Managers
 	{
 		public AeroltMessageBase() {} // Needed to create empty instance of class so it can be read
 		public virtual void Handle() {}
+
+		public void SendToServer()
+		{
+			ClientScene.readyConnection.SendAerolt(this);
+		}
 	}
 
 	class AeroltMessage : MessageBase
