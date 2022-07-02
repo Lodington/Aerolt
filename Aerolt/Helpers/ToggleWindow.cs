@@ -39,7 +39,8 @@ namespace Aerolt.Classes
         {
             _menuIsOpen = !_menuIsOpen;
             panel.SetActive(_menuIsOpen);
-            panelManager.FuckingUnitySorting();
+            if (_menuIsOpen)
+                panelManager.FuckingUnitySorting();
         }
 
         private void OnDestroy()
