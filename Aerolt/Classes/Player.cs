@@ -150,7 +150,7 @@ namespace Aerolt.Classes
             var body = GetBody();
             if (!body) return;
             var aimbot = body.GetComponent<AimbotBehavior>();
-            if (aimbot) aimbot.weight = aimbotWeightEntry.Value;
+            if (aimbot) aimbot.weight = aimbotWeightEntry.Value / 100f; // normalize this to 0-1, should be done in slider already lodington wtf
         }
 
         private void Apply()
