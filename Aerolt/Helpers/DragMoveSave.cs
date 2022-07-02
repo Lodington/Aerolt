@@ -28,7 +28,11 @@ namespace Aerolt.Helpers
 			if (!targetTransform) return;
 			if (eventData.button != PointerEventData.InputButton.Left) return;
 			var localPosition = targetTransform.localPosition;
-			configEntry.Value = new Vector2(localPosition.x, localPosition.y);
+			var parent = (RectTransform) targetTransform.parent;
+			var width = parent.sizeDelta.x * 0.5f - 10f + targetTransform.sizeDelta.x * 0.5f;
+			var height = parent.sizeDelta.y * 0.5f - 10f + targetTransform.sizeDelta.y * 0.5f;
+			configEntry.Value = new Vector2(Mathf.Clamp(localPosition.x, -width, width), Mathf.Clamp(localPosition.y, -height, height));
+			targetTransform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0);
 		}
 	}
 }
