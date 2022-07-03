@@ -19,7 +19,7 @@ namespace Aerolt.Managers
 
         [NonSerialized] public NetworkUser owner;
         [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
-        public HUD hud;
+        [NonSerialized] public HUD hud;
         private Canvas parentCanvas;
         
         private void StartLate()
