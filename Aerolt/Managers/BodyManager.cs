@@ -28,7 +28,7 @@ namespace Aerolt.Managers
             foreach(var body in BodyCatalog.allBodyPrefabBodyBodyComponents)
             {
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<CustomButton>().ButtonText.text = Language.GetString(body.baseNameToken);
+                newButton.GetComponent<CustomButton>().buttonText.text = Language.GetString(body.baseNameToken);
                 newButton.GetComponent<Image>().sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 newButton.GetComponent<Button>().onClick.AddListener(() => SetBodyDef(body));
             }

@@ -36,15 +36,15 @@ namespace Aerolt.Buttons
 			switch (defIn) // Generics are fucked
 			{
 				case ItemDef itemDef:
-					customButton.ButtonText.text = Language.GetString(itemDef.nameToken);
+					customButton.buttonText.text = Language.GetString(itemDef.nameToken);
 					button.GetComponent<Image>().sprite = itemDef.pickupIconSprite;
 					break;
 				case EquipmentDef eqDef:
-					customButton.ButtonText.text = Language.GetString(eqDef.nameToken);
+					customButton.buttonText.text = Language.GetString(eqDef.nameToken);
 					button.GetComponent<Image>().sprite = eqDef.pickupIconSprite;
 					break;
 				case BuffDef buffDef:
-					customButton.ButtonText.text = buffDef.name;
+					customButton.buttonText.text = buffDef.name;
 					var image = button.GetComponent<Image>();
 					image.sprite = buffDef.iconSprite;
 					image.color = buffDef.buffColor;
@@ -96,12 +96,12 @@ namespace Aerolt.Buttons
 		public void UpdateText()
 		{
 			var targetButton = isDecrease ? customButton : countRemoveButton.customButton;
-			targetButton.ButtonText.text = def switch // Generics are fucked
+			targetButton.buttonText.text = def switch // Generics are fucked
 			{
 				ItemDef itemDef => $"{Language.GetString(itemDef.nameToken)} x{itemCounts[def]}",
 				EquipmentDef eqDef => $"{Language.GetString(eqDef.nameToken)} x{itemCounts[def]}",
 				BuffDef buffDef => $"{buffDef.name} x{itemCounts[def]}",
-				_ => targetButton.ButtonText.text
+				_ => targetButton.buttonText.text
 			};
 		}
 

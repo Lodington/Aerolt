@@ -7,17 +7,20 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UI.Image;
 
 namespace Aerolt.Buttons
 {
     public class CustomButton : MonoBehaviour, IPointerClickHandler
     {
-        public TMP_Text ButtonText;
-        public TMP_Sprite Image;
+        public TMP_Text buttonText;
+        public Image image;
+        public RawImage rawImage;
+        [NonSerialized]
+        public Button button;
         public Button.ButtonClickedEvent onRightClick;
         
         private MPEventSystemLocator eventSystemLocator;
-        private Button button;
         public MPEventSystem EventSystem => eventSystemLocator.eventSystem;
         public void InvokeRightClick()
         {

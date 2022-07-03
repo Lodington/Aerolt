@@ -38,7 +38,7 @@ namespace Aerolt.Buttons
                 var body = master.bodyPrefab.GetComponent<CharacterBody>();
                 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<CustomButton>().ButtonText.text = Language.GetString(master.name);
+                newButton.GetComponent<CustomButton>().buttonText.text = Language.GetString(master.name);
                 newButton.GetComponent<Image>().sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 newButton.GetComponent<Button>().onClick.AddListener(() => SetMonsterName(body,master));
             }

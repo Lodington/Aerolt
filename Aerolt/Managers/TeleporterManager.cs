@@ -26,7 +26,7 @@ namespace Aerolt.Managers
                 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform); 
                 
-                newButton.GetComponent<CustomButton>().ButtonText.text = !string.IsNullOrEmpty(scene.nameToken) ? Language.GetString(scene.nameToken) : scene.cachedName;
+                newButton.GetComponent<CustomButton>().buttonText.text = !string.IsNullOrEmpty(scene.nameToken) ? Language.GetString(scene.nameToken) : scene.cachedName;
                 if(scene.previewTexture)
                     newButton.GetComponent<Image>().sprite = Sprite.Create((Texture2D)scene.previewTexture, new Rect(0, 0,scene.previewTexture.width, scene.previewTexture.height), new Vector2(0.5f, 0.5f));
                 newButton.GetComponent<Button>().onClick.AddListener(() => SetScene(scene));

@@ -23,7 +23,7 @@ namespace Aerolt.Buttons
             foreach(var def in ContentManager._itemDefs.OrderBy(x => x.tier))
             {
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<CustomButton>().ButtonText.text = Language.GetString(def.nameToken);
+                newButton.GetComponent<CustomButton>().buttonText.text = Language.GetString(def.nameToken);
                 newButton.GetComponent<Image>().sprite = def.pickupIconSprite;
                 newButton.GetComponent<Button>().onClick.AddListener(() => SetItemDef(def));
             }

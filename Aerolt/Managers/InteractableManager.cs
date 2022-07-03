@@ -38,7 +38,7 @@ namespace Aerolt.Managers
                     if (card.Equals(null) || card.Equals(default)) continue;
                     GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                     var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
-                    newButton.GetComponent<CustomButton>().ButtonText.text =
+                    newButton.GetComponent<CustomButton>().buttonText.text =
                         provider != null ? provider.GetDisplayName() : card.name; // Language.GetString(card.name);
                     newButton.GetComponent<Image>().sprite = PingIndicator.GetInteractableIcon(card.prefab);
                     newButton.GetComponent<Button>().onClick.AddListener(() => SetInteractable(card));
