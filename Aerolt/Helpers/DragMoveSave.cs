@@ -32,7 +32,7 @@ namespace Aerolt.Helpers
 			var width = parent.sizeDelta.x * 0.5f - 10f + targetTransform.sizeDelta.x * 0.5f;
 			var height = parent.sizeDelta.y * 0.5f - 10f + targetTransform.sizeDelta.y * 0.5f;
 			configEntry.Value = new Vector2(Mathf.Clamp(localPosition.x, -width, width), Mathf.Clamp(localPosition.y, -height, height));
-			targetTransform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0);
+			//targetTransform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0);
 		}
 	}
 }
