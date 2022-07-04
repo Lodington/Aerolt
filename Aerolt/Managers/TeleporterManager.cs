@@ -24,18 +24,20 @@ namespace Aerolt.Managers
                 if(!scene)
                     continue;
                 
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform); 
-                
-                newButton.GetComponent<CustomButton>().buttonText.text = !string.IsNullOrEmpty(scene.nameToken) ? Language.GetString(scene.nameToken) : scene.cachedName;
+                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+
+                var buttonComponet = newButton.GetComponent<CustomButton>();
+                buttonComponet.buttonText.text = !string.IsNullOrEmpty(scene.nameToken) ? Language.GetString(scene.nameToken) : scene.cachedName;
                 if(scene.previewTexture)
-                    newButton.GetComponent<Image>().sprite = Sprite.Create((Texture2D)scene.previewTexture, new Rect(0, 0,scene.previewTexture.width, scene.previewTexture.height), new Vector2(0.5f, 0.5f));
-                newButton.GetComponent<Button>().onClick.AddListener(() => SetScene(scene));
+                    buttonComponet.image.sprite = Sprite.Create((Texture2D)scene.previewTexture, new Rect(0, 0,scene.previewTexture.width, scene.previewTexture.height), new Vector2(0.5f, 0.5f));
+                buttonComponet.button.onClick.AddListener(() => SetScene(scene));
             }
         }
 
         public void SetScene(SceneDef scene)
         {
             Run.instance.AdvanceStage(scene);
+            Run.instance.stageClearCount--;
         }
         
         

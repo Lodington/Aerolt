@@ -12,7 +12,7 @@ namespace Aerolt.Managers
 {
     public class LobbyManager : MonoBehaviour
     {
-        public readonly Dictionary<NetworkUser, LobbyManagerStrip> Players = new();
+       // public readonly Dictionary<NetworkUser> Players = new();
 
         private NetworkUser _localPlayer;
         
@@ -23,7 +23,7 @@ namespace Aerolt.Managers
         
         public void OnEnable()
         {
-            GameObject StripPrefabInstantiated;
+            
 
             var array = NetworkUser.readOnlyInstancesList.ToArray();
             var newUsers = array.Except(cachedUsers).ToArray();
@@ -33,16 +33,14 @@ namespace Aerolt.Managers
                 {
                     _localPlayer = networkUser;
                 }
-                StripPrefabInstantiated = Instantiate(stripPrefab, stripParent.transform);
-                var strip = StripPrefabInstantiated.GetComponent<LobbyManagerStrip>();
-                strip.Init(networkUser, this);
-                Players.Add(networkUser, strip);
+
+                //Players.Add(networkUser);
             }
             var removedUsers = cachedUsers.Except(array).ToArray();
             foreach (var user in removedUsers)
             {
-                Destroy(Players[user].gameObject);
-                Players.Remove(user);
+                //Destroy(Players[user].gameObject);
+                //Players.Remove(user);
             }
 
             cachedUsers = array;

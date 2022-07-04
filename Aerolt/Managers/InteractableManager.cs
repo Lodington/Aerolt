@@ -19,60 +19,36 @@ namespace Aerolt.Managers
         public GameObject buttonPrefab;
         public GameObject buttonParent;
 
-        public TMP_Text interactableText;
-        public static List<SpawnCard> Cards = new List<SpawnCard>();
-
-        private SpawnCard _spawnCard;
-
-        public static Dictionary<SpawnCard, GameObject> interactableButtons = new();
-        private List<SpawnCard> cachedCards = new();
-
-        private void Awake()
-        {
-            //var newCards = Cards.Except(cachedCards).ToArray();
-            //if (newCards.Any())
-            {
-                // add new buttons
-                foreach (var card in cards) //newCards)
-                {
-                    if (card.Equals(null) || card.Equals(default)) continue;
-                    GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                    var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
-                    newButton.GetComponent<CustomButton>().buttonText.text =
-                        provider != null ? provider.GetDisplayName() : card.name; // Language.GetString(card.name);
-                    newButton.GetComponent<Image>().sprite = PingIndicator.GetInteractableIcon(card.prefab);
-                    newButton.GetComponent<Button>().onClick.AddListener(() => SetInteractable(card));
-                    //interactableButtons.Add(card, newButton);
-                }
-            }
-
-            /*
-            var removedCards = cachedCards.Except(Cards).ToArray();
-            if (removedCards.Any())
-            {
-                // remove cards
-                foreach (var card in removedCards)
-                {
-                    Destroy(interactableButtons[card]);
-                    interactableButtons.Remove(card);
-                }
-            }
-
-            cachedCards = Cards;
-            */
-        }
+        
+        [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
+        public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).ToArray();
 
         static InteractableManager()
         {
             Run.onRunStartGlobal += _ => _spawnCards = null; // clear the spawncards so they can be filled if you disable/enable expansions
         }
-
-        [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
-        public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).ToArray();
-
-        public void SpawnInteractable()
+        private void Awake()
         {
-            var user = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
+            
+            foreach (var card in cards)
+            {
+                if (card.Equals(null) || card.Equals(default)) continue;
+                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
+
+                var buttonComponet = newButton.GetComponent<CustomButton>();
+                buttonComponet.buttonText.text = provider != null ? provider.GetDisplayName() : card.name;
+                buttonComponet.image.sprite = PingIndicator.GetInteractableIcon(card.prefab);
+                buttonComponet.button.onClick.AddListener(() => SpawnInteractable(card));
+            }
+        }
+
+        public void SpawnInteractable(SpawnCard card)
+        {
+
+           // var user = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
+
+           var user = LocalUserManager.GetFirstLocalUser();
             
             var master = user.cachedMaster;
             if (!master)
@@ -94,20 +70,12 @@ namespace Aerolt.Managers
             
             if (NetworkServer.active)
             {
-                Spawn((uint) Array.IndexOf(cards, _spawnCard), position + aimRay);
+                Spawn((uint) Array.IndexOf(cards, card), position + aimRay);
             }
             else
             {
-                ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage((uint) Array.IndexOf(cards, _spawnCard), position + aimRay));
+                ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage((uint) Array.IndexOf(cards, card), position + aimRay));
             }
-        }
-
-        public void SetInteractable(SpawnCard card)
-        {
-            var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
-            interactableText.text = provider != null ? provider.GetDisplayName() : card.name; 
-            //interactableText.text = card.name;
-            _spawnCard = card;
         }
 
         public static void Spawn(uint index, Vector3 position)
