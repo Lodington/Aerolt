@@ -33,8 +33,6 @@ namespace Aerolt
         public const string Version = "2.0.1";
         public static ManualLogSource Log;
         public static GameObject _co;
-        //private static GameObject _op;
-        //private static GameObject _popup;
         public static AssetBundle _assets;
 
         public static GameObject settingsRoot;
@@ -51,8 +49,6 @@ namespace Aerolt
             _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); _assets.LoadAsset<GameObject>("AeroltUI");
-            //_op = _assets.LoadAsset<GameObject>("SettingUI");
-            //_popup = _assets.LoadAsset<GameObject>("Popup");
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();

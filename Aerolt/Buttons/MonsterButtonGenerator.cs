@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Managers;
 using RoR2;
@@ -18,6 +19,8 @@ namespace Aerolt.Buttons
     {
         public GameObject buttonPrefab;
         public GameObject buttonParent;
+
+        public GameObject editItemsPrefab;
 
         public TMP_Dropdown teamIndexDropDown;
         public TMP_Dropdown eliteIndexDropDown;
@@ -51,7 +54,6 @@ namespace Aerolt.Buttons
             if(eliteIndexDropDown)
                 eliteIndexDropDown.AddOptions(eliteMap.Keys.ToList());
         }
-
 
         public void SpawnMonster(CharacterMaster monsterMaster)
         {

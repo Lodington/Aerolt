@@ -37,15 +37,15 @@ namespace Aerolt.Buttons
 			{
 				case ItemDef itemDef:
 					customButton.buttonText.text = Language.GetString(itemDef.nameToken);
-					button.GetComponent<Image>().sprite = itemDef.pickupIconSprite;
+					customButton.image.sprite = itemDef.pickupIconSprite;
 					break;
 				case EquipmentDef eqDef:
 					customButton.buttonText.text = Language.GetString(eqDef.nameToken);
-					button.GetComponent<Image>().sprite = eqDef.pickupIconSprite;
+					customButton.image.sprite = eqDef.pickupIconSprite;
 					break;
 				case BuffDef buffDef:
 					customButton.buttonText.text = buffDef.name;
-					var image = button.GetComponent<Image>();
+					var image = customButton.image;
 					image.sprite = buffDef.iconSprite;
 					image.color = buffDef.buffColor;
 					break;
