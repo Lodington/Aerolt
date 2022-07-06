@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Managers;
@@ -57,12 +58,10 @@ namespace Aerolt.Buttons
 
         public void SpawnMonster(CharacterMaster monsterMaster)
         {
-            var localUser = LocalUserManager.GetFirstLocalUser();
-            if(localUser == null || !localUser.cachedBody)
-                return;
-            
-            var location = localUser.cachedBody.transform.position;
-            var body = monsterMaster.GetComponent<CharacterMaster>().bodyPrefab;
+            var body = GetComponentInParent<MenuInfo>().Body;
+            if (!body) return;
+            var location = body.transform.position;
+            var bodyPrefab = monsterMaster.GetComponent<CharacterMaster>().bodyPrefab;
 
             var bodyGameObject = Instantiate(monsterMaster.gameObject, location, Quaternion.identity);
             var master = bodyGameObject.GetComponent<CharacterMaster>();
@@ -78,10 +77,8 @@ namespace Aerolt.Buttons
 
 
             NetworkServer.Spawn(bodyGameObject);
-            master.bodyPrefab = body;
-            master.SpawnBody(localUser.cachedBody.transform.position, Quaternion.identity);
-            
+            master.bodyPrefab = bodyPrefab;
+            master.SpawnBody(location, Quaternion.identity);
         }
-        
     }
 }

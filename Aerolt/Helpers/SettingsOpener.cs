@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Aerolt.Classes;
 using Aerolt.Managers;
 using BepInEx.Bootstrap;
 using RiskOfOptions.Components.Panel;
@@ -16,10 +17,14 @@ namespace Aerolt.Helpers
         private LocalUser localuser;
         private Transform headerTransform;
 
+        public void Awake()
+        {
+            localuser = GetComponentInParent<MenuInfo>().Owner.localUser;
+        }
+
         public void OpenSettingsForced()
         {
             Console.instance.SubmitCmd(null, "pause", false); // This is how you do it, apparently splitscreen users do not have their own pause screen despite it being mostly implemented that way.
-            localuser = GetComponentInParent<PanelManager>().owner.localUser;
             if (localuser != null)
                 openSettings = OpenState.WaitingForPause;
         }

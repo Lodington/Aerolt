@@ -121,9 +121,9 @@ namespace Aerolt.Classes
 
         public void Awake()
         {
-            var panelManager = GetComponentInParent<PanelManager>();
-            owner = panelManager.owner;
-            configFile = panelManager.configFile;
+            var panelManager = GetComponentInParent<MenuInfo>();
+            owner = panelManager.Owner;
+            configFile = panelManager.ConfigFile;
             owner.master.onBodyStart += MasterBodyStart;
             owner.master.onBodyDestroyed += MasterDestroyBody;
 

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Models;
 using RoR2;
-using RoR2.UI;
 using UnityEngine;
 
 namespace Aerolt.Managers
@@ -16,23 +14,7 @@ namespace Aerolt.Managers
     {
         public List<PanelInstanceModel> _panelInstanceModels = new List<PanelInstanceModel>();
         [NonSerialized] public ObjectPool objectPool;
-
-        [NonSerialized] public NetworkUser owner;
-        [NonSerialized] public ZioConfigFile.ZioConfigFile configFile;
-        [NonSerialized] public HUD hud;
         private Canvas parentCanvas;
-        
-        private void StartLate()
-        {
-            parentCanvas = GetComponentInParent<Canvas>();
-            PauseManager.onPauseStartGlobal += FuckingUnitySorting;
-            objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
-            foreach (var obj in objectPool.prefabsForPool)
-            {
-                ShowPanel(obj.gameObject.name, PanelShowBehaviour.HIDE_PREVIOUS);
-                HideLastPanel();
-            }
-        }
 
         private void OnDestroy()
         {
@@ -109,17 +91,14 @@ namespace Aerolt.Managers
         }
         private void Awake()
         {
-            Initialize(Load.tempViewer);
-            hud = Load.tempHud;
-            StartLate();
-        }
-
-        public void Initialize(NetworkUser ownerIn)
-        {
-            owner = ownerIn;
-            transform.parent.GetComponentInChildren<ToggleWindow>().Init(owner, this);
-            if (ownerIn.localUser != null)
-                configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, $"/Aerolt/Profiles/{ownerIn.localUser.userProfile.fileName}.cfg", true);
+            parentCanvas = GetComponentInParent<Canvas>();
+            PauseManager.onPauseStartGlobal += FuckingUnitySorting;
+            objectPool = transform.parent.GetComponentInChildren<ObjectPool>();
+            foreach (var obj in objectPool.prefabsForPool)
+            {
+                ShowPanel(obj.gameObject.name, PanelShowBehaviour.HIDE_PREVIOUS);
+                HideLastPanel();
+            }
         }
     }
 

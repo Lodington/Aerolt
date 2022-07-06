@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Buttons;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Messages;
 using JetBrains.Annotations;
@@ -21,6 +22,7 @@ namespace Aerolt.Managers
 
         
         [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
+        private MenuInfo _info;
         public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).ToArray();
 
         static InteractableManager()
@@ -29,7 +31,7 @@ namespace Aerolt.Managers
         }
         private void Awake()
         {
-            
+            _info = GetComponentInParent<MenuInfo>();
             foreach (var card in cards)
             {
                 if (card.Equals(null) || card.Equals(default)) continue;
@@ -45,19 +47,13 @@ namespace Aerolt.Managers
 
         public void SpawnInteractable(SpawnCard card)
         {
-
-           // var user = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
-
-           var user = LocalUserManager.GetFirstLocalUser();
-            
-            var master = user.cachedMaster;
-            if (!master)
+            if (!_info.Master)
             {
                 Tools.Log(Aerolt.Enums.LogLevel.Error, $"Cant Spawn Interactable Localuser Master is null");
                 return;
             }
-                
-            var body = master.GetBody();
+
+            var body = _info.Body;
             if (!body) //wats a erorr catch?
             {
                 Tools.Log(Aerolt.Enums.LogLevel.Error, $"Cant Spawn Interactable Localuser Body is null");

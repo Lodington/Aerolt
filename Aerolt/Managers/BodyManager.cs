@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Aerolt.Buttons;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Rewired.Utils.Libraries.TinyJson;
 using RoR2;
@@ -41,7 +42,7 @@ namespace Aerolt.Managers
                 Load.CallPopup("Error", $"No Body Selected! Please Select a body to spawn as", buttonParent.transform);
             if (_newBody)
             {
-                var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
+                var localUser = GetComponentInParent<MenuInfo>().LocalUser;
                 if (localUser.cachedMasterController && localUser.cachedMasterController.master)
                 {
                     var master = localUser.cachedMaster;

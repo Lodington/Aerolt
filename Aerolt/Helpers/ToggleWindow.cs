@@ -14,10 +14,9 @@ namespace Aerolt.Classes
         [NonSerialized] public NetworkUser owner;
         private PanelManager panelManager;
 
-        public void Init(NetworkUser owner, PanelManager pm)
+        public void Init(NetworkUser owner)
         {
             this.owner = owner;
-            panelManager = pm;
             var profile = owner.localUser?.userProfile;
             if (profile == null)
             {

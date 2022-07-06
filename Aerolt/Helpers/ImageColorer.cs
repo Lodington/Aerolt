@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aerolt.Classes;
 using Aerolt.Managers;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -27,9 +28,9 @@ namespace Aerolt.Helpers
 
         public void Start()
         {
-            var panelManager = transform.parent ? GetComponentInParent<PanelManager>() : GetComponent<PanelManager>(); 
-            configFile = panelManager ? panelManager.configFile : Load.Instance.configFile;
-            who = panelManager ? Load.Name + " " + panelManager.owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
+            var menuInfo = transform.parent ? GetComponentInParent<MenuInfo>() : GetComponent<MenuInfo>(); 
+            configFile = menuInfo ? menuInfo.ConfigFile : Load.Instance.configFile;
+            who = menuInfo ? Load.Name + " " + menuInfo.Owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
             image = GetComponent<Image>();
             if (!image) throw new ArgumentNullException($"Missing Image Component on object {gameObject} for ImageColorer.");
             var def = catagory + name;

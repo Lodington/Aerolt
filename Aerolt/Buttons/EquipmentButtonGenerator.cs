@@ -1,4 +1,5 @@
-﻿using Aerolt.Helpers;
+﻿using Aerolt.Classes;
+using Aerolt.Helpers;
 using Aerolt.Managers;
 using RoR2;
 using RoR2.ContentManagement;
@@ -16,9 +17,11 @@ namespace Aerolt.Buttons
 
         public TMP_Text EquipmentText;
         private EquipmentDef _equipmentDef;
+        private MenuInfo _info;
 
         private void Awake()
         {
+            _info = GetComponentInParent<MenuInfo>();
             foreach (var def in ContentManager._equipmentDefs)
             {
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
@@ -36,18 +39,17 @@ namespace Aerolt.Buttons
 
         public void GiveEquipment()
         {
-            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
-            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
-            var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>();
+            if (!_info.Master) return;
+            //var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>(); what the fuck is this lodington
+            var inventory = _info.Master.inventory;
 
             inventory.SetEquipmentIndex(_equipmentDef.equipmentIndex);
         }
         
         public void DropEquipment(int amount = 1)
         {
-            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
-            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
-            var body = localUser.cachedMasterController.master.GetBody();
+            var body = _info.Body;
+            if (!body) return;
             for (int i = 0; i < amount; i++)
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_equipmentDef.equipmentIndex),
                     body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);

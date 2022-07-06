@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Managers;
 using RoR2;
@@ -17,9 +18,11 @@ namespace Aerolt.Buttons
 
         public TMP_Text itemText;
         private ItemDef _itemDef;
+        private MenuInfo _info;
 
         private void Awake()
         {
+            _info = GetComponentInParent<MenuInfo>();
             foreach(var def in ContentManager._itemDefs.OrderBy(x => x.tier))
             {
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
@@ -41,18 +44,16 @@ namespace Aerolt.Buttons
             if (!_itemDef)
                 Load.CallPopup("Error", "Please Selection a item to spawn it",
                     GetComponentInParent<PanelManager>().transform);
-            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
-            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
-            var inventory = localUser.cachedMasterController.master.inventory;
+            if (!_info.Master) return;
+            var inventory = _info.Master.inventory;
 
             inventory.GiveItem(_itemDef, amount);
         }
         
         public void DropItem(int amount)
         {
-            var localUser = GetUser.FetchUser(GetComponentInParent<PanelManager>().hud);
-            if (!localUser.cachedMasterController || !localUser.cachedMasterController.master) return;
-            var body = localUser.cachedMasterController.master.GetBody();
+            var body = _info.Body;
+            if (!body) return;
             
             for (var i = 0; i < amount; i++)
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_itemDef.itemIndex),

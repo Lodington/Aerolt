@@ -1,4 +1,5 @@
 using System;
+using Aerolt.Classes;
 using Aerolt.Managers;
 using RoR2.UI;
 using UnityEngine;
@@ -17,8 +18,8 @@ namespace Aerolt.Helpers
 		public void Start()
 		{
 			targetTransform = (RectTransform) transform;
-			var panelManager = targetTransform.parent ? GetComponentInParent<PanelManager>() : GetComponent<PanelManager>();
-			var configFile = panelManager ? panelManager.configFile : Load.Instance.configFile;
+			var menuInfo = targetTransform.parent ? GetComponentInParent<MenuInfo>() : GetComponent<MenuInfo>();
+			var configFile = menuInfo ? menuInfo.ConfigFile : Load.Instance.configFile;
 			configEntry = configFile.Bind("Window Positions", windowName, (Vector2) targetTransform.localPosition, "Stored position of this window.");
 			targetTransform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0);
 		}
