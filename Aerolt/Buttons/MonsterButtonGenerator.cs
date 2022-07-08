@@ -16,7 +16,7 @@ using UnityEngine.UI;
 
 namespace Aerolt.Buttons
 {
-    public class MonsterButtonGenerator : MonoBehaviour
+    public class MonsterButtonGenerator : MonoBehaviour, IModuleStartup
     {
         public GameObject buttonPrefab;
         public GameObject buttonParent;
@@ -31,7 +31,7 @@ namespace Aerolt.Buttons
         private Dictionary<string, EquipmentIndex> eliteMap;
         public Toggle brainDead;
 
-        private void Awake()
+        public void ModuleStart()
         {
             foreach (var master in MasterCatalog.allAiMasters)
             {

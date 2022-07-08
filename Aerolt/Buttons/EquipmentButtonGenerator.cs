@@ -43,13 +43,14 @@ namespace Aerolt.Buttons
             //var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>(); what the fuck is this lodington
             var inventory = _info.Master.inventory;
 
-            inventory.SetEquipmentIndex(_equipmentDef.equipmentIndex);
+            inventory.SetEquipmentIndex(_equipmentDef ? _equipmentDef.equipmentIndex : EquipmentIndex.None);
         }
         
         public void DropEquipment(int amount = 1)
         {
             var body = _info.Body;
             if (!body) return;
+            if (!_equipmentDef) return;
             for (int i = 0; i < amount; i++)
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_equipmentDef.equipmentIndex),
                     body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);

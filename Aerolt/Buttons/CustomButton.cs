@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using JetBrains.Annotations;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
@@ -16,11 +17,11 @@ namespace Aerolt.Buttons
         public TMP_Text buttonText;
         public Image image;
         public RawImage rawImage;
-        [NonSerialized]
-        public Button button;
+        public Button button => _button ??= GetComponent<Button>();
         public Button.ButtonClickedEvent onRightClick;
         
         private MPEventSystemLocator eventSystemLocator;
+        [CanBeNull] private Button _button;
         public MPEventSystem EventSystem => eventSystemLocator.eventSystem;
         public void InvokeRightClick()
         {
@@ -45,7 +46,6 @@ namespace Aerolt.Buttons
         public void Awake()
         {
             eventSystemLocator = GetComponent<MPEventSystemLocator>();
-            button = GetComponent<Button>();
         }
         public void Update()
         {

@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace Aerolt.Classes
 {
-    public class Esp : MonoBehaviour
+    public class Esp : MonoBehaviour, IModuleStartup
     {
         private static readonly EspHelper Helper = new EspHelper(); // why lodington
         
@@ -102,7 +102,7 @@ namespace Aerolt.Classes
             }
         }
 
-        public void Awake()
+        public void ModuleStart()
         {
             var configFile = Load.Instance.configFile;
             teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");

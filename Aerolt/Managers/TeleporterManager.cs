@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Aerolt.Buttons;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Rewired.Config;
 using RoR2;
@@ -12,12 +13,12 @@ namespace Aerolt.Managers
 {
 
     
-    public class TeleporterManager : MonoBehaviour
+    public class TeleporterManager : MonoBehaviour, IModuleStartup
     {
         public GameObject buttonPrefab;
         public GameObject buttonParent;
         
-        public void Start()
+        public void ModuleStart()
         {
             foreach (var scene in SceneCatalog.allSceneDefs.OrderByDescending(x => x.sceneType))
             {

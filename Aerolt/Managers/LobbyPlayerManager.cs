@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Buttons;
+using Aerolt.Classes;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 namespace Aerolt.Managers
 {
 	[RequireComponent(typeof(ToggleGroup))]
-	public class LobbyPlayerManager : MonoBehaviour
+	public class LobbyPlayerManager : MonoBehaviour, IModuleStartup
 	{
 		public GameObject playerEntryPrefab;
 		public Transform playerEntryParent;
@@ -18,7 +19,7 @@ namespace Aerolt.Managers
 		private readonly Dictionary<NetworkUser, CustomButton> users = new();
 		private ToggleGroup toggleGroup;
 
-		private void Awake()
+		public void ModuleStart()
 		{
 			NetworkUser.onNetworkUserDiscovered += UserAdded;
 			NetworkUser.onNetworkUserLost += UserLost;

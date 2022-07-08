@@ -21,12 +21,26 @@ namespace Aerolt.Classes
 		{
 			Hud = Load.tempHud;
 			Owner = Load.tempViewer;
-			transform.parent.GetComponentInChildren<ToggleWindow>().Init(Owner);
+			//transform.GetComponentInChildren<ToggleWindow>().Init(Owner); Currently not implemented
 			
 			if (Owner.localUser == null) return;
-			if (Files.TryGetValue(Owner.localUser, out ConfigFile)) return;
-			ConfigFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, $"/Aerolt/Profiles/{Owner.localUser.userProfile.fileName}.cfg", true);
-			Files.Add(Owner.localUser, ConfigFile);
+			if (!Files.TryGetValue(Owner.localUser, out ConfigFile))
+			{
+				ConfigFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, $"/Aerolt/Profiles/{Owner.localUser.userProfile.fileName}.cfg", true);
+				Files.Add(Owner.localUser, ConfigFile);
+			}
+
+			foreach (var startup in GetComponentsInChildren<IModuleStartup>(true))
+			{
+				try
+				{
+					startup?.ModuleStart();
+				}
+				catch (Exception e)
+				{
+					Load.Log.LogError(e);
+				}
+			}
 		}
 	}
 }

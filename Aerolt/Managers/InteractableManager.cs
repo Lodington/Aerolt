@@ -15,7 +15,7 @@ using UnityEngine.UI;
 
 namespace Aerolt.Managers
 {
-    public class InteractableManager : MonoBehaviour
+    public class InteractableManager : MonoBehaviour, IModuleStartup
     {
         public GameObject buttonPrefab;
         public GameObject buttonParent;
@@ -29,7 +29,7 @@ namespace Aerolt.Managers
         {
             Run.onRunStartGlobal += _ => _spawnCards = null; // clear the spawncards so they can be filled if you disable/enable expansions
         }
-        private void Awake()
+        public void ModuleStart()
         {
             _info = GetComponentInParent<MenuInfo>();
             foreach (var card in cards)
