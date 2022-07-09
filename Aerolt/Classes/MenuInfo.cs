@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using RoR2;
@@ -12,7 +13,8 @@ namespace Aerolt.Classes
 		[NonSerialized] public NetworkUser Owner;
 		[NonSerialized] public ZioConfigFile.ZioConfigFile ConfigFile;
 		[NonSerialized] public HUD Hud;
-		private static readonly Dictionary<LocalUser, ZioConfigFile.ZioConfigFile> Files = new();
+		private Canvas parentCanvas;
+		public static readonly Dictionary<LocalUser, ZioConfigFile.ZioConfigFile> Files = new();
 		[CanBeNull] public LocalUser LocalUser => Owner.localUser;
 		[CanBeNull] public CharacterBody Body => LocalUser?.cachedBody;
 		[CanBeNull] public CharacterMaster Master => Owner.master;
@@ -21,7 +23,7 @@ namespace Aerolt.Classes
 		{
 			Hud = Load.tempHud;
 			Owner = Load.tempViewer;
-			//transform.GetComponentInChildren<ToggleWindow>().Init(Owner); Currently not implemented
+			transform.GetComponentInChildren<ToggleWindow>().Init(Owner, this);
 			
 			if (Owner.localUser == null) return;
 			if (!Files.TryGetValue(Owner.localUser, out ConfigFile))
@@ -40,6 +42,37 @@ namespace Aerolt.Classes
 				{
 					Load.Log.LogError(e);
 				}
+			}
+
+			parentCanvas = GetComponent<Canvas>();
+			PauseManager.onPauseStartGlobal += FuckingUnitySorting;
+			FuckingUnitySorting();
+		}
+
+		private void OnDestroy()
+		{
+			foreach (var startup in GetComponentsInChildren<IModuleStartup>(true))
+			{
+				try
+				{
+					startup?.ModuleEnd();
+				}
+				catch (Exception e)
+				{
+					Load.Log.LogError(e);
+				}
+			}
+			PauseManager.onPauseStartGlobal -= FuckingUnitySorting;
+		}
+
+		public void FuckingUnitySorting()
+		{
+			StartCoroutine(Example());
+            
+			IEnumerator Example()
+			{
+				yield return new WaitForSecondsRealtime(0.01f);
+				parentCanvas.sortingOrder = 1000; // something keeps fucking setting this back to 0
 			}
 		}
 	}

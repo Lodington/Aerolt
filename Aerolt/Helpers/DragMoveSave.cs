@@ -9,7 +9,7 @@ using ZioConfigFile;
 namespace Aerolt.Helpers
 {
 	[RequireComponent(typeof(DragMove))]
-	public class DragMoveSave : MonoBehaviour, IEndDragHandler
+	public class DragMoveSave : MonoBehaviour, IEndDragHandler, IBeginDragHandler
 	{
 		private RectTransform targetTransform;
 		private ZioConfigEntry<Vector2> configEntry;
@@ -34,6 +34,11 @@ namespace Aerolt.Helpers
 			var height = parent.sizeDelta.y * 0.5f - 10f + targetTransform.sizeDelta.y * 0.5f;
 			configEntry.Value = new Vector2(Mathf.Clamp(localPosition.x, -width, width), Mathf.Clamp(localPosition.y, -height, height));
 			//targetTransform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0);
+		}
+
+		public void OnBeginDrag(PointerEventData eventData)
+		{
+			targetTransform.SetAsLastSibling();
 		}
 	}
 }

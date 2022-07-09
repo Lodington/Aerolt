@@ -12,10 +12,11 @@ namespace Aerolt.Classes
 
         public GameObject panel;
         [NonSerialized] public NetworkUser owner;
-        private PanelManager panelManager;
+        private MenuInfo menuInfo;
 
-        public void Init(NetworkUser owner)
+        public void Init(NetworkUser owner, MenuInfo info)
         {
+            menuInfo = info;
             this.owner = owner;
             var profile = owner.localUser?.userProfile;
             if (profile == null)
@@ -39,7 +40,7 @@ namespace Aerolt.Classes
             _menuIsOpen = !_menuIsOpen;
             panel.SetActive(_menuIsOpen);
             if (_menuIsOpen)
-                panelManager.FuckingUnitySorting();
+                menuInfo.FuckingUnitySorting();
         }
 
         private void OnDestroy()

@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
-using Aerolt.Classes;
+using JetBrains.Annotations;
 using RoR2;
 using TMPro;
 using UnityEngine;
@@ -11,22 +15,31 @@ namespace Aerolt.Buttons
         public GameObject parent;
         public GameObject playerValuePrefab;
         private bool setup;
-        private MenuInfo _info;
+        private CharacterBody _target;
+        private readonly Dictionary<FieldInfo, TMP_InputField> _entries = new();
+        private static readonly FieldInfo[] Fields = _fields ??= typeof(CharacterBody).GetFields().Where(x => x.FieldType == typeof(float)).ToArray();
+        [CanBeNull] private static readonly FieldInfo[] _fields;
 
-        public void Awake()
+        public CharacterBody TargetBody
         {
-            _info = GetComponentInParent<MenuInfo>();
+            get => _target;
+            set
+            {
+                _target = value;
+                UpdateText();
+            }
+        }
+
+        private void UpdateText()
+        {
+            foreach (var (field, inputField) in _entries) ((TextMeshProUGUI) inputField.placeholder).text = field.GetValue(TargetBody).ToString();
         }
 
         public void Update()
         {
             if (setup) return;
-            var body = _info.Body;
-            if (!body) return;
-            FieldInfo[] fields = typeof(CharacterBody).GetFields();
-            foreach (var field in fields)
-                if (field.FieldType == typeof(float))
-                    CreateNewStatPrefab(field);
+            foreach (var field in Fields) CreateNewStatPrefab(field);
+            if (TargetBody) UpdateText();
             setup = true;
         }
 
@@ -35,14 +48,16 @@ namespace Aerolt.Buttons
             var prefab = Instantiate(playerValuePrefab, parent.transform);
             prefab.GetComponentInChildren<TextMeshProUGUI>().text = field.Name;
             var input = prefab.GetComponentInChildren<TMP_InputField>();
-            var body = _info.Body;
-            if (!body) return;
-            input.text = field.GetValue(body).ToString();
             input.m_OnEndEdit.AddListener(result =>
             {
-                var infoBody = _info.Body;
-                if (infoBody && float.TryParse(result, out var value)) field.SetValue(infoBody, value);
+                if (!TargetBody || !float.TryParse(result, out var value)) return;
+                
+                field.SetValue(TargetBody, value);
+                TargetBody.statsDirty = true;
+                input.text = string.Empty;
+                ((TextMeshProUGUI) input.placeholder).text = value.ToString(CultureInfo.InvariantCulture);
             });
+            _entries[field] = input;
         }
 
     }
