@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using Aerolt.Enums;
 using Aerolt.Managers;
+using BepInEx.Bootstrap;
+using BepInEx.Configuration;
+using RiskOfOptions;
 using RoR2;
 using UnityEngine;
+using UnityEngine.UI;
+using ZioConfigFile;
+using ZioRiskOfOptions;
 
 namespace Aerolt.Classes
 {
@@ -13,6 +20,8 @@ namespace Aerolt.Classes
         public GameObject panel;
         [NonSerialized] public NetworkUser owner;
         private MenuInfo menuInfo;
+        private static List<ConfigDefinition> roo = new();
+        private ZioConfigEntry<bool> visible;
 
         public void Init(NetworkUser owner, MenuInfo info)
         {
@@ -26,7 +35,23 @@ namespace Aerolt.Classes
                 return;
             }
             Invoke(nameof(WindowToggle), 0.01f);
+            visible = menuInfo.ConfigFile.Bind("General", "Show Icon", true, "You should probably leave this on if you're using a gamepad.");
+            visible.SettingChanged += VisibleOnSettingChanged;
+            if (!roo.Contains(visible.Definition) && Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
+                MakeRiskOfOptions(visible);
         }
+
+        private void VisibleOnSettingChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        {
+            GetComponent<Image>().enabled = visible.Value;
+        }
+
+        private void MakeRiskOfOptions(ZioConfigEntry<bool> visible)
+        {
+            var who = menuInfo ? Load.Name + " " + menuInfo.Owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
+            ModSettingsManager.AddOption(new ZioCheckBoxOption(visible), who, who);
+        }
+
         public void Update()
         {
             var localUser = LocalUserManager.GetFirstLocalUser();
@@ -46,6 +71,7 @@ namespace Aerolt.Classes
         private void OnDestroy()
         {
             Load.aeroltUIs.Remove(owner);
+            visible.SettingChanged -= VisibleOnSettingChanged;
         }
     }
 }
