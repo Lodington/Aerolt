@@ -50,10 +50,12 @@ namespace Aerolt.Classes
         {
             var who = menuInfo ? Load.Name + " " + menuInfo.Owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
             ModSettingsManager.AddOption(new ZioCheckBoxOption(visible), who, who);
+            roo.Add(visible.Definition);
         }
 
         public void Update()
         {
+            if (!owner) return;
             var localUser = LocalUserManager.GetFirstLocalUser();
             var isFirst = localUser == owner.localUser;
             if (isFirst && Load.GetKeyPressed(Load.KeyBinds[ButtonNames.OpenMenu]))

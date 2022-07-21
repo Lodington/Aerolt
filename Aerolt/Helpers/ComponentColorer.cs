@@ -29,15 +29,30 @@ namespace Aerolt.Helpers
 		public Image toggleImage; // Might want to put these under their own config entry/color, especially this one considering its paired to the grey text color which is ew.
 		public Image toggleOnImage;
 		private MenuInfo menuInfo;
+		private bool initialized;
+
+		private void Awake()
+		{
+			ModuleStart();
+		}
 
 		public void ModuleStart()
 		{
+			if (initialized) return;
 			menuInfo = GetComponentInParent<MenuInfo>();
 			var configFile = menuInfo.ConfigFile;
+			if (configFile == null) return;
 
 			if (string.IsNullOrWhiteSpace(configName))
-				configName = GetComponent<DragMoveSave>().windowName;
-			
+			{
+				var save = GetComponent<DragMoveSave>();
+				if (save)
+					configName = save.windowName;
+				var moveresize = GetComponent<DragResizeMove>();
+				if (moveresize)
+					configName = moveresize.windowName;
+			}
+
 			var i = 0;
 			foreach (var colorName in Enum.GetNames(typeof(ColorLayer)))
 			{
@@ -57,6 +72,7 @@ namespace Aerolt.Helpers
 			ColorChanged(colorEntries[ColorLayer.TextGrey], null, false);
 			colorEntries[ColorLayer.Foreground].SettingChanged += ColorChangedOn;
 			ColorChangedOn(colorEntries[ColorLayer.Foreground], null, false);
+			initialized = true;
 		}
 
 		private void MakeRiskOfOptions(ZioConfigEntryBase value)
@@ -90,18 +106,20 @@ namespace Aerolt.Helpers
 
 		private void Awake()
 		{
-			parent = GetComponentInParent<ComponentColorer>().colorEntries[colorLayer];
-			parent.SettingChanged += Colorize;
+			if (GetComponentInParent<ComponentColorer>().colorEntries.TryGetValue(colorLayer, out parent))
+				parent.SettingChanged += Colorize;
 		}
 
 		private void OnEnable()
 		{
-			Colorize(parent, null, false);
+			if (parent != null)
+				Colorize(parent, null, false);
 		}
 
 		private void OnDestroy()
 		{
-			parent.SettingChanged -= Colorize;
+			if (parent != null)
+				parent.SettingChanged -= Colorize;
 		}
 
 		public ColorLayer colorLayer = ColorLayer.Foreground; // this cant be a property for some fucking reason unity wont serialize it

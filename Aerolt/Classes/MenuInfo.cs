@@ -21,16 +21,20 @@ namespace Aerolt.Classes
 
 		private void Awake()
 		{
+			parentCanvas = GetComponent<Canvas>();
+			PauseManager.onPauseStartGlobal += FuckingUnitySorting;
+			FuckingUnitySorting();
+			
 			Hud = Load.tempHud;
 			Owner = Load.tempViewer;
-			transform.GetComponentInChildren<ToggleWindow>().Init(Owner, this);
-			
+
 			if (Owner.localUser == null) return;
 			if (!Files.TryGetValue(Owner.localUser, out ConfigFile))
 			{
 				ConfigFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, $"/Aerolt/Profiles/{Owner.localUser.userProfile.fileName}.cfg", true);
 				Files.Add(Owner.localUser, ConfigFile);
 			}
+			transform.GetComponentInChildren<ToggleWindow>().Init(Owner, this);
 
 			foreach (var startup in GetComponentsInChildren<IModuleStartup>(true))
 			{
@@ -43,10 +47,6 @@ namespace Aerolt.Classes
 					Load.Log.LogError(e);
 				}
 			}
-
-			parentCanvas = GetComponent<Canvas>();
-			PauseManager.onPauseStartGlobal += FuckingUnitySorting;
-			FuckingUnitySorting();
 		}
 
 		private void OnDestroy()
