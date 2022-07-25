@@ -2,10 +2,12 @@ using System;
 using System.Linq;
 using Aerolt.Buttons;
 using Aerolt.Classes;
+using Aerolt.Messages;
 using RoR2;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace Aerolt.Managers
@@ -83,6 +85,20 @@ namespace Aerolt.Managers
 		{
 			teamDropdown.options.Clear(); // ensure it was empty to begin with.
 			teamDropdown.AddOptions(Enum.GetNames(typeof(TeamIndex)).Where(x => x != "None").ToList());
+			
+			moneyInputField.onEndEdit.AddListener(amt => SetCurrency(CurrencyType.Money, amt));
+			lunarCoinsInputField.onEndEdit.AddListener(amt => SetCurrency(CurrencyType.Lunar, amt));
+			voidMarkersInputField.onEndEdit.AddListener(amt => SetCurrency(CurrencyType.Void, amt));
+		}
+
+		public void SetCurrency(CurrencyType currencyType, string strAmount)
+		{
+			if (!uint.TryParse(strAmount, out var amount)) return;
+			var message = new CurrencyMessage(master, currencyType, amount);
+			if (!NetworkServer.active)
+				message.SendToServer();
+			else
+				message.Handle();
 		}
 
 		public void ModuleEnd()
