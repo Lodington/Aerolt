@@ -56,7 +56,7 @@ namespace Aerolt.Helpers
 			var i = 0;
 			foreach (var colorName in Enum.GetNames(typeof(ColorLayer)))
 			{
-				var definition = new ConfigDefinition(configName + " Colors", colorName);
+				var definition = new ConfigDefinition($"{configName} Colors".Trim(), colorName);
 
 				if (!configFile.TryGetValue(definition, out var entry))
 				{

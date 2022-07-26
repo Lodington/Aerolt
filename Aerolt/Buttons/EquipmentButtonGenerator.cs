@@ -14,46 +14,39 @@ namespace Aerolt.Buttons
     {
         public GameObject buttonPrefab;
         public GameObject buttonParent;
-
-        public TMP_Text EquipmentText;
+        
         private EquipmentDef _equipmentDef;
-        private MenuInfo _info;
+        private NetworkUser target;
 
         private void Awake()
         {
-            _info = GetComponentInParent<MenuInfo>();
             foreach (var def in ContentManager._equipmentDefs)
             {
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<CustomButton>().buttonText.text = Language.GetString(def.nameToken);
-                newButton.GetComponent<Image>().sprite = def.pickupIconSprite;
-                newButton.GetComponent<Button>().onClick.AddListener(() => SetEquipmentDef(def));
+                var newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                var customButton = newButton.GetComponent<CustomButton>(); 
+                customButton.buttonText.text = Language.GetString(def.nameToken);
+                customButton.image.sprite = def.pickupIconSprite;
+                customButton.button.onClick.AddListener(() => SetEquipmentDef(def));
             }
         }
 
         public void SetEquipmentDef(EquipmentDef def)
         {
-            EquipmentText.text = Language.GetString(def.nameToken);
             _equipmentDef = def;
+            GiveEquipment();
         }
 
-        public void GiveEquipment()
+        public void GiveEquipment() // TODO Network this
         {
-            if (!_info.Master) return;
-            //var inventory = localUser.cachedMasterController.master.GetBody().GetComponent<Inventory>(); what the fuck is this lodington
-            var inventory = _info.Master.inventory;
+            if (!target.master) return;
+            var inventory = target.master.inventory;
 
             inventory.SetEquipmentIndex(_equipmentDef ? _equipmentDef.equipmentIndex : EquipmentIndex.None);
+            GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
         }
-        
-        public void DropEquipment(int amount = 1)
+        public void Initialize(NetworkUser currentUser)
         {
-            var body = _info.Body;
-            if (!body) return;
-            if (!_equipmentDef) return;
-            for (int i = 0; i < amount; i++)
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(_equipmentDef.equipmentIndex),
-                    body.transform.position + (Vector3.up * 1.5f), Vector3.up * 20f + body.transform.forward * 2f);
+            target = currentUser;
         }
     }
 }

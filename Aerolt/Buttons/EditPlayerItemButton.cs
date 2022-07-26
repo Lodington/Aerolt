@@ -18,7 +18,7 @@ namespace Aerolt.Buttons
 {
     public class EditPlayerItemButton : MonoBehaviour
     {
-        public Dropdown sortMode;
+        public TMP_Dropdown sortMode;
         public TMP_InputField searchFilter;
         public GameObject buttonPrefab;
         public GameObject buttonParent;
@@ -33,6 +33,8 @@ namespace Aerolt.Buttons
         public void Awake()
         {
             if (sortMode)
+            {
+                sortMode.options.Clear();
                 sortMode.AddOptions(new List<string>()
                 {
                     "Tier Descending",
@@ -40,6 +42,7 @@ namespace Aerolt.Buttons
                     "Tier Ascending",
                     "Name Ascending",
                 });
+            }
             if(searchFilter)
                 searchFilter.m_OnEndEdit.AddListener(FilterUpdated);
             foreach (var def in ContentManager._itemDefs)
@@ -79,26 +82,6 @@ namespace Aerolt.Buttons
             foreach (var buttonGen in sorted) buttonGen.button.transform.SetSiblingIndex(0);
         }
 
-        public void Initialize(NetworkUser userIn, ZioConfigFile.ZioConfigFile configFile)
-        {
-            user = userIn;
-            foreach (var def in ContentManager._itemDefs)
-            {
-                itemDefRef[def].SetAmount(user.master.inventory.GetItemCount(def));
-            }
-
-            if (!sortMode)
-            {
-                Sort();
-                return;
-            }
-            
-            sortModeEntry = configFile.Bind("PlayerItems", "SortMode", 0, "");
-            sortModeEntry.SettingChanged += SortModeChanged;
-            sortMode.value = sortModeEntry.Value;
-            Sort();
-        }
-
         private void SortModeChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
         {
             sortMode.value = sortModeEntry.Value;
@@ -108,17 +91,19 @@ namespace Aerolt.Buttons
         public void GiveItems()
         {
             var inv = user.master.inventory;
-            if (NetworkServer.active)
+            new SetItemCountMessage(inv, itemDef).SendToServer();
+            GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
+        }
+
+        public void Initialize(NetworkUser currentUser)
+        {
+            user = currentUser;
+            foreach (var def in ContentManager._itemDefs)
             {
-                foreach (var (key, value) in itemDef)
-                {
-                    inv.GiveItem(key, value - inv.GetItemCount(key));
-                }
+                itemDefRef[def].SetAmount(user.master.inventory.GetItemCount(def));
             }
-            else
-            {
-                ClientScene.readyConnection.SendAerolt(new SetItemCountMessage(inv, itemDef));
-            }
+            
+            Sort();
         }
     }
 }

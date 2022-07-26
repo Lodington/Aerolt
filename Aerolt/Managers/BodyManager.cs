@@ -20,42 +20,50 @@ namespace Aerolt.Managers
 
         public GameObject buttonPrefab;
         public GameObject buttonParent;
-
-        public TMP_Text bodyText;
+        
         private GameObject _newBody;
+        private NetworkUser target;
 
         private void Awake()
         {
             foreach(var body in BodyCatalog.allBodyPrefabBodyBodyComponents)
             {
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                newButton.GetComponent<CustomButton>().buttonText.text = Language.GetString(body.baseNameToken);
-                newButton.GetComponent<Image>().sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
-                newButton.GetComponent<Button>().onClick.AddListener(() => SetBodyDef(body));
+                var customButton = newButton.GetComponent<CustomButton>(); 
+                customButton.buttonText.text = Language.GetString(body.baseNameToken);
+                customButton.image.sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
+                customButton.button.onClick.AddListener(() => SetBodyDef(body));
             }
             
         }
 
-        public void SpawnAsBody()
+        public void SpawnAsBody() // TODO network this
         {
             if (!_newBody)
-                Load.CallPopup("Error", $"No Body Selected! Please Select a body to spawn as", buttonParent.transform);
-            if (_newBody)
             {
-                var localUser = GetComponentInParent<MenuInfo>().LocalUser;
-                if (localUser.cachedMasterController && localUser.cachedMasterController.master)
-                {
-                    var master = localUser.cachedMaster;
-                    master.bodyPrefab = _newBody;
-                    master.Respawn(master.GetBody().transform.position, master.GetBody().transform.rotation);
-                }
+                Load.CallPopup("Error", $"No Body Selected! Please Select a body to spawn as", buttonParent.transform);
+                return;
+            }
+
+            if (target && target.master)
+            {
+                var master = target.master;
+                master.bodyPrefab = _newBody;
+                var transfor = master.GetBody().transform;
+                master.Respawn(transfor.position, transfor.rotation);
             }
         }
 
         public void SetBodyDef(CharacterBody body)
         {
-            bodyText.text = Language.GetString(body.baseNameToken);
             _newBody = BodyCatalog.FindBodyPrefab(body);;
+            SpawnAsBody();
+            GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
+        }
+
+        public void Initialize(NetworkUser currentUser)
+        {
+            target = currentUser;
         }
     }
     

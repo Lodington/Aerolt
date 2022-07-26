@@ -51,7 +51,27 @@ namespace Aerolt.Managers
 
 		public void SendToServer()
 		{
-			ClientScene.readyConnection.SendAerolt(this);
+			if (!NetworkServer.active)
+				ClientScene.readyConnection.SendAerolt(this);
+			else
+				Handle();
+		}
+
+		public void SendToAuthority(NetworkIdentity identity)
+		{
+			identity.clientAuthorityOwner.SendAerolt(this);
+		}
+		public void SendToAuthority(NetworkUser user)
+		{
+			SendToAuthority(user.netIdentity);
+		}
+		public void SendToAuthority(CharacterMaster master)
+		{
+			SendToAuthority(master.networkIdentity);
+		}
+		public void SendToAuthority(CharacterBody body)
+		{
+			SendToAuthority(body.networkIdentity);
 		}
 	}
 

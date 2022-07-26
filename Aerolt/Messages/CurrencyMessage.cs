@@ -28,7 +28,8 @@ namespace Aerolt.Messages
 					master.GiveMoney(amount - master.money);
 					break;
 				case CurrencyType.Lunar:
-					master.playerCharacterMasterController.networkUser.AwardLunarCoins(amount - master.playerCharacterMasterController.networkUser.netLunarCoins);
+					if (master.playerCharacterMasterController)
+						master.playerCharacterMasterController.networkUser.AwardLunarCoins(amount - master.playerCharacterMasterController.networkUser.netLunarCoins);
 					break;
 				case CurrencyType.Void:
 					master.GiveVoidCoins(amount - master.voidCoins);
