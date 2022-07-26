@@ -120,9 +120,21 @@ namespace Aerolt.Managers
 			infiniteSkillsToggle.onValueChanged.AddListener(InfiniteSkills);
 			alwaysSprintToggle.onValueChanged.AddListener(AlwaysSprint);
 
-			moneyInputField.onEndEdit.AddListener(amt => SetCurrency(CurrencyType.Money, amt));
-			lunarCoinsInputField.onEndEdit.AddListener(amt => SetCurrency(CurrencyType.Lunar, amt));
-			voidMarkersInputField.onEndEdit.AddListener(amt => SetCurrency(CurrencyType.Void, amt));
+			moneyInputField.onEndEdit.AddListener(amt =>
+			{
+				SetCurrency(CurrencyType.Money, amt);
+				moneyInputField.SetTextWithoutNotify("");
+			});
+			lunarCoinsInputField.onEndEdit.AddListener(amt =>
+			{
+				SetCurrency(CurrencyType.Lunar, amt);
+				lunarCoinsInputField.SetTextWithoutNotify("");
+			});
+			voidMarkersInputField.onEndEdit.AddListener(amt =>
+			{
+				SetCurrency(CurrencyType.Void, amt);
+				lunarCoinsInputField.SetTextWithoutNotify("");
+			});
 			
 			teamDropdown.onValueChanged.AddListener(TeamChanged);
 		}
