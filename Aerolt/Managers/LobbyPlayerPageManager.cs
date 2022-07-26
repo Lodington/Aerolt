@@ -96,7 +96,7 @@ namespace Aerolt.Managers
 			buffDisplay.source = body;
 			bodyStats.TargetBody = body;
 			teamDropdown.SetValueWithoutNotify((int) body.teamComponent.teamIndex);
-			if (_playerConfig.InfiniteSkillsOn) body.onSkillActivatedAuthority += InfiniteSkillsActivated;
+			if (isLocalUser && _playerConfig.InfiniteSkillsOn) body.onSkillActivatedAuthority += InfiniteSkillsActivated;
 		}
 
 		public void ModuleStart()
