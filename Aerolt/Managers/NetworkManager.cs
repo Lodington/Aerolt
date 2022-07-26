@@ -59,7 +59,10 @@ namespace Aerolt.Managers
 
 		public void SendToAuthority(NetworkIdentity identity)
 		{
-			identity.clientAuthorityOwner.SendAerolt(this);
+			if (!identity.localPlayerAuthority)
+				identity.clientAuthorityOwner.SendAerolt(this);
+			else
+				Handle();
 		}
 		public void SendToAuthority(NetworkUser user)
 		{
