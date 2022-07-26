@@ -66,6 +66,9 @@ namespace Aerolt.Managers
 			if (users.ContainsKey(user)) return;
 			var button = Instantiate(playerEntryPrefab, playerEntryParent, false).GetComponent<CustomButton>();
 			users[user] = new PlayerConfigBinding(user, button);
+			var body = user.master.GetBody();
+			if (body)
+				LobbyPlayerPageManager.ApplyValues(body, users[user]);
 			var toggle = button.GetComponent<Toggle>();
 			toggle.onValueChanged.AddListener(val => { if (val) SetUser(user); });
 			toggle.group = toggleGroup;
