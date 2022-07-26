@@ -1,21 +1,12 @@
 using System;
+using Aerolt.Enums;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Aerolt.Helpers
 {
 
-    public enum HandlerType
-    {
-        TopRight,
-        Right,
-        BottomRight,
-        Bottom,
-        BottomLeft,
-        Left,
-        TopLeft,
-        Top
-    }
+    
 
     [RequireComponent(typeof(EventTrigger))]
     public class ResizePanel : MonoBehaviour

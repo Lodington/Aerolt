@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Aerolt.Buttons;
 using Aerolt.Classes;
+using Aerolt.Enums;
 using Aerolt.Messages;
 using RoR2;
 using RoR2.UI;
@@ -191,15 +192,7 @@ namespace Aerolt.Managers
 			_state = newState;
 		}
 
-		[Serializable]
-		public enum ViewState
-		{
-			Main,
-			Inventory,
-			Equipment,
-			Body,
-			Buff
-		}
+		
 
 		public void SwapViewState()
 		{
