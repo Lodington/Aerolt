@@ -41,7 +41,6 @@ namespace Aerolt.Managers
         {
             if (!_newBody)
             {
-                Load.CallPopup("Error", $"No Body Selected! Please Select a body to spawn as", buttonParent.transform);
                 return;
             }
 

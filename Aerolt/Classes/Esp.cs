@@ -16,8 +16,7 @@ namespace Aerolt.Classes
 {
     public class Esp : MonoBehaviour, IModuleStartup
     {
-        private static readonly EspHelper Helper = new EspHelper(); // why lodington
-        
+
         public static List<PurchaseInteraction> PurchaseInteractions;
         public static List<BarrelInteraction> BarrelInteractions;
         public static List<PressurePlateController> SecretButtons;
@@ -98,7 +97,7 @@ namespace Aerolt.Classes
                         str.AppendLine("- " + Language.GetString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).nameToken));
                 }
                 if (!costSet) continue;
-                Helper.DrawESPLabel(position, Colors.GetColor("Shop"), Color.clear, str.ToString());
+                EspHelper.DrawESPLabel(position, Colors.GetColor("Shop"), Color.clear, str.ToString());
             }
         }
 
@@ -184,7 +183,7 @@ namespace Aerolt.Classes
                 string status = TeleporterInteraction.instance.activationState.ToString();
                 
                 string boxText = $"{friendlyName}\n{status}\n{distance}m";
-                Helper.DrawESPLabel(teleporterInteraction.transform.position, teleporterColor, Color.clear, boxText);
+                EspHelper.DrawESPLabel(teleporterInteraction.transform.position, teleporterColor, Color.clear, boxText);
                 
             }
         }
@@ -201,9 +200,9 @@ namespace Aerolt.Classes
                     string boxText = $"{friendlyName}\n{distance}m";
                     
                     if (Instance.showBarrelToggle.isOn || CheckCursorPosition(barrel.transform.position))
-                        Helper.DrawESPLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear,boxText);
+                        EspHelper.DrawESPLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear,boxText);
                     else
-                        Helper.DrawESPLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear, "+");
+                        EspHelper.DrawESPLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear, "+");
                 }
             }
         }
@@ -217,7 +216,7 @@ namespace Aerolt.Classes
 
                     float distance = (int)Vector3.Distance(Camera.main.transform.position, secretButton.transform.position);
                     string boxText = $"{friendlyName}\n{distance}m";
-                    Helper.DrawESPLabel(secretButton.transform.position, Colors.GetColor("Secret_Plates"), Color.clear, boxText);
+                    EspHelper.DrawESPLabel(secretButton.transform.position, Colors.GetColor("Secret_Plates"), Color.clear, boxText);
                     
                 }
             }
@@ -233,7 +232,7 @@ namespace Aerolt.Classes
                     var position = scrapper.transform.position;
                     float distance = (int)Vector3.Distance(Camera.main.transform.position, position);
                     string boxText = $"{friendlyName}\n{distance}m";
-                    Helper.DrawESPLabel(position, Colors.GetColor("Scrappers"), Color.clear, boxText);
+                    EspHelper.DrawESPLabel(position, Colors.GetColor("Scrappers"), Color.clear, boxText);
                 }
             }
         }
@@ -259,9 +258,9 @@ namespace Aerolt.Classes
         public static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
         {
             if (Instance.showChestAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
-                Helper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, GetDistance(purchaseInteraction));
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, GetDistance(purchaseInteraction));
             else
-                Helper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
         }
         public static string GetDistance(PurchaseInteraction purchaseInteraction)
         {

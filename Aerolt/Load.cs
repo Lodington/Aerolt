@@ -39,6 +39,13 @@ namespace Aerolt
         
         public static Load Instance;
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
+        
+        public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
+        private static GameObject settingsUI;
+        public ZioConfigFile.ZioConfigFile configFile;
+        public static NetworkUser tempViewer;
+        public static HUD tempHud;
+
 
         public void Awake()
         {
@@ -49,9 +56,7 @@ namespace Aerolt
             _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); _assets.LoadAsset<GameObject>("AeroltUI");
-
-            var harm = new Harmony(Info.Metadata.GUID);
-            new PatchClassProcessor(harm, typeof(Hooks)).Patch();
+            
             NetworkManager.Initialize();
         }
         public void OnGUI()
@@ -61,17 +66,6 @@ namespace Aerolt
             Esp.Draw();
         }
 
-        public static void CallPopup(string title, string message, Transform parent)
-        {
-            return;
-            //GameObject popup = Instantiate(_popup, parent);
-            //popup.GetComponent<PopupManager>().SetupPopup(title, message);
-        }
-        public static void CallPopup(string title, string body)
-        {
-            CallPopup(title,body, settingsRoot.transform);
-        }
-        
         public void Start()
         {
             RoR2Application.onLoad += GameLoad;
@@ -105,25 +99,8 @@ namespace Aerolt
         private void GameLoad()
         {
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
-            // create settings menu;
             CreateKeyBindSettings();
             Colors.InitColors();
-            return;
-            //settingsRoot = Instantiate(_op);
-            settingsUI = settingsRoot.transform.Find("SettingUIPanel").gameObject;
-            settingsUI.SetActive(false);
-            DontDestroyOnLoad(settingsRoot);
-            var welcomeMessage = DailyMessage.GetMessage();
-            var stringConverter = TomlTypeConverter.GetConverter(typeof(string));
-            welcomeMessage = (string) stringConverter.ConvertToObject(welcomeMessage, typeof(string));
-            
-            var config = configFile.Bind("DoNotTouch", "WelcomeMessage", "", "");
-            if (config.Value != welcomeMessage)
-            {
-                CallPopup($"Welcome To Aerolt v{Version}", welcomeMessage, settingsRoot.transform);
-                config.Value = welcomeMessage;
-            }
-            
         }
 
         private void CreateKeyBindSettings()
@@ -141,11 +118,6 @@ namespace Aerolt
             }
         }
 
-        public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
-        private static GameObject settingsUI;
-        public ZioConfigFile.ZioConfigFile configFile;
-        public static NetworkUser tempViewer;
-        public static HUD tempHud;
 
         public static void CreateHud(HUD hud, ref bool shoulddisplay)
         {
@@ -161,17 +133,6 @@ namespace Aerolt
             ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
             tempViewer = null;
             tempHud = null;
-            /*
-            ui.transform.localScale = Vector3.one;
-            var rect = (RectTransform) ui.transform;
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMax = Vector2.zero;
-            rect.offsetMin = Vector2.zero;
-            ui.transform.localPosition = Vector3.zero;
-            //rect.anchoredPosition = rect.GetParentSize() * 0.5f;
-            */
             aeroltUIs.Add(viewer, ui);
             Tools.Log(Enums.LogLevel.Information, "Created UI");
         }

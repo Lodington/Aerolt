@@ -41,9 +41,6 @@ namespace Aerolt.Buttons
 
         public void GiveItem(int amount)
         {
-            if (!_itemDef)
-                Load.CallPopup("Error", "Please Selection a item to spawn it",
-                    GetComponentInParent<PanelManager>().transform);
             if (!_info.Master) return;
             var inventory = _info.Master.inventory;
 

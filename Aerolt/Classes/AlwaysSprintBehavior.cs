@@ -8,25 +8,7 @@ namespace Aerolt.Classes
 	{
 		private LocalUser localUser;
 		private PlayerCharacterMasterController controller;
-
-		/* fuck this
-		private CharacterBody body;
-		private bool notPlayer;
-
-		public void Awake()
-		{
-			body = GetComponent<CharacterBody>();
-			notPlayer = !body.master || !body.master.playerCharacterMasterController || !body.master.playerCharacterMasterController.networkUser || body.master.playerCharacterMasterController.networkUser.localUser?.inputPlayer == null;
-		}
-
-		private void Update()
-		{
-			var ignoreSprint = notPlayer || !body.master.playerCharacterMasterController.networkUser.localUser!.inputPlayer!.GetButton("Sprint");
-			
-			if (body && !body.isSprinting && ignoreSprint) //.!localUser.inputPlayer.GetButton("Sprint"))
-				body.inputBank.sprint.PushState(true); //controller.sprintInputPressReceived = true;
-		}
-		*/
+		
 		public void Awake()
 		{
 			localUser = LocalUserManager.GetFirstLocalUser();
@@ -39,7 +21,6 @@ namespace Aerolt.Classes
 			if (!controller)
 			{
 				Destroy(this);
-				Load.CallPopup("Always Sprint Error", "Tried to apply always sprint to something that wasn't a player.");
 				return;
 			}
 			

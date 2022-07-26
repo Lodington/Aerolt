@@ -17,15 +17,10 @@ namespace Aerolt.Managers
                 Event e = Event.current;
                 if (e.isKey)
                 {
-                    //Load.Instance.KeyBinds[currentKey.buttonName].Value = e.keyCode; Disabled for now;
                     OpenMenu.text = e.keyCode.ToString();
                     currentKey = null;
                 }
             }
-        }
-        public void Awake()
-        {
-            //OpenMenu.text = Load.Instance.KeyBinds[ButtonNames.OpenMenu].Value.ToString(); Disabled for now;
         }
 
         public void UpdateKey(ButtonNameHelper clicked)
