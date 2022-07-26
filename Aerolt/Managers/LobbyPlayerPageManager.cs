@@ -71,7 +71,8 @@ namespace Aerolt.Managers
 			master.onBodyStart += SetBody;
 			var bodyIn = master.GetBody();
 			if (bodyIn) SetBody(bodyIn);
-			
+
+			if (!isLocalUser) return;
 			godToggle.SetIsOnWithoutNotify(_playerConfig.GodModeOn);
 			aimbotToggle.SetIsOnWithoutNotify(_playerConfig.AimbotOn);
 			aimbotWeightSlider.SetValueWithoutNotify(_playerConfig.AimbotWeight);
