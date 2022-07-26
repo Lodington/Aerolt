@@ -157,7 +157,6 @@ namespace Aerolt.Classes
         {
             //godModeEntry.Value = PlayerCharacterMasterController.instances.Any(x => x && x.master && x.master.godMode);
             godModeToggle.SetIsOnWithoutNotify(godModeEntry.Value);
-            ApplyGodMode();
             disableMobSpawnsToggle.SetIsOnWithoutNotify(mobSpawnsEntry.Value);
             ApplyMobSpawns();
             
@@ -239,39 +238,32 @@ namespace Aerolt.Classes
             return _cachedBody;
         }
         
-        private void MasterBodyStart(CharacterBody obj)
+        public static void MasterBodyStart(CharacterBody obj)
         {
-            if (infiniteSkillsEntry.Value)
+            if (true)
             {
                 obj.onSkillActivatedAuthority += SkillActivated;
             }
         }
-        private void MasterDestroyBody(CharacterBody obj)
+        public static void MasterDestroyBody(CharacterBody obj)
         {
-            if (infiniteSkillsEntry.Value)
+            if (true)
             {
                 obj.onSkillActivatedAuthority -= SkillActivated;
             }
         }
 
-        public void GodModeToggle()
-        {
-            godModeEntry.Value = !godModeEntry.Value;
-            ApplyGodMode();
-        }
-
-        public void ApplyGodMode()
+        public static void ApplyGodModeForAll(bool godmodeEnabled)
         {
             foreach (var playerInstance in PlayerCharacterMasterController.instances)
             {
-                playerInstance.master.godMode = godModeEntry.Value;
+                playerInstance.master.godMode = godmodeEnabled;
                 playerInstance.master.UpdateBodyGodMode();
             }
         }
 
-        public void RollRandomItems()
+        public static void RollRandomItems(CharacterBody localUser)
         {
-            var localUser = GetBody();
             WeightedSelection<List<PickupIndex>> weightedSelection = new WeightedSelection<List<PickupIndex>>(8);
             weightedSelection.AddChoice(Run.instance.availableTier1DropList, 80f);
             weightedSelection.AddChoice(Run.instance.availableTier2DropList, 19f);
@@ -295,18 +287,14 @@ namespace Aerolt.Classes
 
         }
         
-        private void SkillActivated(GenericSkill obj) => obj.AddOneStock();
+        public static void SkillActivated(GenericSkill obj) => obj.AddOneStock();
 
-        public void GiveAllItems()
+        public static void GiveAllItems()
         {
-            foreach (var networkUser in NetworkUser.readOnlyInstancesList)
-            {
-                if (!networkUser.isLocalPlayer) continue; // why
-                GiveAllItemsTo(networkUser);
-            }
+            foreach (var networkUser in NetworkUser.readOnlyInstancesList) GiveAllItemsTo(networkUser);
         }
 
-        private void GiveAllItemsTo(NetworkUser networkUser)
+        public static void GiveAllItemsTo(NetworkUser networkUser)
         {
             if (NetworkServer.active) foreach (var item in ContentManager.itemDefs) networkUser.master.inventory.GiveItem(item);
             else
@@ -315,7 +303,7 @@ namespace Aerolt.Classes
                 new SetItemCountMessage(networkUser.master.inventory, items).SendToServer();
             }
         }
-        private void ClearItemsTo(NetworkUser networkUser)
+        public static void ClearItemsTo(NetworkUser networkUser)
         {
             if (NetworkServer.active) foreach (var item in ContentManager.itemDefs) networkUser.master.inventory.RemoveItem(item, networkUser.master.inventory.GetItemCount(item));
             else
@@ -325,13 +313,13 @@ namespace Aerolt.Classes
             }
         }
 
-        public void GiveAllItemsToAll()
+        public static void GiveAllItemsToAll()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
                 GiveAllItemsTo(networkUser);
         }
 
-        public void ClearInventory()
+        public static void ClearInventory()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
@@ -339,23 +327,23 @@ namespace Aerolt.Classes
                 ClearItemsTo(networkUser);
             }
         }
-        public void ClearInventoryAll()
+        public static void ClearInventoryAll()
         {
             foreach (var networkUser in NetworkUser.readOnlyInstancesList)
             {
                 ClearItemsTo(networkUser);
             }
         }
-        public void KillAllMobs()
+        public static void KillAllMobs()
         {
-            var mobs = CharacterMaster.instancesList.Where(x => x && x.teamIndex != owner.master.teamIndex).ToArray();
-            foreach (var characterMaster in mobs)
-            {
-                var body = characterMaster.GetBody();
-                if (body)
-                    Chat.AddMessage($"<color=yellow>Killed {body.GetDisplayName()} </color>");
-                characterMaster.TrueKill();
-            }
+            //var mobs = CharacterMaster.instancesList.Where(x => x && x.teamIndex != owner.master.teamIndex).ToArray();
+            //foreach (var characterMaster in mobs)
+           // {
+            //    var body = characterMaster.GetBody();
+           //     if (body)
+           //         Chat.AddMessage($"<color=yellow>Killed {body.GetDisplayName()} </color>");
+           //     characterMaster.TrueKill();
+           // }
         }
         
     }

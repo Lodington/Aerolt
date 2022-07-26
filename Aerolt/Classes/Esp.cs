@@ -105,6 +105,7 @@ namespace Aerolt.Classes
         public void ModuleStart()
         {
             var configFile = Load.Instance.configFile;
+            
             teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");
             showTeleporterToggle.Set(teleporterEntry.Value);
             chestEntry = configFile.Bind("ESP", "showChest", false, "");
@@ -114,25 +115,32 @@ namespace Aerolt.Classes
             chestAdvancedEntry = configFile.Bind("ESP", "showChestAdvanced", false, "");
             showChestAdvancedToggle.Set(chestAdvancedEntry.Value);
             shopAdvancedEntry = configFile.Bind("ESP", "showShopAdvanced", false, "");
+            
             if (showShopAdvancedToggle) // fucking lodington not updating the asset bundle
                 showShopAdvancedToggle.Set(shopAdvancedEntry.Value);
+            
             barrelEntry = configFile.Bind("ESP", "showBarrel", false, "");
             showBarrelToggle.Set(barrelEntry.Value);
             scrapperEntry = configFile.Bind("ESP", "showScrapper", false, "");
             showScrapperToggle.Set(scrapperEntry.Value);
             secretEntry = configFile.Bind("ESP", "showSecret", false, "");
             ShowSecretToggle.Set(secretEntry.Value);
+            
             if (Instance) return;
             Instance = this;
+            
             showTeleporterToggle.onValueChanged.AddListener(val => teleporterEntry.Value = val);
             showChestToggle.onValueChanged.AddListener(val => chestEntry.Value = val);
             showMultiShopToggle.onValueChanged.AddListener(val => shopEntry.Value = val);
             showChestAdvancedToggle.onValueChanged.AddListener(val => chestAdvancedEntry.Value = val);
+            
             if (showShopAdvancedToggle) // fucking lodington not updating the asset bundle
                 showShopAdvancedToggle.onValueChanged.AddListener(val => shopAdvancedEntry.Value = val);
+            
             showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
             showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
             ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
+            
             GatherObjects(); // these objects should exist by hud awake
         }
 

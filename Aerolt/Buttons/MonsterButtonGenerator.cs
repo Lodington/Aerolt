@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Managers;
@@ -16,7 +15,7 @@ using UnityEngine.UI;
 
 namespace Aerolt.Buttons
 {
-    public class MonsterButtonGenerator : MonoBehaviour, IModuleStartup
+    public class MonsterButtonGenerator : MonoBehaviour
     {
         public GameObject buttonPrefab;
         public GameObject buttonParent;
@@ -31,7 +30,7 @@ namespace Aerolt.Buttons
         private Dictionary<string, EquipmentIndex> eliteMap;
         public Toggle brainDead;
 
-        public void ModuleStart()
+        private void Awake()
         {
             foreach (var master in MasterCatalog.allAiMasters)
             {
@@ -58,10 +57,12 @@ namespace Aerolt.Buttons
 
         public void SpawnMonster(CharacterMaster monsterMaster)
         {
-            var body = GetComponentInParent<MenuInfo>().Body;
-            if (!body) return;
-            var location = body.transform.position;
-            var bodyPrefab = monsterMaster.GetComponent<CharacterMaster>().bodyPrefab;
+            var localUser = LocalUserManager.GetFirstLocalUser();
+            if(localUser == null || !localUser.cachedBody)
+                return;
+            
+            var location = localUser.cachedBody.transform.position;
+            var body = monsterMaster.GetComponent<CharacterMaster>().bodyPrefab;
 
             var bodyGameObject = Instantiate(monsterMaster.gameObject, location, Quaternion.identity);
             var master = bodyGameObject.GetComponent<CharacterMaster>();
@@ -77,8 +78,10 @@ namespace Aerolt.Buttons
 
 
             NetworkServer.Spawn(bodyGameObject);
-            master.bodyPrefab = bodyPrefab;
-            master.SpawnBody(location, Quaternion.identity);
+            master.bodyPrefab = body;
+            master.SpawnBody(localUser.cachedBody.transform.position, Quaternion.identity);
+            
         }
+        
     }
 }
