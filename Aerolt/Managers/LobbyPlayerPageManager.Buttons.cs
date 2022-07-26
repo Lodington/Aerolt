@@ -27,7 +27,7 @@ namespace Aerolt.Managers
 			if (info.Body && body) new TeleportMessage(body, info.Body.transform.position).SendToAuthority(body);
 		}
 
-		public void Kill() => new KillMessage(master).SendToServer();
+		public void Kill() => new KillMessage(master).SendToServer(); // Todo, test to see if this needs to be sent on auth(the function calls to inventory add item inside truekill make me feel like no, but its also not working?)
 		public void Revive()
 		{
 			var gameover = FindObjectOfType<GameOverController>();
@@ -42,7 +42,7 @@ namespace Aerolt.Managers
 			
 			// The actual reviving should be networked though.
 			if (NetworkClient.active && !master.isServer)
-				master.CmdRespawn(master.bodyPrefab.name);
+				master.CmdRespawn(master.bodyPrefab.name); // Todo this seems to not work???
 			else
 			{
 				Run.instance.isGameOverServer = false;
