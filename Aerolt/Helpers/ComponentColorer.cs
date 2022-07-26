@@ -106,7 +106,13 @@ namespace Aerolt.Helpers
 
 		private void Awake()
 		{
-			if (GetComponentInParent<ComponentColorer>().colorEntries.TryGetValue(colorLayer, out parent))
+			var colorer = GetComponentInParent<ComponentColorer>();
+			if (!colorer)
+			{
+				failedToSetUp = true;
+				return;
+			}
+			if (colorer.colorEntries.TryGetValue(colorLayer, out parent))
 				parent.SettingChanged += Colorize;
 		}
 
@@ -114,6 +120,15 @@ namespace Aerolt.Helpers
 		{
 			if (parent != null)
 				Colorize(parent, null, false);
+		}
+
+		private void LateUpdate() // Catch the dropdown entries, they dont have a parent when awake is fired.
+		{
+			if (!failedToSetUp) return;
+			failedToSetUp = false;
+			Awake();
+			if (!failedToSetUp) OnEnable();
+			else throw new InvalidOperationException("Colorable Component still failed to set up after late update.");
 		}
 
 		private void OnDestroy()
@@ -126,6 +141,7 @@ namespace Aerolt.Helpers
 		public abstract void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _);
 
 		protected Color Color;
+		private bool failedToSetUp;
 	}
 	
 	public enum ColorLayer
