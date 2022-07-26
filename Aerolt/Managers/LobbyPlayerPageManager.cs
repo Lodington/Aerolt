@@ -45,12 +45,13 @@ namespace Aerolt.Managers
 		public BodyManager bodyContent;
 		public EditPlayerBuffButton buffContent;
 		private ViewState _state = ViewState.Main;
-
-		private bool isLocalUser;
-		private PlayerConfigBinding _playerConfig;
+		
+		private LobbyPlayerManager playerManager;
+		private PlayerConfigBinding PlayerConfig => playerManager.users[currentUser];
 
 		public void SetUser(NetworkUser user)
 		{
+			SwapViewState();
 			if (currentUser != null) currentUser.master.onBodyStart -= SetBody;
 			currentUser = user;
 			master = currentUser.master;
@@ -59,28 +60,18 @@ namespace Aerolt.Managers
 			inventoryDisplay.SetSubscribedInventory(inv);
 			equipmentIcon.targetInventory = inv;
 
-			isLocalUser = false;
-			if (currentUser.localUser != null && MenuInfo.Files.TryGetValue(currentUser.localUser, out var configFile))
-			{
-				isLocalUser = true;
-
-				_playerConfig?.OnDestroy();
-				_playerConfig = new PlayerConfigBinding(configFile); // TODO iterate the local users to ensure all the settings are set for each user
-			}
+			
 
 			master.onBodyStart += SetBody;
 			var bodyIn = master.GetBody();
 			if (bodyIn) SetBody(bodyIn);
-
-			if (!isLocalUser) return;
-			godToggle.SetIsOnWithoutNotify(_playerConfig.GodModeOn);
-			aimbotToggle.SetIsOnWithoutNotify(_playerConfig.AimbotOn);
-			aimbotWeightSlider.SetValueWithoutNotify(_playerConfig.AimbotWeight);
-			noclipToggle.SetIsOnWithoutNotify(_playerConfig.NoclipOn);
-			infiniteSkillsToggle.SetIsOnWithoutNotify(_playerConfig.InfiniteSkillsOn);
-			alwaysSprintToggle.SetIsOnWithoutNotify(_playerConfig.AlwaysSprintOn);
-
-			ApplyValues(body, _playerConfig);
+			
+			godToggle.SetIsOnWithoutNotify(PlayerConfig.GodModeOn);
+			aimbotToggle.SetIsOnWithoutNotify(PlayerConfig.AimbotOn);
+			aimbotWeightSlider.SetValueWithoutNotify(PlayerConfig.AimbotWeight);
+			noclipToggle.SetIsOnWithoutNotify(PlayerConfig.NoclipOn);
+			infiniteSkillsToggle.SetIsOnWithoutNotify(PlayerConfig.InfiniteSkillsOn);
+			alwaysSprintToggle.SetIsOnWithoutNotify(PlayerConfig.AlwaysSprintOn);
 		}
 
 		public void Update()
@@ -97,22 +88,23 @@ namespace Aerolt.Managers
 			buffDisplay.source = body;
 			bodyStats.TargetBody = body;
 			teamDropdown.SetValueWithoutNotify((int) body.teamComponent.teamIndex);
-			if (isLocalUser && _playerConfig.InfiniteSkillsOn) body.onSkillActivatedAuthority += InfiniteSkillsActivated;
+			if (PlayerConfig.InfiniteSkillsOn) body.onSkillActivatedAuthority += InfiniteSkillsActivated;
 		}
 
 		public void ModuleStart()
 		{
 			info = GetComponentInParent<MenuInfo>();
+			playerManager = GetComponent<LobbyPlayerManager>();
 			
 			teamDropdown.options.Clear(); // ensure it was empty to begin with.
 			teamDropdown.AddOptions(Enum.GetNames(typeof(TeamIndex)).Where(x => x != "None").ToList());
 
-			godToggle.onValueChanged.AddListener(val => _playerConfig.GodModeOn = val);
-			aimbotToggle.onValueChanged.AddListener(val => _playerConfig.AimbotOn = val);
-			aimbotWeightSlider.onValueChanged.AddListener(val => _playerConfig.AimbotWeight = val);
-			noclipToggle.onValueChanged.AddListener(val => _playerConfig.NoclipOn = val);
-			infiniteSkillsToggle.onValueChanged.AddListener(val => _playerConfig.InfiniteSkillsOn = val);
-			alwaysSprintToggle.onValueChanged.AddListener(val => _playerConfig.AlwaysSprintOn = val);
+			godToggle.onValueChanged.AddListener(val => PlayerConfig.GodModeOn = val);
+			aimbotToggle.onValueChanged.AddListener(val => PlayerConfig.AimbotOn = val);
+			aimbotWeightSlider.onValueChanged.AddListener(val => PlayerConfig.AimbotWeight = val);
+			noclipToggle.onValueChanged.AddListener(val => PlayerConfig.NoclipOn = val);
+			infiniteSkillsToggle.onValueChanged.AddListener(val => PlayerConfig.InfiniteSkillsOn = val);
+			alwaysSprintToggle.onValueChanged.AddListener(val => PlayerConfig.AlwaysSprintOn = val);
 			
 			godToggle.onValueChanged.AddListener(GodMode);
 			aimbotToggle.onValueChanged.AddListener(Aimbot);
@@ -147,14 +139,7 @@ namespace Aerolt.Managers
 			if (body)
 				body.teamComponent.teamIndex = index;
 		}
-
-		public void ModuleEnd()
-		{
-			if (isLocalUser)
-			{
-				_playerConfig.OnDestroy();
-			}
-		}
+		
 		public void SwapViewState(ViewState newState) {
 			switch (_state)
 			{

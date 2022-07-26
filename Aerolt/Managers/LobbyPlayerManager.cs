@@ -16,8 +16,10 @@ namespace Aerolt.Managers
 		public GameObject playerEntryPrefab;
 		public Transform playerEntryParent;
 		public UserChangedEvent userChanged;
-		private readonly Dictionary<NetworkUser, CustomButton> users = new();
+		public readonly Dictionary<NetworkUser, PlayerConfigBinding> users = new();
 		private ToggleGroup toggleGroup;
+		private NetworkUser selectedUser;
+
 		public void ModuleStart()
 		{
 			// var wasActive = gameObject.activeSelf;
@@ -36,40 +38,50 @@ namespace Aerolt.Managers
 			foreach (var networkUser in NetworkUser.instancesList) UserAdded(networkUser);
 			// gameObject.SetActive(wasActive);
 		}
+
+		void IModuleStartup.ModuleEnd()
+		{
+			NetworkUser.onNetworkUserDiscovered -= UserAdded;
+			NetworkUser.onNetworkUserLost -= UserLost;
+
+			foreach (var configBinding in users.Values)
+			{
+				configBinding.OnDestroy();
+			}
+		}
+
 		private void OnEnable()
 		{
 			foreach (var user in users.Keys) UpdateUserLobbyButton(user);
 		}
 		private void UpdateUserLobbyButton(NetworkUser user)
 		{
-			var button = users[user];
+			var button = users[user].customButton;
 			button.buttonText.text = user.userName;
 			button.rawImage.texture = user.master.bodyPrefab.GetComponent<CharacterBody>().portraitIcon;
-		}
-		private void OnDestroy()
-		{
-			NetworkUser.onNetworkUserDiscovered -= UserAdded;
-			NetworkUser.onNetworkUserLost -= UserLost;
 		}
 
 		private void UserAdded(NetworkUser user)
 		{
 			if (users.ContainsKey(user)) return;
 			var button = Instantiate(playerEntryPrefab, playerEntryParent, false).GetComponent<CustomButton>();
+			users[user] = new PlayerConfigBinding(user, button);
 			var toggle = button.GetComponent<Toggle>();
 			toggle.onValueChanged.AddListener(val => { if (val) SetUser(user); });
 			toggle.group = toggleGroup;
-			if (users.Count == 0) toggle.isOn = true;
-			users[user] = button;
+			if (users.Count == 1) toggle.isOn = true;
 		}
 		private void UserLost(NetworkUser user)
 		{
 			if (!users.ContainsKey(user)) return;
-			Destroy(users[user].gameObject);
+			Destroy(users[user].customButton.gameObject);
 			users.Remove(user);
+			if (selectedUser == user && users.Any())
+				SetUser(users.Keys.Last());
 		}
 		private void SetUser(NetworkUser user)
 		{
+			selectedUser = user;
 			userChanged?.Invoke(user);
 		}
 

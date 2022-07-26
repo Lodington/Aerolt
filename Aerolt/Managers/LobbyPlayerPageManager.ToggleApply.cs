@@ -27,7 +27,7 @@ namespace Aerolt.Managers
 			if (!uint.TryParse(strAmount, out var amount)) return;
 			new CurrencyMessage(master, currencyType, amount).SendToServer(); // Send to server now just calls handle if we're on a server already
 		}
-		public void Aimbot(bool enable) => Aimbot(body, enable, _playerConfig.AimbotWeight);
+		public void Aimbot(bool enable) => Aimbot(body, enable, PlayerConfig.AimbotWeight);
 		public static void Aimbot(CharacterBody bod, bool enable, float weight) => ToggleComponent<AimbotBehavior>(bod, enable, comp => comp.weight = weight);
 		public void AimbotWeight(float weight) => AimbotWeight(body, weight);
 		public static void AimbotWeight(CharacterBody bod, float weight)
