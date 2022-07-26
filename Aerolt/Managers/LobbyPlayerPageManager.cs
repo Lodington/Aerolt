@@ -52,6 +52,9 @@ namespace Aerolt.Managers
 		public void SetUser(NetworkUser user)
 		{
 			SwapViewState();
+			var ownerIsSelected = user == info.Owner;
+			bodyStats.SetTogglesActive(ownerIsSelected);
+			if (!ownerIsSelected) bodyStats.ProfileSelected(0, false);
 			if (currentUser != null) currentUser.master.onBodyStart -= SetBody;
 			currentUser = user;
 			master = currentUser.master;
@@ -59,8 +62,6 @@ namespace Aerolt.Managers
 			var inv = master.inventory;
 			inventoryDisplay.SetSubscribedInventory(inv);
 			equipmentIcon.targetInventory = inv;
-
-			
 
 			master.onBodyStart += SetBody;
 			var bodyIn = master.GetBody();
