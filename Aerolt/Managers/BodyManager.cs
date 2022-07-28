@@ -29,7 +29,7 @@ namespace Aerolt.Managers
 
         public void SpawnAsBody()
         {
-            new SetBodyMessage(target, _newBody.GetComponent<CharacterBody>()).SendToServer();
+                new SetBodyMessage(target, _newBody.GetComponent<CharacterBody>()).SendToServer();
         }
 
         public void SetBodyDef(CharacterBody body)

@@ -9,26 +9,20 @@ namespace Aerolt.Messages
     public class SetBodyMessage : AeroltMessageBase
     {
         private NetworkUser user;
-        private CharacterBody newBody;
+        private string newBody;
 
         public SetBodyMessage(){}
         public SetBodyMessage(NetworkUser user, CharacterBody newBody)
         {
             this.user = user;
-            this.newBody = newBody;
+            this.newBody = newBody.name;
 
         }
 
         public override void Handle()
         {
             base.Handle();
-            if (!newBody) return;
-            if (!user || !user.master) return;
-
-            if (NetworkServer.active)
-                user.master.CmdRespawn(newBody.name);
-            else
-                user.master.CallCmdRespawn(newBody.name);
+            user.master.CmdRespawn(newBody);
         }
 
         public override void Deserialize(NetworkReader reader)
@@ -38,15 +32,16 @@ namespace Aerolt.Messages
             if (obj)
             {
                 user = obj.GetComponent<NetworkUser>();
-                newBody = obj.GetComponent<CharacterBody>();
             }
+            newBody = reader.ReadString();
+
         }
 
         public override void Serialize(NetworkWriter writer)
         {
             base.Serialize(writer);
             writer.Write(user.netId);
-            writer.Write(newBody.netId);
+            writer.Write(newBody);
         }
     }
 }
