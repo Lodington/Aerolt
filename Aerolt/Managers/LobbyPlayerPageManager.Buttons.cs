@@ -43,7 +43,7 @@ namespace Aerolt.Managers
 			
 			// The actual reviving should be networked though.
 			if (NetworkClient.active && !master.isServer)
-				master.CmdRespawn(master.bodyPrefab.name); // Todo this seems to not work???
+				master.CallCmdRespawn(master.bodyPrefab.name);
 			else
 			{
 				Run.instance.isGameOverServer = false;

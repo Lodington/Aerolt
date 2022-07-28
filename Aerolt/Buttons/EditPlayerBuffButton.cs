@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Managers;
+using Aerolt.Messages;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
@@ -31,14 +32,11 @@ namespace Aerolt.Buttons
 			foreach (var def in ContentManager.buffDefs) buffDefRef[def].SetAmount(body ? body.GetBuffCount(def) : 0);
 		}
 
-		public void GiveBuffs() // TODO network this
+		public void GiveBuffs()
 		{
 			var body = user.master.GetBody();
 			if (!body) return;
-			foreach (var (key, value) in buffDef)
-			{
-				body.SetBuffCount(key.buffIndex, value);
-			}
+			new SetBuffCountMessage(body, buffDef.ToDictionary(x => x.Key.buffIndex, x => (uint) x.Value)).SendToServer();
 			GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
 		}
 	}

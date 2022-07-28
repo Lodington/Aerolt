@@ -1,6 +1,7 @@
 using Aerolt.Buttons;
 using RoR2;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Aerolt.Managers
 {
@@ -25,15 +26,15 @@ namespace Aerolt.Managers
             }
         }
 
-        public void SpawnAsBody() // TODO network this
+        public void SpawnAsBody()
         {
             if (!_newBody) return;
             if (!target || !target.master) return;
-            
-            var master = target.master;
-            master.bodyPrefab = _newBody;
-            var transfor = master.GetBody().transform;
-            master.Respawn(transfor.position, transfor.rotation);
+
+            if (NetworkServer.active)
+                target.master.CmdRespawn(_newBody.name);
+            else
+                target.master.CallCmdRespawn(_newBody.name);
         }
 
         public void SetBodyDef(CharacterBody body)
