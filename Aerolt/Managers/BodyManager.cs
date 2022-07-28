@@ -1,4 +1,5 @@
 using Aerolt.Buttons;
+using Aerolt.Messages;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -28,18 +29,12 @@ namespace Aerolt.Managers
 
         public void SpawnAsBody()
         {
-            if (!_newBody) return;
-            if (!target || !target.master) return;
-
-            if (NetworkServer.active)
-                target.master.CmdRespawn(_newBody.name);
-            else
-                target.master.CallCmdRespawn(_newBody.name);
+            new SetBodyMessage(target, _newBody.GetComponent<CharacterBody>()).SendToServer();
         }
 
         public void SetBodyDef(CharacterBody body)
         {
-            _newBody = BodyCatalog.FindBodyPrefab(body);;
+            _newBody = BodyCatalog.FindBodyPrefab(body);
             SpawnAsBody();
             GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
         }

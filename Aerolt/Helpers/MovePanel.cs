@@ -15,7 +15,7 @@ namespace Aerolt.Helpers
 
         void Awake()
         {
-            Target = transform.parent.transform;
+            Target = transform;
 
             var menuInfo = Target.transform.parent ? GetComponentInParent<MenuInfo>() : GetComponent<MenuInfo>();
             var configFile = menuInfo ? menuInfo.ConfigFile : Load.Instance.configFile;

@@ -18,6 +18,12 @@ namespace Aerolt.Helpers
 
         private EventTrigger _eventTrigger;
 
+        private void Awake()
+        {
+            Target = (RectTransform)transform.parent;
+        }
+
+
         void Start()
         {
             _eventTrigger = GetComponent<EventTrigger>();
