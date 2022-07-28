@@ -13,7 +13,7 @@ using ZioConfigFile;
 
 namespace Aerolt.Buttons
 {
-    public class PlayerValuesGenerator : MonoBehaviour, IModuleStartup
+    public class PlayerValuesGenerator : MonoBehaviour
     {
         public GameObject parent;
         public GameObject playerValuePrefab;
@@ -28,7 +28,7 @@ namespace Aerolt.Buttons
         private List<StatProfile> profiles = new();
         public List<Toggle> toggles;
 
-        public void ModuleStart()
+        public void Setup()
         {
             foreach (var field in Fields) CreateNewStatPrefab(field);
             
@@ -67,8 +67,9 @@ namespace Aerolt.Buttons
 
         public void ProfileSelected(int i, bool applyValuesToBody = true)
         {
+            if (!TargetBody) return;
             selectedProfile.Value = i;
-            if (i == 0 && TargetBody)
+            if (i == 0)
             {
                 var defaultBody = TargetBody.master.bodyPrefab.GetComponent<CharacterBody>();
                 foreach (var (entry, text) in _entries)

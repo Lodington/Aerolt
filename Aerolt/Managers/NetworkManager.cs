@@ -59,8 +59,8 @@ namespace Aerolt.Managers
 
 		public void SendToAuthority(NetworkIdentity identity)
 		{
-			if (!identity.localPlayerAuthority)
-				identity.clientAuthorityOwner.SendAerolt(this);
+			if (!Util.HasEffectiveAuthority(identity))
+				identity.clientAuthorityOwner.SendAerolt(this); // TODO this field is only set on host, as a client trying to exert auth over another client/host they need to tell the server about it.
 			else
 				Handle();
 		}

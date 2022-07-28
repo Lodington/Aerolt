@@ -48,14 +48,14 @@ namespace Aerolt.Managers
 		private ViewState _state = ViewState.Main;
 		
 		private LobbyPlayerManager playerManager;
+		private bool ownerIsSelected;
 		private PlayerConfigBinding PlayerConfig => playerManager.users[currentUser];
 
 		public void SetUser(NetworkUser user)
 		{
 			SwapViewState();
-			var ownerIsSelected = user == info.Owner;
+			ownerIsSelected = user == info.Owner;
 			bodyStats.SetTogglesActive(ownerIsSelected);
-			if (!ownerIsSelected) bodyStats.ProfileSelected(0, false);
 			if (currentUser != null) currentUser.master.onBodyStart -= SetBody;
 			currentUser = user;
 			master = currentUser.master;
@@ -87,6 +87,7 @@ namespace Aerolt.Managers
 		private void SetBody(CharacterBody bodyIn)
 		{
 			body = bodyIn;
+			if (!ownerIsSelected) bodyStats.ProfileSelected(0, false);
 			buffDisplay.source = body;
 			bodyStats.TargetBody = body;
 			teamDropdown.SetValueWithoutNotify((int) body.teamComponent.teamIndex);
@@ -97,7 +98,8 @@ namespace Aerolt.Managers
 		{
 			info = GetComponentInParent<MenuInfo>();
 			playerManager = GetComponent<LobbyPlayerManager>();
-			
+			bodyStats.Setup();
+
 			teamDropdown.options.Clear(); // ensure it was empty to begin with.
 			teamDropdown.AddOptions(Enum.GetNames(typeof(TeamIndex)).Where(x => x != "None").ToList());
 
