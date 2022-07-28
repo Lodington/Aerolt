@@ -24,7 +24,8 @@ namespace Aerolt.Managers
 		{
 			// var wasActive = gameObject.activeSelf;
 			// gameObject.SetActive(true);
-			NetworkUser.onNetworkUserDiscovered += UserAdded;
+			NetworkUser.onPostNetworkUserStart += UserAdded;
+			//NetworkUser.onNetworkUserDiscovered += UserAdded;
 			NetworkUser.onNetworkUserLost += UserLost;
 
 			toggleGroup = GetComponent<ToggleGroup>();
@@ -41,7 +42,8 @@ namespace Aerolt.Managers
 
 		void IModuleStartup.ModuleEnd()
 		{
-			NetworkUser.onNetworkUserDiscovered -= UserAdded;
+			NetworkUser.onPostNetworkUserStart -= UserAdded;
+			//NetworkUser.onNetworkUserDiscovered -= UserAdded;
 			NetworkUser.onNetworkUserLost -= UserLost;
 
 			foreach (var configBinding in users.Values)
