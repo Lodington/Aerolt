@@ -49,7 +49,7 @@ namespace Aerolt.Messages
             base.Handle();
             foreach (var equipment in equipmentCounts)
             {
-                inventory.GiveEquipmentString(equipment.Key.ToString());
+                inventory.SetEquipmentIndex(equipment.Key ? equipment.Key.equipmentIndex : EquipmentIndex.None);
             }
         }
     }

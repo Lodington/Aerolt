@@ -34,16 +34,9 @@ namespace Aerolt.Buttons
             Dictionary<EquipmentDef, int> equipmentDef = new();
             equipmentDef.Add(def, 1);
             new SetEquipmentMessage(target.master.inventory, equipmentDef).SendToServer();
-        }
-
-        public void GiveEquipment() // TODO Network this
-        {
-            if (!target.master) return;
-            var inventory = target.master.inventory;
-
-            inventory.SetEquipmentIndex(_equipmentDef ? _equipmentDef.equipmentIndex : EquipmentIndex.None);
             GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
         }
+        
         public void Initialize(NetworkUser currentUser)
         {
             target = currentUser;
