@@ -72,6 +72,7 @@ namespace Aerolt.Classes
                 if (advanced)
                     str.AppendLine("Multi Shop Terminal"); // TODO use lang token
                 var costSet = false;
+                if (multiShopController.terminalGameObjects.src == null) continue; // TODO properly fix this
                 foreach (var o in multiShopController.terminalGameObjects)
                 {
                     var shop = o.GetComponent<ShopTerminalBehavior>();
