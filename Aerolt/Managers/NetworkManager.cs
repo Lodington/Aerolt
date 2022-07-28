@@ -98,6 +98,7 @@ namespace Aerolt.Managers
 				if (!connection.isConnected) continue;
 				connection.SendAerolt(message);
 			}
+			message.Handle();
 		}
 		public override void Deserialize(NetworkReader reader)
 		{
