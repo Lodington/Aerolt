@@ -22,11 +22,11 @@ namespace Aerolt.Messages
 		{
 			base.Serialize(writer);
 			writer.Write(inventory.netId);
-			writer.Write(itemCounts.Count);
+			writer.WritePackedUInt32((uint) itemCounts.Count);
 			foreach (var (key, value) in itemCounts)
 			{
-				writer.WritePackedUInt32((uint) key.itemIndex);
-				writer.Write(value);
+				writer.WritePackedUInt32((uint) (int) key.itemIndex);
+				writer.WritePackedUInt32((uint) value);
 			}
 		}
 
@@ -35,9 +35,11 @@ namespace Aerolt.Messages
 			base.Deserialize(reader);
 			inventory = Util.FindNetworkObject(reader.ReadNetworkId())?.GetComponent<Inventory>();
 			itemCounts = new Dictionary<ItemDef, int>();
-			for (var i = 0; i < reader.ReadInt32(); i++)
+			var length = reader.ReadPackedUInt32();
+			for (var i = 0; i < length; i++)
 			{
-				itemCounts.Add(ItemCatalog.GetItemDef((ItemIndex) reader.ReadPackedUInt32()), reader.ReadInt32());
+				var def = ItemCatalog.GetItemDef((ItemIndex) (int) reader.ReadPackedUInt32());
+				itemCounts.Add(def, (int) reader.ReadPackedUInt32());
 			}
 		}
 
