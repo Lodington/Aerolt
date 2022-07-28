@@ -139,9 +139,7 @@ namespace Aerolt.Managers
 		public void TeamChanged(int team)
 		{
 			var index = (TeamIndex) team;
-			master.teamIndex = index;
-			if (body)
-				body.teamComponent.teamIndex = index;
+			new TeamSwitchMessage(master, index).SendToServer();
 		}
 		
 		public void SwapViewState(ViewState newState) {
