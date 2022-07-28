@@ -36,7 +36,7 @@ namespace Aerolt.Managers
 
 		public static void SendAerolt<T>(this NetworkConnection connection, T message) where T : AeroltMessageBase
 		{
-			var typ = (uint) Array.IndexOf(RegisteredMessages, typeof(T));
+			var typ = (uint) Array.IndexOf(RegisteredMessages, message.GetType());// typeof(T)); this returns AeroltMessageBase, and not the actual type. fucking generics
 			var mes = new AeroltMessage {Type = typ, message = message};
 			connection.Send(2004, mes);
 		}

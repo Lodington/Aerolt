@@ -68,7 +68,7 @@ namespace Aerolt.Managers
 			users[user] = new PlayerConfigBinding(user, button);
 			var body = user.master.GetBody();
 			if (body)
-				LobbyPlayerPageManager.ApplyValues(body, users[user]);
+				LobbyPlayerPageManager.ApplyValues(body, users[user]); // TODO move this somewhere, it doesnt work for multiplayer, fires too early.
 			var toggle = button.GetComponent<Toggle>();
 			toggle.onValueChanged.AddListener(val => { if (val) SetUser(user); });
 			toggle.group = toggleGroup;
