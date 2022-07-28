@@ -1,3 +1,4 @@
+using System;
 using Aerolt.Classes;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,21 +9,25 @@ namespace Aerolt.Helpers
     [RequireComponent(typeof(EventTrigger))]
     public class MovePanel : MonoBehaviour
     {
-        public GameObject Target;
+        private Transform Target;
         private EventTrigger _eventTrigger;
         private ZioConfigEntry<Vector2> configEntry;
-        
+
+        void Awake()
+        {
+            Target = transform.parent.transform;
+
+            var menuInfo = Target.transform.parent ? GetComponentInParent<MenuInfo>() : GetComponent<MenuInfo>();
+            var configFile = menuInfo ? menuInfo.ConfigFile : Load.Instance.configFile;
+            configEntry = configFile.Bind("Window Positions", Target.name, (Vector2) Target.transform.localPosition, "Stored position of this window.");
+            Target.transform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0); 
+        }
+
         void Start()
         {
             _eventTrigger = GetComponent<EventTrigger>();
             _eventTrigger.AddEventTrigger(OnDrag, EventTriggerType.Drag);
             _eventTrigger.AddEventTrigger(OnDragEnd, EventTriggerType.EndDrag);
-            
-            var menuInfo = Target.transform.parent ? GetComponentInParent<MenuInfo>() : GetComponent<MenuInfo>();
-            var configFile = menuInfo ? menuInfo.ConfigFile : Load.Instance.configFile;
-            configEntry = configFile.Bind("Window Positions", Target.name, (Vector2) Target.transform.localPosition, "Stored position of this window.");
-            Target.transform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0);
-            
         }
 
 
