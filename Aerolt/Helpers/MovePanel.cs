@@ -9,13 +9,13 @@ namespace Aerolt.Helpers
     [RequireComponent(typeof(EventTrigger))]
     public class MovePanel : MonoBehaviour
     {
-        private GameObject Target;
+        private Transform Target;
         private EventTrigger _eventTrigger;
         private ZioConfigEntry<Vector2> configEntry;
 
         void Awake()
         {
-            Target.transform.parent = transform.parent;
+            Target = transform.parent.transform;
 
             var menuInfo = Target.transform.parent ? GetComponentInParent<MenuInfo>() : GetComponent<MenuInfo>();
             var configFile = menuInfo ? menuInfo.ConfigFile : Load.Instance.configFile;
