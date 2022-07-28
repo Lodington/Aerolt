@@ -36,8 +36,7 @@ namespace Aerolt.Managers
 
 		public static void SendAerolt<T>(this NetworkConnection connection, T message) where T : AeroltMessageBase
 		{
-			var typ = (uint) Array.IndexOf(RegisteredMessages, message.GetType());// typeof(T)); this returns AeroltMessageBase, and not the actual type. fucking generics
-			var mes = new AeroltMessage {Type = typ, message = message};
+			var mes = new AeroltMessage(message);
 			connection.Send(2004, mes);
 		}
 
@@ -59,8 +58,10 @@ namespace Aerolt.Managers
 
 		public void SendToAuthority(NetworkIdentity identity)
 		{
-			if (!Util.HasEffectiveAuthority(identity))
-				identity.clientAuthorityOwner.SendAerolt(this); // TODO this field is only set on host, as a client trying to exert auth over another client/host they need to tell the server about it.
+			if (!Util.HasEffectiveAuthority(identity) && NetworkServer.active)
+				identity.clientAuthorityOwner.SendAerolt(this);
+			else if (!NetworkServer.active)
+				new NewAuthMessage(identity, this).SendToServer();
 			else
 				Handle();
 		}
@@ -78,10 +79,51 @@ namespace Aerolt.Managers
 		}
 	}
 
+	public class NewAuthMessage : AeroltMessageBase
+	{
+		private NetworkIdentity target;
+		private AeroltMessageBase message;
+		public NewAuthMessage(){}
+		public NewAuthMessage(NetworkIdentity identity, AeroltMessageBase aeroltMessageBase)
+		{
+			target = identity;
+			message = aeroltMessageBase;
+		}
+
+		public override void Handle()
+		{
+			base.Handle();
+			message.SendToAuthority(target);
+		}
+
+		public override void Deserialize(NetworkReader reader)
+		{
+			base.Deserialize(reader);
+			var obj = Util.FindNetworkObject(reader.ReadNetworkId());
+			if (obj)
+				target = obj.GetComponent<NetworkIdentity>();
+			message = reader.ReadMessage<AeroltMessage>().message;
+		}
+
+		public override void Serialize(NetworkWriter writer)
+		{
+			base.Serialize(writer);
+			writer.Write(target.netId);
+			writer.Write(new AeroltMessage(message));
+		}
+	}
+
 	class AeroltMessage : MessageBase
 	{
 		public uint Type;
 		public AeroltMessageBase message;
+
+		public AeroltMessage(){}
+		public AeroltMessage(AeroltMessageBase aeroltMessageBase)
+		{
+			message = aeroltMessageBase;
+			Type = (uint) Array.IndexOf(NetworkManager.RegisteredMessages, message.GetType());
+		}
 
 		public override void Serialize(NetworkWriter writer)
 		{
