@@ -55,7 +55,10 @@ namespace Aerolt.Managers
 			else
 				Handle();
 		}
-
+		public void SendToEveryone()
+		{
+			new BroadcastMessage(this).SendToServer();
+		}
 		public void SendToAuthority(NetworkIdentity identity)
 		{
 			if (!Util.HasEffectiveAuthority(identity) && NetworkServer.active)
@@ -76,6 +79,37 @@ namespace Aerolt.Managers
 		public void SendToAuthority(CharacterBody body)
 		{
 			SendToAuthority(body.networkIdentity);
+		}
+	}
+
+	public class BroadcastMessage : AeroltMessageBase
+	{
+		private AeroltMessageBase message;
+		public BroadcastMessage(){}
+		public BroadcastMessage(AeroltMessageBase aeroltMessageBase)
+		{
+			message = aeroltMessageBase;
+		}
+		public override void Handle()
+		{
+			base.Handle();
+			foreach (var connection in NetworkServer.connections)
+			{
+				if (!connection.isConnected) continue;
+				connection.SendAerolt(message);
+			}
+			message.Handle();
+		}
+		public override void Deserialize(NetworkReader reader)
+		{
+			base.Deserialize(reader);
+			message = reader.ReadMessage<AeroltMessage>().message;
+		}
+
+		public override void Serialize(NetworkWriter writer)
+		{
+			base.Serialize(writer);
+			writer.Write(new AeroltMessage(message));
 		}
 	}
 
