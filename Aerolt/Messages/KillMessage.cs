@@ -17,6 +17,7 @@ namespace Aerolt.Messages
 		public override void Handle()
 		{
 			base.Handle();
+			
 			master.TrueKill();
 		}
 
