@@ -1,12 +1,10 @@
-﻿using Aerolt.Classes;
-using Aerolt.Helpers;
+﻿using System.Collections.Generic;
 using Aerolt.Managers;
+using Aerolt.Messages;
 using RoR2;
 using RoR2.ContentManagement;
-using RoR2.UI;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+
 
 namespace Aerolt.Buttons
 {
@@ -33,7 +31,9 @@ namespace Aerolt.Buttons
         public void SetEquipmentDef(EquipmentDef def)
         {
             _equipmentDef = def;
-            GiveEquipment();
+            Dictionary<EquipmentDef, int> equipmentDef = new();
+            equipmentDef.Add(def, 1);
+            new SetEquipmentMessage(target.master.inventory, equipmentDef).SendToServer();
         }
 
         public void GiveEquipment() // TODO Network this
