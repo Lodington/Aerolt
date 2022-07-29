@@ -16,7 +16,11 @@ namespace Aerolt.Helpers
             {"Shop", Color.red},
             {"Secret_Plates", Color.cyan},
             {"Barrels", new Color32(255, 128, 0, 255)},
-            {"Scrappers", Color.blue}
+            {"Scrappers", Color.blue},
+            {"ClensingPool", Color.white},
+            {"Shrine", Color.white},
+            {"Drone", Color.white},
+            {"Printer", Color.white},
         };
 
         public static readonly Dictionary<string, ZioConfigEntry<Color>> GlobalColors = new();

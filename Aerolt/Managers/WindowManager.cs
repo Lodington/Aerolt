@@ -10,27 +10,24 @@ namespace Aerolt.Managers
 {
 	public class WindowManager : MonoBehaviour
 	{
-		public List<Panel> panels;
-		private Dictionary<Panel, ZioConfigEntry<bool>> windowOpen = new();
+		public List<Toggle> buttons;
+		public List<GameObject> panels;
+		private List<ZioConfigEntry<bool>> windowOpen = new();
 
-		public void Awake()
+		public void Start()
 		{
 			var info = GetComponentInParent<MenuInfo>();
+			var i = 0;
 			foreach (var panel in panels)
 			{
-				if (!panel.button || !panel.window)
-					continue;
-				var entry = info.ConfigFile.Bind("Window Open", panel.window.name, panel.button.isOn, "");
-				windowOpen[panel] = entry;
-				panel.button.onValueChanged.AddListener(on => entry.Value = on);
+				if (i >= buttons.Count) break;
+				var toggle = buttons[i];
+				var entry = info.ConfigFile.Bind("Window Open", panel.name, toggle.isOn, "");
+				windowOpen.Add(entry);
+				toggle.Set(entry.Value);
+				toggle.onValueChanged.AddListener(on => entry.Value = on);
+				i++;
 			}
-		}
-
-		[Serializable]
-		public struct Panel
-		{
-			public GameObject window;
-			public Toggle button;
 		}
 	}
 }

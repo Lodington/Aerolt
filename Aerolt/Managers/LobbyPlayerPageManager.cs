@@ -191,9 +191,7 @@ namespace Aerolt.Managers
 			
 			_state = newState;
 		}
-
 		
-
 		public void SwapViewState()
 		{
 			SwapViewState(ViewState.Main);

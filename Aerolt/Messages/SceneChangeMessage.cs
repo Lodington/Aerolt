@@ -7,13 +7,19 @@ namespace Aerolt.Messages
 	public class SceneChangeMessage : AeroltMessageBase
 	{
 		private SceneIndex target;
+		private bool isSet;
 		public SceneChangeMessage(){}
-		public SceneChangeMessage(SceneIndex sceneIndex) => target = sceneIndex;
+		public SceneChangeMessage(SceneIndex sceneIndex)
+		{
+			isSet = true;
+			target = sceneIndex;
+		}
+
 		public override void Handle()
 		{
 			base.Handle();
 			var def = SceneCatalog.GetSceneDef(target);
-			if (def)
+			if (isSet && def)
 			{
 				Run.instance.AdvanceStage(def);
 				Run.instance.stageClearCount--;
@@ -27,12 +33,14 @@ namespace Aerolt.Messages
 		public override void Deserialize(NetworkReader reader)
 		{
 			base.Deserialize(reader);
+			isSet = reader.ReadBoolean();
 			target = (SceneIndex) reader.ReadInt32();
 		}
 
 		public override void Serialize(NetworkWriter writer)
 		{
 			base.Serialize(writer);
+			writer.Write(isSet);
 			writer.Write((int) target);
 		}
 	}

@@ -23,30 +23,37 @@ namespace Aerolt.Classes
         public static List<ScrapperController> Scrappers;
         public static List<MultiShopController> MultiShops;
 
+        public Toggle showAdvancedToggle;
         public Toggle showTeleporterToggle;
         public Toggle showChestToggle;
-        public Toggle showChestAdvancedToggle;
         public Toggle showMultiShopToggle;
-        public Toggle showShopAdvancedToggle;
         public Toggle showBarrelToggle;
         public Toggle showScrapperToggle;
         public Toggle ShowSecretToggle;
+        public Toggle showDuplicatorToggle;
+        public Toggle showDroneToggle;
+        public Toggle showShrineToggle;
+        public Toggle showClensingPoolToggle;
+
         
         public static Esp Instance;
+        private ZioConfigEntry<bool> advancedEntry;
         private ZioConfigEntry<bool> teleporterEntry;
         private ZioConfigEntry<bool> chestEntry;
         private ZioConfigEntry<bool> shopEntry;
-        private ZioConfigEntry<bool> chestAdvancedEntry;
-        private ZioConfigEntry<bool> shopAdvancedEntry;
         private ZioConfigEntry<bool> barrelEntry;
         private ZioConfigEntry<bool> scrapperEntry;
         private ZioConfigEntry<bool> secretEntry;
+        private ZioConfigEntry<bool> duplicatorEntry;
+        private ZioConfigEntry<bool> droneEntry;
+        private ZioConfigEntry<bool> shrineEntry;
+        private ZioConfigEntry<bool> showClensingPoolEntry;
 
         public static void Draw()
         {
             if (Instance.showTeleporterToggle.isOn)
                 ShowTeleporter();
-            if (Instance.showChestToggle.isOn)
+            if (Instance.showChestToggle.isOn || Instance.showDuplicatorToggle.isOn || Instance.showDroneToggle.isOn || Instance.showShrineToggle.isOn || Instance.showClensingPoolToggle.isOn)
                 DrawPurchaseInteractables();
             if (Instance.showMultiShopToggle.isOn)
                 DrawShops();
@@ -68,7 +75,7 @@ namespace Aerolt.Classes
                 var transform1 = multiShopController.transform;
                 var position = transform1.position + transform1.up * 1.5f;
                 var distanceToObject = Mathf.RoundToInt(Vector3.Distance(Camera.main.transform.position, position));
-                var advanced = CheckCursorPosition(position) || Instance.showShopAdvancedToggle && Instance.showShopAdvancedToggle.isOn;
+                var advanced = CheckCursorPosition(position) || Instance.showAdvancedToggle.isOn;
                 if (advanced)
                     str.AppendLine("Multi Shop Terminal"); // TODO use lang token
                 var costSet = false;
@@ -112,13 +119,9 @@ namespace Aerolt.Classes
             showChestToggle.Set(chestEntry.Value);
             shopEntry = configFile.Bind("ESP", "showShop", false, "");
             showMultiShopToggle.Set(shopEntry.Value);
-            chestAdvancedEntry = configFile.Bind("ESP", "showChestAdvanced", false, "");
-            showChestAdvancedToggle.Set(chestAdvancedEntry.Value);
-            shopAdvancedEntry = configFile.Bind("ESP", "showShopAdvanced", false, "");
-            
-            if (showShopAdvancedToggle) // fucking lodington not updating the asset bundle
-                showShopAdvancedToggle.Set(shopAdvancedEntry.Value);
-            
+            advancedEntry = configFile.Bind("ESP", "showAdvanced", false, "");
+            showAdvancedToggle.Set(advancedEntry.Value);
+
             barrelEntry = configFile.Bind("ESP", "showBarrel", false, "");
             showBarrelToggle.Set(barrelEntry.Value);
             scrapperEntry = configFile.Bind("ESP", "showScrapper", false, "");
@@ -126,20 +129,34 @@ namespace Aerolt.Classes
             secretEntry = configFile.Bind("ESP", "showSecret", false, "");
             ShowSecretToggle.Set(secretEntry.Value);
             
+            duplicatorEntry = configFile.Bind("ESP", "showDuplicator", false, "");
+            showDuplicatorToggle.Set(duplicatorEntry.Value);
+            droneEntry = configFile.Bind("ESP", "showDrone", false, "");
+            showDroneToggle.Set(droneEntry.Value);
+            shrineEntry = configFile.Bind("ESP", "showShrine", false, "");
+            showShrineToggle.Set(shrineEntry.Value);
+        
+            showClensingPoolEntry = configFile.Bind("ESP", "showClensingPools", false, "");
+            showClensingPoolToggle.Set(showClensingPoolEntry.Value);
+            
+            
             if (Instance) return;
             Instance = this;
             
             showTeleporterToggle.onValueChanged.AddListener(val => teleporterEntry.Value = val);
             showChestToggle.onValueChanged.AddListener(val => chestEntry.Value = val);
             showMultiShopToggle.onValueChanged.AddListener(val => shopEntry.Value = val);
-            showChestAdvancedToggle.onValueChanged.AddListener(val => chestAdvancedEntry.Value = val);
+            showAdvancedToggle.onValueChanged.AddListener(val => advancedEntry.Value = val);
             
-            if (showShopAdvancedToggle) // fucking lodington not updating the asset bundle
-                showShopAdvancedToggle.onValueChanged.AddListener(val => shopAdvancedEntry.Value = val);
             
             showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
             showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
             ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
+            showDuplicatorToggle.onValueChanged.AddListener(val => duplicatorEntry.Value = val);
+            showDroneToggle.onValueChanged.AddListener(val => droneEntry.Value = val);
+            showShrineToggle.onValueChanged.AddListener(val => shrineEntry.Value = val);
+            
+            showClensingPoolToggle.onValueChanged.AddListener(val => showClensingPoolEntry.Value = val);
             
             GatherObjects(); // these objects should exist by hud awake
         }
@@ -244,21 +261,76 @@ namespace Aerolt.Classes
                 if (!purchaseInteraction || !purchaseInteraction.available) continue;
                 
                 var chest = purchaseInteraction.GetComponent<ChestBehavior>();
-                //var multiShop = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
                 if (chest && Instance.showChestToggle.isOn) 
                     ShowChest(chest, purchaseInteraction);
 
-                /*
-                if (multiShop && Instance.showMultiShopToggle.isOn) 
-                    ShowShop(multiShop, purchaseInteraction);
-                    */
+                var shopTerminal = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
+                if (shopTerminal)
+                {
+                    if (Instance.showDuplicatorToggle.isOn)
+                    {
+                        if (purchaseInteraction.displayNameToken == "DUPLICATOR_NAME")
+                            ShowDuplicator("DUPLICATOR_NAME", shopTerminal);
+                        if (purchaseInteraction.displayNameToken == "BAZAAR_CAULDRON_NAME")
+                            ShowDuplicator("BAZAAR_CAULDRON_NAME", shopTerminal);
+                    }
+                }
+                
+                var masterSummon = purchaseInteraction.GetComponent<SummonMasterBehavior>();
+                if (masterSummon && Instance.showDroneToggle.isOn)
+                {
+                    ShowDrone(purchaseInteraction);
+                }
+
+                var nameProvider = purchaseInteraction.GetComponent<GenericDisplayNameProvider>();
+                if (nameProvider)
+                {
+                    if (Instance.showShrineToggle.isOn && nameProvider.displayToken.ToUpper().Contains("SHRINE"))
+                    {
+                        ShowShrine(purchaseInteraction);
+                    }
+                }
+
+                if (purchaseInteraction.costType == CostTypeIndex.LunarItemOrEquipment &&
+                    Instance.showClensingPoolToggle.isOn)
+                {
+                    ShowClensingPool(purchaseInteraction);
+                }
             }
         }
-       
-        
+
+        private static void ShowClensingPool(PurchaseInteraction purchaseInteraction)
+        {
+            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("ClensingPool"), Color.clear, GetDistance(purchaseInteraction));
+        }
+
+        private static void ShowShrine(PurchaseInteraction purchaseInteraction)
+        {
+            var position = purchaseInteraction.transform.position;
+            EspHelper.DrawESPLabel(position, Colors.GetColor("Shrine"), Color.clear, purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
+        }
+
+        private static void ShowDrone(PurchaseInteraction purchaseInteraction)
+        {
+            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Drone"), Color.clear, GetDistance(purchaseInteraction));
+        }
+
+        private static void ShowDuplicator(string token, ShopTerminalBehavior shopTerminal)
+        {
+            var text = $"{Language.GetString(token)}\n{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n{shopTerminal.itemTier.ToString()}\n{GetDistance(shopTerminal.transform.position)}m";
+            EspHelper.DrawESPLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear, text);
+        }
+
+        public static float GetDistance(Vector3 position)
+        {
+            var distanceToObject = Vector3.Distance(Camera.main.transform.position, position);
+            var distance = (int)distanceToObject;
+            return distance;
+        }
+
         public static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
         {
-            if (Instance.showChestAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, GetDistance(purchaseInteraction));
             else
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
