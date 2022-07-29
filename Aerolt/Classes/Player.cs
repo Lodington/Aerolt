@@ -334,17 +334,7 @@ namespace Aerolt.Classes
                 ClearItemsTo(networkUser);
             }
         }
-        public static void KillAllMobs()
-        {
-            //var mobs = CharacterMaster.instancesList.Where(x => x && x.teamIndex != owner.master.teamIndex).ToArray();
-            //foreach (var characterMaster in mobs)
-           // {
-            //    var body = characterMaster.GetBody();
-           //     if (body)
-           //         Chat.AddMessage($"<color=yellow>Killed {body.GetDisplayName()} </color>");
-           //     characterMaster.TrueKill();
-           // }
-        }
+       
         
     }
 }
