@@ -4,6 +4,7 @@ using System.Linq;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Managers;
+using Aerolt.Messages;
 using RoR2;
 using RoR2.ContentManagement;
 using RoR2.UI;
@@ -63,24 +64,9 @@ namespace Aerolt.Buttons
             
             var location = localUser.cachedBody.transform.position;
             var body = monsterMaster.GetComponent<CharacterMaster>().bodyPrefab;
-
-            var bodyGameObject = Instantiate(monsterMaster.gameObject, location, Quaternion.identity);
-            var master = bodyGameObject.GetComponent<CharacterMaster>();
-
-            master.teamIndex = (TeamIndex) teamIndexDropDown.value;
-            
-            if (ItemDef.Any())
-                foreach (var item in ItemDef)
-                    master.inventory.GiveItem(item.Key, item.Value);
-            if (eliteIndexDropDown && eliteIndexDropDown.value != (int) EliteIndex.None)
-                master.inventory.SetEquipmentIndex(eliteMap[eliteIndexDropDown.options[eliteIndexDropDown.value].text]);
-            if (brainDead && brainDead.isOn) foreach (var masterAIComponent in master.aiComponents) Destroy(masterAIComponent);
-
-
-            NetworkServer.Spawn(bodyGameObject);
-            master.bodyPrefab = body;
-            master.SpawnBody(localUser.cachedBody.transform.position, Quaternion.identity);
-            
+            var eliteIndex = eliteMap[eliteIndexDropDown.options[eliteIndexDropDown.value].text];
+            var teamIndex = (TeamIndex) teamIndexDropDown.value;
+            new MonsterSpawnMessage(body.name, location, teamIndex, eliteIndex, brainDead.isOn, ItemDef.ToDictionary(x => x.Key, x => (uint) x.Value)).SendToServer();
         }
         
     }
