@@ -43,16 +43,6 @@ namespace Aerolt.Helpers
 			var configFile = menuInfo.ConfigFile;
 			if (configFile == null) return;
 
-			if (string.IsNullOrWhiteSpace(configName))
-			{
-				var save = GetComponent<DragMoveSave>();
-				if (save)
-					configName = save.windowName;
-				var moveresize = GetComponent<DragResizeMove>();
-				if (moveresize)
-					configName = moveresize.windowName;
-			}
-
 			var i = 0;
 			foreach (var colorName in Enum.GetNames(typeof(ColorLayer)))
 			{
@@ -142,15 +132,6 @@ namespace Aerolt.Helpers
 
 		protected Color Color;
 		private bool failedToSetUp;
-	}
-	
-	public enum ColorLayer
-	{
-		Foreground,
-		Background,
-		Text,
-		Accent,
-		TextGrey
 	}
 
 	public class ColorableText : ColorableComponent

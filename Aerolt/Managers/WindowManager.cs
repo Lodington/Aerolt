@@ -18,6 +18,8 @@ namespace Aerolt.Managers
 			var info = GetComponentInParent<MenuInfo>();
 			foreach (var panel in panels)
 			{
+				if (!panel.button)
+					continue;
 				var entry = info.ConfigFile.Bind("Window Open", panel.window.name, panel.button.isOn, "");
 				windowOpen[panel] = entry;
 				panel.button.onValueChanged.AddListener(on => entry.Value = on);
