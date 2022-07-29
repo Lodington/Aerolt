@@ -133,15 +133,6 @@ namespace Aerolt.Helpers
 		protected Color Color;
 		private bool failedToSetUp;
 	}
-	
-	public enum ColorLayer
-	{
-		Foreground,
-		Background,
-		Text,
-		Accent,
-		TextGrey
-	}
 
 	public class ColorableText : ColorableComponent
 	{
