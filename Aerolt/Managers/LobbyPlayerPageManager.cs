@@ -15,38 +15,49 @@ namespace Aerolt.Managers
 {
 	public partial class LobbyPlayerPageManager : MonoBehaviour, IModuleStartup
 	{
+		[Header("Character Info")]
 		private NetworkUser currentUser;
 		private CharacterBody body;
 		private CharacterMaster master;
 		private MenuInfo info;
-
 		public PlayerValuesGenerator bodyStats;
 
+		
+		[Header("Inventory Display")]
 		public ItemInventoryDisplay inventoryDisplay;
 		public EquipmentIcon equipmentIcon;
 		public BuffDisplay buffDisplay;
 
+		[Header("Toggles")]
 		public Toggle aimbotToggle;
 		public Toggle noclipToggle;
 		public Toggle godToggle;
 		public Toggle infiniteSkillsToggle;
 		public Toggle alwaysSprintToggle;
+		public Toggle disableMobSpawnToggle;
 
+		[Header("Sliders")]
 		public Slider aimbotWeightSlider;
+		public Slider xpSlider;
 
+		[Header("DropDowns")]
 		public TMP_Dropdown teamDropdown;
 
+		[Header("InputFields")]
 		public TMP_InputField moneyInputField;
 		public TMP_InputField lunarCoinsInputField;
 		public TMP_InputField voidMarkersInputField;
+		public TMP_InputField xpToGiveInputField;
 
+		[Header("Content Display")]
 		public GameObject mainContent;
 		public EditPlayerItemButton itemContent;
 		public EquipmentButtonGenerator equipmentContent;
 		public BodyManager bodyContent;
 		public EditPlayerBuffButton buffContent;
-		private ViewState _state = ViewState.Main;
+		public TMP_Text LevelLabel;
 		
+		private ViewState _state = ViewState.Main;
 		private LobbyPlayerManager playerManager;
 		private bool ownerIsSelected;
 		private PlayerConfigBinding PlayerConfig => playerManager.users[currentUser];
@@ -76,12 +87,21 @@ namespace Aerolt.Managers
 			alwaysSprintToggle.SetIsOnWithoutNotify(PlayerConfig.AlwaysSprintOn);
 		}
 
+		public void OnEnable()
+		{
+			xpSlider.maxValue = TeamManager.instance.GetTeamNextLevelExperience((TeamIndex)teamDropdown.value);
+			xpSlider.value = TeamManager.instance.GetTeamCurrentLevelExperience((TeamIndex) teamDropdown.value);
+			LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
+		}
+
 		public void Update()
 		{
 			if (!currentUser) return;
 			((TextMeshProUGUI) moneyInputField.placeholder).text = master.money.ToString();
 			((TextMeshProUGUI) voidMarkersInputField.placeholder).text = master.voidCoins.ToString();
 			((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = currentUser.lunarCoins.ToString();
+			//((TextMeshProUGUI) xpToGiveInputField.placeholder).text = TeamManager.instance.GetTeamExperience(TeamIndex.Player).ToString();
+			
 		}
 
 		private void SetBody(CharacterBody bodyIn)
@@ -134,6 +154,7 @@ namespace Aerolt.Managers
 			});
 			
 			teamDropdown.onValueChanged.AddListener(TeamChanged);
+			
 		}
 
 		public void TeamChanged(int team)
@@ -190,6 +211,22 @@ namespace Aerolt.Managers
 			}
 			
 			_state = newState;
+		}
+
+		public void ApplyMobSpawns()
+		{
+			foreach (var director in CombatDirector.instancesList)
+				director.monsterSpawnTimer = disableMobSpawnToggle.isOn ? float.PositiveInfinity : 0f;
+		}
+		public void KillAllMobs()
+		{
+			var mobs = CharacterMaster.instancesList.Where(x => x && x.teamIndex != currentUser.master.teamIndex).ToArray();
+			foreach (var characterMaster in mobs)
+			{
+				if (characterMaster.GetBody())
+					Chat.AddMessage($"<color=yellow>Killed {body.GetDisplayName()} </color>");
+				characterMaster.TrueKill();
+			}
 		}
 		
 		public void SwapViewState()
