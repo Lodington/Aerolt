@@ -9,6 +9,7 @@ namespace Aerolt.Messages
 {
 	public class MonsterSpawnMessage : AeroltMessageBase
 	{
+		private string masterName;
 		private string bodyName;
 		private Vector3 location;
 		private TeamIndex teamIndex;
@@ -17,8 +18,9 @@ namespace Aerolt.Messages
 		private Dictionary<ItemDef, uint> itemCounts;
 
 		public MonsterSpawnMessage(){}
-		public MonsterSpawnMessage(string bodyName, Vector3 vector3, TeamIndex teamIndex1, EquipmentIndex equipmentIndex, bool brainDead, Dictionary<ItemDef,uint> toDictionary)
+		public MonsterSpawnMessage(string masterName, string bodyName, Vector3 vector3, TeamIndex teamIndex1, EquipmentIndex equipmentIndex, bool brainDead, Dictionary<ItemDef,uint> toDictionary)
 		{
+			this.masterName = masterName;
 			this.bodyName = bodyName;
 			location = vector3;
 			teamIndex = teamIndex1;
@@ -30,7 +32,7 @@ namespace Aerolt.Messages
 		public override void Handle()
 		{
 			base.Handle();
-			var monsterMaster = MasterCatalog.FindMasterPrefab(bodyName);
+			var monsterMaster = MasterCatalog.FindMasterPrefab(masterName);
 			var bodyGameObject = Object.Instantiate(monsterMaster.gameObject, location, Quaternion.identity);
 			var master = bodyGameObject.GetComponent<CharacterMaster>();
 
@@ -51,6 +53,7 @@ namespace Aerolt.Messages
 		public override void Deserialize(NetworkReader reader)
 		{
 			base.Deserialize(reader);
+			masterName = reader.ReadString();
 			bodyName = reader.ReadString();
 			location = reader.ReadVector3();
 			teamIndex = reader.ReadTeamIndex();
@@ -62,6 +65,7 @@ namespace Aerolt.Messages
 		public override void Serialize(NetworkWriter writer)
 		{
 			base.Serialize(writer);
+			writer.Write(masterName);
 			writer.Write(bodyName);
 			writer.Write(location);
 			writer.Write(teamIndex);

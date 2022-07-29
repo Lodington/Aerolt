@@ -66,7 +66,7 @@ namespace Aerolt.Buttons
             var body = monsterMaster.GetComponent<CharacterMaster>().bodyPrefab;
             var eliteIndex = eliteMap[eliteIndexDropDown.options[eliteIndexDropDown.value].text];
             var teamIndex = (TeamIndex) teamIndexDropDown.value;
-            new MonsterSpawnMessage(body.name, location, teamIndex, eliteIndex, brainDead.isOn, ItemDef.ToDictionary(x => x.Key, x => (uint) x.Value)).SendToServer();
+            new MonsterSpawnMessage(monsterMaster.name, body.name, location, teamIndex, eliteIndex, brainDead.isOn, ItemDef.ToDictionary(x => x.Key, x => (uint) x.Value)).SendToServer();
         }
         
     }
