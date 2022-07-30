@@ -39,7 +39,10 @@ namespace Aerolt.Messages
 					master.GiveVoidCoins(amount - master.voidCoins);
 					break;
 				case CurrencyType.Experience:
-					TeamManager.instance.SetTeamExperience(master.teamIndex, (ulong)amount);
+					TeamManager.instance.SetTeamExperience(master.teamIndex, amount);
+					break;
+				case CurrencyType.Level:
+					TeamManager.instance.SetTeamLevel(master.teamIndex, amount);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
@@ -70,6 +73,7 @@ namespace Aerolt.Messages
 		Money,
 		Lunar,
 		Void,
-		Experience
+		Experience,
+		Level
 	}
 }
