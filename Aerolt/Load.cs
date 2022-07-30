@@ -104,7 +104,7 @@ namespace Aerolt
         {
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             CreateKeyBindSettings();
-            Instantiate(changeLogWindow);
+            //Instantiate(changeLogWindow);
             Colors.InitColors();
         }
 

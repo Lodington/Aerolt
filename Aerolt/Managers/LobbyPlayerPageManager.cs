@@ -85,6 +85,8 @@ namespace Aerolt.Managers
 			noclipToggle.SetIsOnWithoutNotify(PlayerConfig.NoclipOn);
 			infiniteSkillsToggle.SetIsOnWithoutNotify(PlayerConfig.InfiniteSkillsOn);
 			alwaysSprintToggle.SetIsOnWithoutNotify(PlayerConfig.AlwaysSprintOn);
+			
+			UpdateLevelValues(master.teamIndex);
 		}
 
 
@@ -187,6 +189,7 @@ namespace Aerolt.Managers
 		{
 			var index = (TeamIndex) team;
 			new TeamSwitchMessage(master, index).SendToServer();
+			UpdateLevelValues(index);
 		}
 		
 		public void SwapViewState(ViewState newState) {
