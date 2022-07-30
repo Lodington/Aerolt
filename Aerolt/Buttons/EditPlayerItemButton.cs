@@ -42,11 +42,17 @@ namespace Aerolt.Buttons
                     "Tier Ascending",
                     "Name Ascending",
                 });
+                sortMode.onValueChanged.AddListener(Sort);
             }
             if(searchFilter)
-                searchFilter.m_OnEndEdit.AddListener(FilterUpdated);
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
             foreach (var def in ContentManager._itemDefs)
                 itemDefRef[def] = new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
+        }
+
+        private void Sort(int _)
+        {
+            Sort();
         }
 
         private void FilterUpdated(string text)
