@@ -86,11 +86,11 @@ namespace Aerolt.Managers
 			infiniteSkillsToggle.SetIsOnWithoutNotify(PlayerConfig.InfiniteSkillsOn);
 			alwaysSprintToggle.SetIsOnWithoutNotify(PlayerConfig.AlwaysSprintOn);
 			
-			UpdateLevelValues(master.teamIndex);
+			UpdateLevelValues();
 		}
 
 
-		public void FixedUpdate()
+		public void Update()
 		{
 			if (!currentUser) return;
 			((TextMeshProUGUI) moneyInputField.placeholder).text = master.money.ToString();
@@ -112,7 +112,7 @@ namespace Aerolt.Managers
 
 		private void OnEnable()
 		{
-			UpdateLevelValues((TeamIndex) teamDropdown.value);
+			UpdateLevelValues();
 		}
 
 		public void ModuleStart()
@@ -157,29 +157,32 @@ namespace Aerolt.Managers
 			});
 			xpToGiveInputField.onEndEdit.AddListener(amt =>
 			{
-				SetCurrency(CurrencyType.Experience, amt);
-				UpdateLevelValues((TeamIndex) teamDropdown.value);
+				SetCurrency(CurrencyType.Level, amt);
+				UpdateLevelValues();
 				xpToGiveInputField.SetTextWithoutNotify("");
 			});
-			xpSlider.onValueChanged.AddListener(amt =>
-			{
-				SetCurrency(CurrencyType.Experience, amt.ToString());
-				UpdateLevelValues((TeamIndex) teamDropdown.value);
-			});
+			
 			teamDropdown.onValueChanged.AddListener(TeamChanged);
 			
 		}
 
+		public void SetXp()
+		{
+			SetCurrency(CurrencyType.Experience,  Mathf.RoundToInt(xpSlider.value).ToString()); 
+			
+			UpdateLevelValues();
+
+		}
+		
 		private void OnTeamLevelUp(TeamIndex obj)
 		{
-			xpSlider.value = TeamManager.instance.GetTeamCurrentLevelExperience(((TeamIndex) teamDropdown.value));
+			xpSlider.value = TeamManager.instance.GetTeamCurrentLevelExperience((TeamIndex) teamDropdown.value);
 			LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
 		}
 		
-		private void UpdateLevelValues(TeamIndex obj)
+		private void UpdateLevelValues()
 		{
 			LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
-			xpSlider.value = TeamManager.instance.GetTeamExperience((TeamIndex) teamDropdown.value);
 			xpSlider.minValue = TeamManager.instance.GetTeamCurrentLevelExperience(((TeamIndex) teamDropdown.value));
 			xpSlider.maxValue = TeamManager.instance.GetTeamNextLevelExperience((TeamIndex)teamDropdown.value);
 			
@@ -189,7 +192,7 @@ namespace Aerolt.Managers
 		{
 			var index = (TeamIndex) team;
 			new TeamSwitchMessage(master, index).SendToServer();
-			UpdateLevelValues(index);
+			UpdateLevelValues();
 		}
 		
 		public void SwapViewState(ViewState newState) {
