@@ -44,7 +44,7 @@ namespace Aerolt.Classes
 				var dir = x.hurtBox.transform.position - ray.origin;
 				var passesLos = !Physics.Raycast(ray.origin, dir, out _, dir.magnitude, LayerIndex.world.mask,
 					QueryTriggerInteraction.UseGlobal);
-				return x.hurtBox.teamIndex != team && passesLos;
+				return x.hurtBox.teamIndex != team && passesLos && x.dot > weight - 0.5f;
 			}).ToArray();
 			if (!targets.Any())
 			{
