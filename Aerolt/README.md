@@ -59,19 +59,18 @@ F1 to open the menu!
 # Changelog
 - 2.0.0
 	- Mod has been developed from the ground up (again)
-		- New Features
-			- ESP
-				- Add ESP for Shops
-				- Changed How esp displays
-			- Player
-				- Added Disable mob spawns
-				- Reworked Character stats so you can edit more stats
-			- Monsters
-				- Added Edit Items
-				- Added team Change
-			- Lobby
-				- Added Currency, Lunar, and void marker edit fields
-				- Added Edit inventory for all players
+	- ESP
+		- Add ESP for Shops
+		- Changed How esp displays
+	- Player
+		- Added Disable mob spawns
+		- Reworked Character stats so you can edit more stats
+	- Monsters
+		- Added Edit Items
+		- Added team Change
+	- Lobby
+		- Added Currency, Lunar, and void marker edit fields
+		- Added Edit inventory for all players
 - 1.3.3
 	- Fixed Item Tab crashing
 - 1.3.2

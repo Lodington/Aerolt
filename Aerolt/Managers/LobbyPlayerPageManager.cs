@@ -87,21 +87,15 @@ namespace Aerolt.Managers
 			alwaysSprintToggle.SetIsOnWithoutNotify(PlayerConfig.AlwaysSprintOn);
 		}
 
-		public void OnEnable()
-		{
-			xpSlider.maxValue = TeamManager.instance.GetTeamNextLevelExperience((TeamIndex)teamDropdown.value);
-			xpSlider.value = TeamManager.instance.GetTeamCurrentLevelExperience((TeamIndex) teamDropdown.value);
-			LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
-		}
 
-		public void Update()
+		public void FixedUpdate()
 		{
 			if (!currentUser) return;
 			((TextMeshProUGUI) moneyInputField.placeholder).text = master.money.ToString();
 			((TextMeshProUGUI) voidMarkersInputField.placeholder).text = master.voidCoins.ToString();
 			((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = currentUser.lunarCoins.ToString();
-			//((TextMeshProUGUI) xpToGiveInputField.placeholder).text = TeamManager.instance.GetTeamExperience(TeamIndex.Player).ToString();
-			
+
+			//xpSlider.value = TeamManager.instance.GetTeamExperience((TeamIndex) teamDropdown.value);
 		}
 
 		private void SetBody(CharacterBody bodyIn)
@@ -114,12 +108,19 @@ namespace Aerolt.Managers
 			if (PlayerConfig.InfiniteSkillsOn) body.onSkillActivatedAuthority += InfiniteSkillsActivated;
 		}
 
+		private void OnEnable()
+		{
+			UpdateLevelValues((TeamIndex) teamDropdown.value);
+		}
+
 		public void ModuleStart()
 		{
 			info = GetComponentInParent<MenuInfo>();
 			playerManager = GetComponent<LobbyPlayerManager>();
 			bodyStats.Setup();
 
+			GlobalEventManager.onTeamLevelUp += OnTeamLevelUp;
+			
 			teamDropdown.options.Clear(); // ensure it was empty to begin with.
 			teamDropdown.AddOptions(Enum.GetNames(typeof(TeamIndex)).Where(x => x != "None").ToList());
 
@@ -152,8 +153,33 @@ namespace Aerolt.Managers
 				SetCurrency(CurrencyType.Void, amt);
 				lunarCoinsInputField.SetTextWithoutNotify("");
 			});
-			
+			xpToGiveInputField.onEndEdit.AddListener(amt =>
+			{
+				SetCurrency(CurrencyType.Experience, amt);
+				UpdateLevelValues((TeamIndex) teamDropdown.value);
+				xpToGiveInputField.SetTextWithoutNotify("");
+			});
+			xpSlider.onValueChanged.AddListener(amt =>
+			{
+				SetCurrency(CurrencyType.Experience, amt.ToString());
+				UpdateLevelValues((TeamIndex) teamDropdown.value);
+			});
 			teamDropdown.onValueChanged.AddListener(TeamChanged);
+			
+		}
+
+		private void OnTeamLevelUp(TeamIndex obj)
+		{
+			xpSlider.value = TeamManager.instance.GetTeamCurrentLevelExperience(((TeamIndex) teamDropdown.value));
+			LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
+		}
+		
+		private void UpdateLevelValues(TeamIndex obj)
+		{
+			LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
+			xpSlider.value = TeamManager.instance.GetTeamExperience((TeamIndex) teamDropdown.value);
+			xpSlider.minValue = TeamManager.instance.GetTeamCurrentLevelExperience(((TeamIndex) teamDropdown.value));
+			xpSlider.maxValue = TeamManager.instance.GetTeamNextLevelExperience((TeamIndex)teamDropdown.value);
 			
 		}
 
@@ -213,6 +239,8 @@ namespace Aerolt.Managers
 			_state = newState;
 		}
 
+		
+		
 		public void ApplyMobSpawns()
 		{
 			foreach (var director in CombatDirector.instancesList)

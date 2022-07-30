@@ -35,6 +35,8 @@ namespace Aerolt
         public static GameObject _co;
         public static AssetBundle _assets;
 
+        public static GameObject changeLogWindow;
+        
         public static GameObject settingsRoot;
         
         public static Load Instance;
@@ -56,6 +58,8 @@ namespace Aerolt
             _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); _assets.LoadAsset<GameObject>("AeroltUI");
+
+            //changeLogWindow = _assets.LoadAsset<GameObject>("ChangeLog");
             
             NetworkManager.Initialize();
         }
@@ -100,6 +104,7 @@ namespace Aerolt
         {
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             CreateKeyBindSettings();
+            Instantiate(changeLogWindow);
             Colors.InitColors();
         }
 

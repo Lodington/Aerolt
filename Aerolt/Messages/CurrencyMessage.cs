@@ -39,7 +39,7 @@ namespace Aerolt.Messages
 					master.GiveVoidCoins(amount - master.voidCoins);
 					break;
 				case CurrencyType.Experience:
-					master.GiveExperience(amount - TeamManager.instance.GetTeamExperience(master.teamIndex));
+					TeamManager.instance.SetTeamExperience(master.teamIndex, (ulong)amount);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
