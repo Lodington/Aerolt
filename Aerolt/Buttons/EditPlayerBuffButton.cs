@@ -25,7 +25,7 @@ namespace Aerolt.Buttons
 
 		public void Awake()
 		{
-			foreach (var def in ContentManager.buffDefs.OrderByDescending(x => x.name))
+			foreach (var def in ContentManager.buffDefs.OrderBy(x => x.name))
 				buffDefRef[def] = new AddRemoveButtonGen<BuffDef>(def, buttonPrefab, buffDef, buttonParent, itemListParent, false);
 			if(searchFilter)
 				searchFilter.onValueChanged.AddListener(FilterUpdated);

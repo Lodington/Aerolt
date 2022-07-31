@@ -23,7 +23,7 @@ namespace Aerolt.Managers
 
         private void Awake()
         {
-            foreach(var body in BodyCatalog.allBodyPrefabBodyBodyComponents)
+            foreach(var body in BodyCatalog.allBodyPrefabBodyBodyComponents.OrderBy(x => Language.GetString(x.baseNameToken)))
             {
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var customButton = newButton.GetComponent<CustomButton>(); 

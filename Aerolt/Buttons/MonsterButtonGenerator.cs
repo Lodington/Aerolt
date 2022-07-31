@@ -30,7 +30,7 @@ namespace Aerolt.Buttons
 
         private void Awake()
         {
-            foreach (var master in MasterCatalog.allAiMasters)
+            foreach (var master in MasterCatalog.allAiMasters.OrderBy(x => x.bodyPrefab ? Language.GetString(x.bodyPrefab.GetComponent<CharacterBody>().baseNameToken) : x.name))
             {
                 var body = master.bodyPrefab.GetComponent<CharacterBody>();
                 

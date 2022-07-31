@@ -34,7 +34,7 @@ namespace Aerolt.Managers
         public void ModuleStart()
         {
             _info = GetComponentInParent<MenuInfo>();
-            foreach (var card in cards)
+            foreach (var card in cards.OrderBy(x => x.prefab.GetComponentInChildren<IDisplayNameProvider>() != null ? x.prefab.GetComponentInChildren<IDisplayNameProvider>().GetDisplayName() : x.name))
             {
                 if (card.Equals(null) || card.Equals(default)) continue;
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);

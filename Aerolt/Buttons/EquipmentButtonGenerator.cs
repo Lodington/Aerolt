@@ -23,7 +23,7 @@ namespace Aerolt.Buttons
 
         private void Awake()
         {
-            foreach (var def in ContentManager._equipmentDefs.OrderByDescending(x => Language.GetString(x.nameToken)))
+            foreach (var def in ContentManager._equipmentDefs.OrderBy(x => Language.GetString(x.nameToken)))
             {
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var customButton = newButton.GetComponent<CustomButton>(); 
