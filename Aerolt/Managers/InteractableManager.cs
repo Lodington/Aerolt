@@ -5,13 +5,13 @@ using Aerolt.Buttons;
 using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Messages;
+using BepInEx;
 using JetBrains.Annotations;
 using RoR2;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 
 namespace Aerolt.Managers
 {
@@ -19,10 +19,12 @@ namespace Aerolt.Managers
     {
         public GameObject buttonPrefab;
         public GameObject buttonParent;
+        public TMP_InputField searchFilter;
 
         
         [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
         private MenuInfo _info;
+        private Dictionary<SpawnCard, CustomButton> cardDefRef = new();
         public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).ToArray();
 
         static InteractableManager()
@@ -42,7 +44,10 @@ namespace Aerolt.Managers
                 buttonComponet.buttonText.text = provider != null ? provider.GetDisplayName() : card.name;
                 buttonComponet.image.sprite = PingIndicator.GetInteractableIcon(card.prefab);
                 buttonComponet.button.onClick.AddListener(() => SpawnInteractable(card));
+                cardDefRef[card] = buttonComponet;
             }
+            if(searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
         public void SpawnInteractable(SpawnCard card)
@@ -89,6 +94,25 @@ namespace Aerolt.Managers
                 },
                 RoR2Application.rng)
             );
+        }
+        
+        private void FilterUpdated(string text)
+        {
+            if (text.IsNullOrWhiteSpace())
+            {
+                foreach (var buttonGen in cardDefRef)
+                {
+                    buttonGen.Value.gameObject.SetActive(true);
+                }
+                return;
+            }
+            
+            var arr = cardDefRef.Values.ToArray();
+            var matches = Tools.FindMatches(arr, x => x.buttonText.text, text);
+            foreach (var buttonGen in arr)
+            {
+                buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
+            }
         }
     }
 

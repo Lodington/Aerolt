@@ -1,8 +1,12 @@
+using System.Collections.Generic;
+using System.Linq;
 using Aerolt.Buttons;
+using Aerolt.Helpers;
 using Aerolt.Messages;
+using BepInEx;
 using RoR2;
+using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Aerolt.Managers
 {
@@ -14,6 +18,8 @@ namespace Aerolt.Managers
         
         private GameObject _newBody;
         private NetworkUser target;
+        public TMP_InputField searchFilter;
+        private Dictionary<CharacterBody, CustomButton> bodyDefRef = new();
 
         private void Awake()
         {
@@ -24,7 +30,10 @@ namespace Aerolt.Managers
                 customButton.buttonText.text = Language.GetString(body.baseNameToken);
                 customButton.image.sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 customButton.button.onClick.AddListener(() => SetBodyDef(body));
+                bodyDefRef[body] = customButton;
             }
+            if(searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
         public void SpawnAsBody()
@@ -42,6 +51,24 @@ namespace Aerolt.Managers
         public void Initialize(NetworkUser currentUser)
         {
             target = currentUser;
+        }
+        private void FilterUpdated(string text)
+        {
+            if (text.IsNullOrWhiteSpace())
+            {
+                foreach (var buttonGen in bodyDefRef)
+                {
+                    buttonGen.Value.gameObject.SetActive(true);
+                }
+                return;
+            }
+            
+            var arr = bodyDefRef.Values.ToArray();
+            var matches = Tools.FindMatches(arr, x => x.buttonText.text, text);
+            foreach (var buttonGen in arr)
+            {
+                buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
+            }
         }
     }
     

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using JetBrains.Annotations;
+using RoR2;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;

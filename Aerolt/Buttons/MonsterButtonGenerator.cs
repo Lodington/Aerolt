@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Aerolt.Enums;
 using Aerolt.Helpers;
-using Aerolt.Managers;
 using Aerolt.Messages;
+using BepInEx;
 using RoR2;
-using RoR2.ContentManagement;
-using RoR2.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Aerolt.Buttons
@@ -25,11 +20,13 @@ namespace Aerolt.Buttons
 
         public TMP_Dropdown teamIndexDropDown;
         public TMP_Dropdown eliteIndexDropDown;
+        public TMP_InputField searchFilter;
 
         public static Dictionary<ItemDef, int> ItemDef = new Dictionary<ItemDef, int>();
         private List<string> options = new List<string>();
         private Dictionary<string, EquipmentIndex> eliteMap;
         public Toggle brainDead;
+        private Dictionary<CharacterMaster, CustomButton> masterDefRef = new();
 
         private void Awake()
         {
@@ -39,9 +36,10 @@ namespace Aerolt.Buttons
                 
                 GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var buttonComponet = newButton.GetComponent<CustomButton>();
-                buttonComponet.buttonText.text = Language.GetString(master.name);
+                buttonComponet.buttonText.text = master.bodyPrefab ? Language.GetString(master.bodyPrefab.GetComponent<CharacterBody>().baseNameToken) : master.name;
                 buttonComponet.image.sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 buttonComponet.button.onClick.AddListener(() => SpawnMonster(master));
+                masterDefRef[master] = buttonComponet;
             }
             foreach (string team in Enum.GetNames(typeof(TeamIndex))) options.Add(team);
             teamIndexDropDown.AddOptions(options);
@@ -54,6 +52,8 @@ namespace Aerolt.Buttons
             }
             if(eliteIndexDropDown)
                 eliteIndexDropDown.AddOptions(eliteMap.Keys.ToList());
+            if(searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
         public void SpawnMonster(CharacterMaster monsterMaster)
@@ -69,5 +69,23 @@ namespace Aerolt.Buttons
             new MonsterSpawnMessage(monsterMaster.name, body.name, location, teamIndex, eliteIndex, brainDead.isOn, ItemDef.ToDictionary(x => x.Key, x => (uint) x.Value)).SendToServer();
         }
         
+        private void FilterUpdated(string text)
+        {
+            if (text.IsNullOrWhiteSpace())
+            {
+                foreach (var buttonGen in masterDefRef)
+                {
+                    buttonGen.Value.gameObject.SetActive(true);
+                }
+                return;
+            }
+            
+            var arr = masterDefRef.Values.ToArray();
+            var matches = Tools.FindMatches(arr, x => x.buttonText.text, text);
+            foreach (var buttonGen in arr)
+            {
+                buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
+            }
+        }
     }
 }
