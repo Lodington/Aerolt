@@ -348,13 +348,13 @@ namespace Aerolt.Classes
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
-                var items = optionChestBehavior.generatedDrops.Select(x =>
+                var items = optionChestBehavior.generatedDrops != null ? optionChestBehavior.generatedDrops.Select(x =>
                 {
                     var def = PickupCatalog.GetPickupDef(x);
                     return def.itemIndex != ItemIndex.None
                         ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
                         : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken);
-                }).ToArray();
+                }).ToArray() : new string[0];
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
                     GetDistance(purchaseInteraction) + "\n-" + string.Join("\n-", items));
             }
