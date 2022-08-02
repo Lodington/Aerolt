@@ -13,7 +13,6 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using MaterialHud;
 using RiskOfOptions;
 using RoR2;
 using RoR2.UI;

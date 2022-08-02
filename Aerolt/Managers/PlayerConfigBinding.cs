@@ -98,7 +98,7 @@ namespace Aerolt.Managers
 		}
 		public bool this[string name]
 		{
-			get => isLocalUser ? entries[name].Value : values[name];
+			get => isLocalUser ? entries[name].Value : values.ContainsKey(name) && values[name];
 			set
 			{
 				new PlayerConfigBindingSyncMessage(user, name, value).SendToEveryone();

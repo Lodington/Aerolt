@@ -337,7 +337,7 @@ namespace Aerolt.Classes
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var def = PickupCatalog.GetPickupDef(chest.dropPickup);
-                var item = def.itemIndex != ItemIndex.None ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken) : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken);
+                var item = def != null ? def.itemIndex != ItemIndex.None ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken) : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken): "";
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
                     GetDistance(purchaseInteraction) + "\n" + item);
             }
