@@ -31,6 +31,10 @@ namespace Aerolt.Managers
 		{
 			// we can do some auth checks in here later
 			var message = netmsg.ReadMessage<AeroltMessage>();
+			if (message.message is BroadcastMessage mess)
+			{
+				mess.fromConnection = netmsg.conn;
+			}
 			message.message.Handle();
 		}
 
@@ -57,6 +61,7 @@ namespace Aerolt.Managers
 		}
 		public void SendToEveryone()
 		{
+			Handle();
 			new BroadcastMessage(this).SendToServer();
 		}
 		public void SendToAuthority(NetworkIdentity identity)
@@ -85,6 +90,7 @@ namespace Aerolt.Managers
 	public class BroadcastMessage : AeroltMessageBase
 	{
 		private AeroltMessageBase message;
+		public NetworkConnection fromConnection;
 		public BroadcastMessage(){}
 		public BroadcastMessage(AeroltMessageBase aeroltMessageBase)
 		{
@@ -95,6 +101,7 @@ namespace Aerolt.Managers
 			base.Handle();
 			foreach (var connection in NetworkServer.connections)
 			{
+				if (connection == fromConnection) continue;
 				if (!connection.isConnected) continue;
 				connection.SendAerolt(message);
 			}

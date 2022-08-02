@@ -33,7 +33,7 @@ namespace Aerolt.Classes
         public Toggle showDuplicatorToggle;
         public Toggle showDroneToggle;
         public Toggle showShrineToggle;
-        public Toggle showClensingPoolToggle;
+        [FormerlySerializedAs("showClensingPoolToggle")] public Toggle showNewtAlterToggle;
 
         
         public static Esp Instance;
@@ -47,13 +47,13 @@ namespace Aerolt.Classes
         private ZioConfigEntry<bool> duplicatorEntry;
         private ZioConfigEntry<bool> droneEntry;
         private ZioConfigEntry<bool> shrineEntry;
-        private ZioConfigEntry<bool> showClensingPoolEntry;
+        private ZioConfigEntry<bool> showNewtAlterEntry;
 
         public static void Draw()
         {
             if (Instance.showTeleporterToggle.isOn)
                 ShowTeleporter();
-            if (Instance.showChestToggle.isOn || Instance.showDuplicatorToggle.isOn || Instance.showDroneToggle.isOn || Instance.showShrineToggle.isOn || Instance.showClensingPoolToggle.isOn)
+            if (Instance.showChestToggle.isOn || Instance.showDuplicatorToggle.isOn || Instance.showDroneToggle.isOn || Instance.showShrineToggle.isOn || Instance.showNewtAlterToggle.isOn)
                 DrawPurchaseInteractables();
             if (Instance.showMultiShopToggle.isOn)
                 DrawShops();
@@ -136,8 +136,8 @@ namespace Aerolt.Classes
             shrineEntry = configFile.Bind("ESP", "showShrine", false, "");
             showShrineToggle.Set(shrineEntry.Value);
         
-            showClensingPoolEntry = configFile.Bind("ESP", "showClensingPools", false, "");
-            showClensingPoolToggle.Set(showClensingPoolEntry.Value);
+            showNewtAlterEntry = configFile.Bind("ESP", "showNewtAlter", false, "");
+            showNewtAlterToggle.Set(showNewtAlterEntry.Value);
             
             
             if (Instance) return;
@@ -156,7 +156,7 @@ namespace Aerolt.Classes
             showDroneToggle.onValueChanged.AddListener(val => droneEntry.Value = val);
             showShrineToggle.onValueChanged.AddListener(val => shrineEntry.Value = val);
             
-            showClensingPoolToggle.onValueChanged.AddListener(val => showClensingPoolEntry.Value = val);
+            showNewtAlterToggle.onValueChanged.AddListener(val => showNewtAlterEntry.Value = val);
             
             GatherObjects(); // these objects should exist by hud awake
         }
@@ -291,17 +291,17 @@ namespace Aerolt.Classes
                     }
                 }
 
-                if (purchaseInteraction.costType == CostTypeIndex.LunarItemOrEquipment &&
-                    Instance.showClensingPoolToggle.isOn)
+                var portalBehaviour = purchaseInteraction.GetComponent<PortalStatueBehavior>();
+                if (portalBehaviour && Instance.showNewtAlterToggle.isOn)
                 {
-                    ShowClensingPool(purchaseInteraction);
+                    ShowNewtAlter(purchaseInteraction);
                 }
             }
         }
 
-        private static void ShowClensingPool(PurchaseInteraction purchaseInteraction)
+        private static void ShowNewtAlter(PurchaseInteraction purchaseInteraction)
         {
-            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("ClensingPool"), Color.clear, GetDistance(purchaseInteraction));
+            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("NewtAlter"), Color.clear, GetDistance(purchaseInteraction));
         }
 
         private static void ShowShrine(PurchaseInteraction purchaseInteraction)

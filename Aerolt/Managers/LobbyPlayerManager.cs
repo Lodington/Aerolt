@@ -6,6 +6,7 @@ using Aerolt.Classes;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace Aerolt.Managers
@@ -45,11 +46,6 @@ namespace Aerolt.Managers
 			NetworkUser.onPostNetworkUserStart -= UserAdded;
 			//NetworkUser.onNetworkUserDiscovered -= UserAdded;
 			NetworkUser.onNetworkUserLost -= UserLost;
-
-			foreach (var configBinding in users.Values)
-			{
-				configBinding.OnDestroy();
-			}
 		}
 
 		private void OnEnable()
@@ -60,7 +56,8 @@ namespace Aerolt.Managers
 		{
 			var button = users[user].customButton;
 			button.buttonText.text = user.userName;
-			button.rawImage.texture = user.master.bodyPrefab.GetComponent<CharacterBody>().portraitIcon;
+			if (user.master.bodyPrefab)
+				button.rawImage.texture = user.master.bodyPrefab.GetComponent<CharacterBody>().portraitIcon;
 		}
 
 		private void UserAdded(NetworkUser user)

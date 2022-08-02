@@ -52,6 +52,7 @@ namespace Aerolt.Managers
 
 		public static void ApplyValues(CharacterBody characterBody, PlayerConfigBinding playerConfig)
 		{
+			if (!characterBody) return;
 			Aimbot(characterBody, playerConfig.AimbotOn, playerConfig.AimbotWeight);
 			GodMode(characterBody, playerConfig.GodModeOn);
 			Noclip(characterBody, playerConfig.NoclipOn);

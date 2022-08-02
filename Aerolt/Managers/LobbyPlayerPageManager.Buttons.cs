@@ -31,24 +31,9 @@ namespace Aerolt.Managers
 		public void Kill() => new KillMessage(master).SendToServer(); // Todo, test to see if this needs to be sent on auth(the function calls to inventory add item inside truekill make me feel like no, but its also not working?)
 		public void Revive()
 		{
-			var gameover = FindObjectOfType<GameOverController>();
-			if (gameover)
-			{
-				foreach (var gameEndReportPanelController in gameover.reportPanels)
-				{
-					Destroy(gameEndReportPanelController.Value.gameObject); // TODO this will need to be networked to host if client tries to revive from game over
-				}
-				Destroy(gameover.gameObject);
-			}
-			
-			// The actual reviving should be networked though.
-			if (NetworkClient.active && !master.isServer)
-				master.CallCmdRespawn(master.bodyPrefab.name);
-			else
-			{
-				Run.instance.isGameOverServer = false;
-				Stage.instance.RespawnCharacter(master);
-			}
+			var message = new SetBodyMessage(currentUser);
+			message.Handle();
+			message.SendToServer();
 		}
 
 		public void GiveAllItems()

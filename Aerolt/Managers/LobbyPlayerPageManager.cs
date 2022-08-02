@@ -163,7 +163,13 @@ namespace Aerolt.Managers
 			});
 			
 			teamDropdown.onValueChanged.AddListener(TeamChanged);
-			
+			TeamComponent.onJoinTeamGlobal += TeamJoined;
+
+		}
+
+		private void TeamJoined(TeamComponent who, TeamIndex team)
+		{
+			if (who.body == body) teamDropdown.SetValueWithoutNotify((int) team);
 		}
 
 		public void SetXp()

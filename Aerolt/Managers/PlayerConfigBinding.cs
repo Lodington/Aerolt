@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using Aerolt.Buttons;
 using Aerolt.Classes;
+using Aerolt.Messages;
 using RoR2;
 using ZioConfigFile;
 
@@ -8,99 +11,58 @@ namespace Aerolt.Managers
 {
 	public class PlayerConfigBinding // TODO network the values;
 	{
-		private ZioConfigEntry<bool> noclipEntry;
-		private ZioConfigEntry<bool> aimbotEntry;
-		private ZioConfigEntry<bool> infiniteSkillsEntry;
-		private ZioConfigEntry<bool> godModeEntry;
-		private ZioConfigEntry<bool> alwaysSprintEntry;
-		private ZioConfigEntry<bool> noclipInteractDown;
-		private ZioConfigEntry<float> aimbotWeightEntry;
-		
-		public Action<float> aimbotWeightChanged; // these are probably going to go unused, and get removed.
-		public Action<bool> noclipInteractDownChanged;
-		
 		public CustomButton customButton; // this probably shouldn't be in here, but it was convenient
-		
+
 		public bool isLocalUser;
 		private ZioConfigFile.ZioConfigFile configFile;
+		private NetworkUser user;
 		
-		// Used for remote users, and always default if its local
-		private bool _noclipValue;
-		private bool _aimbotValue;
-		private bool _infiniteSkillsValue;
-		private bool _godModeValue;
-		private bool _alwaysSprintValue;
-		private bool _noclipInteractDownValue;
-		private float _aimbotWeightValue;
+		public static readonly string[] entriesNames = {
+			"Noclip",
+			"Aimbot",
+			"InfiniteSkills",
+			"AlwaysSprint",
+			"GodMode"
+		};
 
+		private Dictionary<string, ZioConfigEntry<bool>> entries;
+		private Dictionary<string, bool> values = new();
+		private ZioConfigEntry<float> aimbotWeightEntry;
+		private float _aimbotWeightValue;
 
 		public bool NoclipOn
 		{
-			get => isLocalUser ? noclipEntry.Value : _noclipValue;
-			set
-			{
-				if (isLocalUser) noclipEntry.Value = value;
-				else _noclipValue = value;
-			}
+			get => this["Noclip"];
+			set => this["Noclip"] = value;
 		}
 		public bool AimbotOn
 		{
-			get => isLocalUser ? aimbotEntry.Value : _aimbotValue;
-			set
-			{
-				if (isLocalUser)
-					aimbotEntry.Value = value;
-				else
-					_aimbotValue = value;
-			}
+			get => this["Aimbot"];
+			set => this["Aimbot"] = value;
 		}
 
 		public bool InfiniteSkillsOn
 		{
-			get => isLocalUser ? infiniteSkillsEntry.Value : _infiniteSkillsValue;
-			set
-			{
-				if (isLocalUser)
-					infiniteSkillsEntry.Value = value;
-				else
-					_infiniteSkillsValue = value;
-			}
+			get => this["InfiniteSkills"];
+			set => this["InfiniteSkills"] = value;
 		}
 
 		public bool GodModeOn
 		{
-			get => isLocalUser ? godModeEntry.Value : _godModeValue;
-			set
-			{
-				if (isLocalUser)
-					godModeEntry.Value = value;
-				else
-					_godModeValue = value;
-			}
+			get => this["GodMode"];
+			set => this["GodMode"] = value;
 		}
 
 		public bool AlwaysSprintOn
 		{
-			get => isLocalUser ? alwaysSprintEntry.Value : _alwaysSprintValue;
-			set
-			{
-				if (isLocalUser)
-					alwaysSprintEntry.Value = value;
-				else
-					_alwaysSprintValue = value;
-			}
+			get => this["AlwaysSprint"];
+			set => this["AlwaysSprint"] = value;
 		}
 
 		public bool NoclipInteractDownOn
 		{
-			get => isLocalUser ? noclipInteractDown.Value : _noclipInteractDownValue;
-			set
-			{
-				if(isLocalUser)
-					noclipInteractDown.Value = value;
-				else
-					_noclipInteractDownValue = value;
-			}
+			get => this["NoclipInteractDown"];
+			set => this["NoclipInteractDown"] = value;
 		}
 
 		public float AimbotWeight
@@ -108,44 +70,54 @@ namespace Aerolt.Managers
 			get => isLocalUser ? aimbotWeightEntry.Value : _aimbotWeightValue;
 			set
 			{
-				if(isLocalUser)
-					aimbotWeightEntry.Value = value;
-				else
-					_aimbotWeightValue = value;
+				new PlayerConfigBindingSyncMessage(user, "AimbotWeight", value).SendToEveryone();
+				SetValue("AimbotWeight", value);
 			}
 		}
+
 		public PlayerConfigBinding(NetworkUser currentUser, CustomButton button)
 		{
 			customButton = button;
+			user = currentUser;
 			if (currentUser.localUser != null && MenuInfo.Files.TryGetValue(currentUser.localUser, out var configFile))
 			{
 				isLocalUser = true;
 
 				this.configFile = configFile;
-				noclipEntry = configFile.Bind("PlayerMenu", "Noclip", false, "");
-				aimbotEntry = configFile.Bind("PlayerMenu", "Aimbot", false, "");
-				infiniteSkillsEntry = configFile.Bind("PlayerMenu", "InfiniteSkills", false, "");
-				alwaysSprintEntry = configFile.Bind("PlayerMenu", "AlwaysSprint", false, "");
+				entries = new Dictionary<string, ZioConfigEntry<bool>>
+				{
+					{"NoclipInteractDown", configFile.Bind("PlayerMenu", "NoclipInteractDown", true, "Should holding interact move you down when noclipping.")}
+				};
+				foreach (var entriesName in entriesNames)
+				{
+					entries[entriesName] = configFile.Bind("PlayerMenu", entriesName, false, "");
+				}
+				
 				aimbotWeightEntry = configFile.Bind("PlayerMenu", "AimbotWeight", 0.5f, "0 is weighted entirely to distance, while 1 is entirely to angle.");
-				godModeEntry = configFile.Bind("PlayerMenu", "GodMode", false, "");
-				noclipInteractDown = configFile.Bind("PlayerMenu", "NoclipInteractDown", true, "Should holding interact move you down when noclipping.");
+			}
+		}
+		public bool this[string name]
+		{
+			get => isLocalUser ? entries[name].Value : values[name];
+			set
+			{
+				new PlayerConfigBindingSyncMessage(user, name, value).SendToEveryone();
+				SetValue(name, value);
 			}
 		}
 
-		public void OnDestroy()
+		public void SetValue(string name, bool value)
 		{
-			//noclipInteractDown.SettingChanged -= NoclipDownChanged;
-			//aimbotWeightEntry.SettingChanged -= AimbotWeightChanged;
+			if (isLocalUser) entries[name].Value = value;
+			else values[name] = value;
+			LobbyPlayerPageManager.ApplyValues(user.GetCurrentBody(), this);
 		}
 
-		private void AimbotWeightChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
+		public void SetValue(string name, float value)
 		{
-			aimbotWeightChanged?.Invoke(aimbotWeightEntry.Value);
-		}
-
-		private void NoclipDownChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
-		{
-			noclipInteractDownChanged?.Invoke(noclipEntry.Value);
+			if (isLocalUser) aimbotWeightEntry.Value = value; // TODO make this not retarded
+			else _aimbotWeightValue = value;
+			LobbyPlayerPageManager.ApplyValues(user.GetCurrentBody(), this);
 		}
 	}
 }

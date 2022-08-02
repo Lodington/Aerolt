@@ -17,7 +17,7 @@ namespace Aerolt.Helpers
             {"Secret_Plates", Color.cyan},
             {"Barrels", new Color32(255, 128, 0, 255)},
             {"Scrappers", Color.blue},
-            {"ClensingPool", Color.white},
+            {"NewtAlter", Color.white},
             {"Shrine", Color.white},
             {"Drone", Color.white},
             {"Printer", Color.white},
