@@ -25,7 +25,7 @@ namespace Aerolt.Managers
         [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
         private MenuInfo _info;
         private Dictionary<SpawnCard, CustomButton> cardDefRef = new();
-        public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).ToArray();
+        public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).Union(FindObjectOfType<SceneDirector>().GenerateInteractableCardSelection().choices.Select(x => x.value.spawnCard)).ToArray();
 
         static InteractableManager()
         {
