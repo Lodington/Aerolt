@@ -8,7 +8,6 @@ using RoR2;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace Aerolt.Managers
@@ -255,18 +254,11 @@ namespace Aerolt.Managers
 		
 		public void ApplyMobSpawns()
 		{
-			foreach (var director in CombatDirector.instancesList)
-				director.monsterSpawnTimer = disableMobSpawnToggle.isOn ? float.PositiveInfinity : 0f;
+			new ToggleMobSpawnsMessage(disableMobSpawnToggle.isOn).SendToEveryone();
 		}
 		public void KillAllMobs()
 		{
-			var mobs = CharacterMaster.instancesList.Where(x => x && x.teamIndex != currentUser.master.teamIndex).ToArray();
-			foreach (var characterMaster in mobs)
-			{
-				if (characterMaster.GetBody())
-					Chat.AddMessage($"<color=yellow>Killed {body.GetDisplayName()} </color>");
-				characterMaster.TrueKill();
-			}
+			new KillAllTeamMessage(TeamIndex.Player).SendToServer();
 		}
 		
 		public void SwapViewState()

@@ -3,7 +3,7 @@ using Aerolt.Managers;
 using RoR2;
 using UnityEngine.Networking;
 
-namespace Aerolt.Buttons
+namespace Aerolt.Messages
 {
 	public class BodyStatMessage : AeroltMessageBase
 	{
@@ -11,6 +11,7 @@ namespace Aerolt.Buttons
 		private float value;
 		private string fieldName;
 
+		public BodyStatMessage(){}
 		public BodyStatMessage(CharacterBody targetBody, string fieldName, float result)
 		{
 			this.fieldName = fieldName;
