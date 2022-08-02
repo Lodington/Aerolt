@@ -117,9 +117,8 @@ namespace Aerolt.Buttons
             {
                 if (!TargetBody || !float.TryParse(result, out var value)) return;
                 
-                field.SetValue(TargetBody, value);
                 if (selectedProfile.Value > 0) profiles[selectedProfile.Value - 1].entries[field].Value = value;
-                TargetBody.statsDirty = true;
+                new BodyStatMessage(TargetBody, field.Name, value).SendToEveryone();
                 input.text = string.Empty;
                 ((TextMeshProUGUI) input.placeholder).text = value.ToString(CultureInfo.InvariantCulture);
             });
