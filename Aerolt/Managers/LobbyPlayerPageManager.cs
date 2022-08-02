@@ -190,7 +190,7 @@ namespace Aerolt.Managers
 			LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
 			xpSlider.minValue = TeamManager.instance.GetTeamCurrentLevelExperience(((TeamIndex) teamDropdown.value));
 			xpSlider.maxValue = TeamManager.instance.GetTeamNextLevelExperience((TeamIndex)teamDropdown.value);
-			
+			xpSlider.value = TeamManager.instance.GetTeamExperience((TeamIndex) teamDropdown.value);
 		}
 
 		public void TeamChanged(int team)

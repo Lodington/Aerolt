@@ -2,19 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Aerolt.Enums;
+using UnityEngine;
 
 namespace Aerolt.Helpers
 {
     public static class Tools
     {
-        
-        public static Boolean CursorIsVisible()
-        {
-            foreach (var mpeventSystem in RoR2.UI.MPEventSystem.readOnlyInstancesList)
-                if (mpeventSystem.isCursorVisible)
-                    return true;
-            return false;
-        }
         public static T[] FindMatches<T>(T[] toMatch, Func<T, string> toString, string filter)
         {
             Regex filterRegex = new Regex(filter, RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -25,7 +18,7 @@ namespace Aerolt.Helpers
             }
             return matches.ToArray();
         }
-        
+
         public static void Log(Enum level, object s)
         {
             switch (level) 

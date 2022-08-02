@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Security;
 using System.Security.Permissions;
+using System.Threading.Tasks;
 using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
@@ -11,12 +13,15 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using MaterialHud;
 using RiskOfOptions;
 using RoR2;
 using RoR2.UI;
+using RoR2.UI.MainMenu;
 using UnityEngine;
 using ZioConfigFile;
 using ZioRiskOfOptions;
+using Aerolt.Social;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
@@ -36,7 +41,6 @@ namespace Aerolt
         public static AssetBundle _assets;
 
         public static GameObject changeLogWindow;
-        
         public static GameObject settingsRoot;
         
         public static Load Instance;
@@ -59,7 +63,9 @@ namespace Aerolt
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); _assets.LoadAsset<GameObject>("AeroltUI");
 
-            //changeLogWindow = _assets.LoadAsset<GameObject>("ChangeLog");
+            changeLogWindow = _assets.LoadAsset<GameObject>("ChangeLogWindow");
+            
+            
             
             NetworkManager.Initialize();
         }
@@ -76,12 +82,6 @@ namespace Aerolt
             HUD.shouldHudDisplay += CreateHud;
         }
 
-        private void Update()
-        {
-            if (!settingsUI) return;
-            //if (GetKeyPressed(KeyBinds[ButtonNames.OpenMenu]) && aeroltUIs.Count == 0) SettingsToggle(); Disabled for now.
-        }
-
         public static bool GetKeyPressed(ZioConfigEntry<KeyboardShortcut> entry)
         {
             foreach (var item in entry.Value.Modifiers)
@@ -93,19 +93,18 @@ namespace Aerolt
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-
-        private void SettingsToggle()
-        {
-            if (!settingsUI) return;
-            settingsUI.SetActive(!settingsUI.activeSelf);
-        }
-
+        
         private void GameLoad()
         {
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             CreateKeyBindSettings();
-            //Instantiate(changeLogWindow);
+            // new SocketClient().LocalConnectionToServer();
             Colors.InitColors();
+            
+            var harm = new Harmony(Info.Metadata.GUID);
+            new PatchClassProcessor(harm, typeof(Hooks)).Patch();
+
+            //AsynchronousClient.StartClient();
         }
 
         private void CreateKeyBindSettings()

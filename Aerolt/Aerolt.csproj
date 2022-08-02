@@ -15,12 +15,16 @@
       <PackageReference Include="RiskOfRain2.GameLibs" Version="1.2.4-r.0" />
       <PackageReference Include="Rune580-Risk_Of_Options" Version="2.5.3" />
       <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
+      <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
       <PackageReference Include="Zio" Version="0.7.3" />
     </ItemGroup>
 
     <ItemGroup>
       <Reference Include="LeanTween, Version=1.0.6223.20226, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\LeanTween.dll</HintPath>
+      </Reference>
+      <Reference Include="RiskUI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\Bubbet-RiskUI\RiskUI.dll</HintPath>
       </Reference>
     </ItemGroup>
 
