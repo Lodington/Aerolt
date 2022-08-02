@@ -264,6 +264,10 @@ namespace Aerolt.Classes
                 if (chest && Instance.showChestToggle.isOn) 
                     ShowChest(chest, purchaseInteraction);
 
+                var optionChest = purchaseInteraction.GetComponent<OptionChestBehavior>();
+                if (optionChest && Instance.showChestToggle.isOn) 
+                    ShowChest(optionChest, purchaseInteraction);
+
                 var shopTerminal = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
                 if (shopTerminal)
                 {
@@ -328,10 +332,32 @@ namespace Aerolt.Classes
             return distance;
         }
 
-        public static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
+        private static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
-                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, GetDistance(purchaseInteraction));
+            {
+                var def = PickupCatalog.GetPickupDef(chest.dropPickup);
+                var item = def.itemIndex != ItemIndex.None ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken) : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken);
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    GetDistance(purchaseInteraction) + "\n" + item);
+            }
+            else
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
+        }
+        public static void ShowChest(OptionChestBehavior optionChestBehavior, PurchaseInteraction purchaseInteraction)
+        {
+            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            {
+                var items = optionChestBehavior.generatedDrops.Select(x =>
+                {
+                    var def = PickupCatalog.GetPickupDef(x);
+                    return def.itemIndex != ItemIndex.None
+                        ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
+                        : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken);
+                }).ToArray();
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    GetDistance(purchaseInteraction) + "\n-" + string.Join("\n-", items));
+            }
             else
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
         }
