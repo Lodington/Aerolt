@@ -330,11 +330,11 @@ namespace Aerolt.Classes
                 var items = optionChestBehavior.entries != null ? optionChestBehavior.entries.OrderByDescending(x =>
                 {
                     var def = PickupCatalog.GetPickupDef(x.pickupIndex);
-                    return def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
+                    return def != null && def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
                 }).Take(3).OrderBy(x => x.endTime.timeUntil).Select(x =>
                 {
                     var def = PickupCatalog.GetPickupDef(x.pickupIndex);
-                    var tier = def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
+                    var tier = def != null && def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
                     var itemName = def != null && def.itemIndex != ItemIndex.None ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken) : Language.GetString(EquipmentCatalog.GetEquipmentDef(def?.equipmentIndex ?? EquipmentIndex.None).nameToken);
                     return $"{itemName} : {tier} : {x.endTime.timeUntil:0.##}s";
                 }).ToArray() : new string[0];
