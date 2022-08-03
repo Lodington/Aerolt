@@ -267,6 +267,14 @@ namespace Aerolt.Classes
                 var optionChest = purchaseInteraction.GetComponent<OptionChestBehavior>();
                 if (optionChest && Instance.showChestToggle.isOn) 
                     ShowChest(optionChest, purchaseInteraction);
+                
+                var casinoChest = purchaseInteraction.GetComponent<RouletteChestController>();
+                if (casinoChest && Instance.showChestToggle.isOn) 
+                    ShowChest(casinoChest, purchaseInteraction);
+                
+                var timedChest = purchaseInteraction.GetComponent<TimedChestController>(); // TODO this is not a purchase interaction
+                if (timedChest && Instance.showChestToggle.isOn) 
+                    ShowChest(timedChest, purchaseInteraction);
 
                 var shopTerminal = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
                 if (shopTerminal)
@@ -302,6 +310,39 @@ namespace Aerolt.Classes
                 }
             }
         }
+
+        private static void ShowChest(TimedChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
+        {
+            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            {
+                var items = optionChestBehavior.remainingTime;
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    GetDistance(purchaseInteraction) + "\n-" + items + "s");
+            }
+            else
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");   
+        }
+
+        private static void ShowChest(RouletteChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
+        {
+            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            {
+                var items = optionChestBehavior.entries != null ? optionChestBehavior.entries.OrderByDescending(x =>
+                {
+                    var def = PickupCatalog.GetPickupDef(x.pickupIndex);
+                    return def != null && def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
+                }).Take(3).OrderBy(x => x.endTime.timeUntil).Select(x =>
+                {
+                    var def = PickupCatalog.GetPickupDef(x.pickupIndex);
+                    var tier = def != null && def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
+                    var itemName = def != null && def.itemIndex != ItemIndex.None ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken) : Language.GetString(EquipmentCatalog.GetEquipmentDef(def?.equipmentIndex ?? EquipmentIndex.None).nameToken);
+                    return $"{itemName} : {tier} : {x.endTime.timeUntil:0.##}s";
+                }).ToArray() : new string[0];
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    GetDistance(purchaseInteraction) + "\n-" + string.Join("\n-", items));
+            }
+            else
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");        }
 
         private static void ShowNewtAlter(PurchaseInteraction purchaseInteraction)
         {
