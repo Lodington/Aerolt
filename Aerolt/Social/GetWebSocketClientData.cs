@@ -1,5 +1,4 @@
 using System;
-using Aerolt.Social;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,9 +13,15 @@ namespace Aerolt.Social
         public TMP_Text userWindowText;
         public Button sendButton;
         public TMP_Text userCount;
+        private bool textDirty;
 
         private void Update()
         {
+            if (textDirty)
+            {
+                UpdateChatWindow();
+                textDirty = false;
+            }
             if (Input.GetKeyDown(KeyCode.Return)) SendMessage();
         }
 
@@ -30,20 +35,24 @@ namespace Aerolt.Social
         
         public void Awake()
         {
-            WebSocketClient.Message.OnMessage += UpdateChatWindow;
-            WebSocketClient.UserCount.OnMessage += UpdateChatWindow;
-            WebSocketClient.Usernames.OnMessage += UpdateChatWindow;
+            WebSocketClient.Message.OnMessage += MarkTextDirty;
+            WebSocketClient.UserCount.OnMessage += MarkTextDirty;
+            WebSocketClient.Usernames.OnMessage += MarkTextDirty;
             sendButton.onClick.AddListener(SendMessage);
+        }
+
+        private void MarkTextDirty(object sender, MessageEventArgs e)
+        {
+            textDirty = true;
         }
 
         private void OnDestroy()
         {
-            WebSocketClient.Message.OnMessage -= UpdateChatWindow;
-            WebSocketClient.UserCount.OnMessage -= UpdateChatWindow;
-            WebSocketClient.Usernames.OnMessage -= UpdateChatWindow;
+            WebSocketClient.Message.OnMessage -= MarkTextDirty;
+            WebSocketClient.UserCount.OnMessage -= MarkTextDirty;
+            WebSocketClient.Usernames.OnMessage -= MarkTextDirty;
         }
-
-        private void UpdateChatWindow(object sender, MessageEventArgs e)
+        private void UpdateChatWindow()
         {
             chatWindowText.text = WebSocketClient.MessageText;
             userWindowText.text = WebSocketClient.UsernameText;
