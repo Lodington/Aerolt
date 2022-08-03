@@ -2,6 +2,7 @@ using System;
 using Aerolt.Classes;
 using Aerolt.Managers;
 using RoR2;
+using RoR2.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,10 +16,10 @@ namespace Aerolt.Social
         public TMP_InputField inputField;
         public Button sendButton;
         public TMP_Text usernamePanel;
-        private MenuInfo _info;
+        public TMP_Text userCount;
         
-        public static string ip = "d";
-        public static string port = "8000";
+        public static string ip = "aerolt.lodington.dev";
+        public static string port = "5000";
         public class ClientName 
         {
             public static string Name = ""; 
@@ -41,6 +42,10 @@ namespace Aerolt.Social
         {
             public static readonly WebSocket Socket = new WebSocket($"ws://{ip}:{port}/Usernames");
         }
+        public class UserCount 
+        {
+            public static readonly WebSocket Socket = new WebSocket($"ws://{ip}:{port}/UserCount");
+        }
 
         // Initiate socket allowing disconnection
         public class Disconnect
@@ -50,8 +55,7 @@ namespace Aerolt.Social
 
         public void Start()
         {
-            _info = GetComponentInParent<MenuInfo>();
-            var username = _info.Owner.userName;
+            var username = RoR2Application.GetBestUserName();
             ClientName.Name = username; // Set name variable
 
             // Connect to Connect SocketBehaviour
@@ -65,6 +69,11 @@ namespace Aerolt.Social
             Usernames.Socket.Send(username);
             Usernames.Socket.OnMessage += (sender, e) =>
                 usernamePanel.text = e.Data + "\n";
+            
+            UserCount.Socket.Connect();
+            UserCount.Socket.Send(username);
+            UserCount.Socket.OnMessage += (sender, e) =>
+                userCount.text = e.Data;
 
                 // Connect to Message SocketBehaviour
             Message.Socket.Connect();
@@ -74,10 +83,10 @@ namespace Aerolt.Social
             sendButton.onClick.AddListener(SendMessageOnClick);
         }
         
-        
-
         private void SendMessageOnClick()
         {
+            if(String.IsNullOrEmpty(inputField.text))
+                return;
             // Send message via /Message on button click
             Message.Socket.Send(ClientName.Name + "  ->  " + inputField.text);
             inputField.text = string.Empty; // Clear input

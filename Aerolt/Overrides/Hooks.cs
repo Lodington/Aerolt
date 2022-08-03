@@ -13,15 +13,14 @@ namespace Aerolt.Overrides
         public static void MenuTransform(BaseMainMenuScreen __instance)
         {
             var transform = __instance.transform;
-            GameObject.Instantiate(Load.changeLogWindow, transform);
-            
-            RectTransform rt = Load.changeLogWindow.GetComponent (typeof (RectTransform)) as RectTransform;
-            Load.changeLogWindow.transform.localPosition =
-                Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2 + 50, Screen.height / 2,
-                    Camera.main.nearClipPlane));
-            rt.SetSize(746,480);
-            
 
+            GameObject.Instantiate(Load.chatWindow, transform);
+            
+            RectTransform chatwindowRect = Load.changeLogWindow.GetComponent (typeof (RectTransform)) as RectTransform;
+            Load.changeLogWindow.transform.localPosition =
+                Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height,
+                    Camera.main.nearClipPlane));
+            chatwindowRect.SetSize(746,480);
         }
     }
 }

@@ -40,6 +40,7 @@ namespace Aerolt
         public static AssetBundle _assets;
 
         public static GameObject changeLogWindow;
+        public static GameObject chatWindow;
         public static GameObject settingsRoot;
         
         public static Load Instance;
@@ -63,7 +64,9 @@ namespace Aerolt
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); _assets.LoadAsset<GameObject>("AeroltUI");
 
             changeLogWindow = _assets.LoadAsset<GameObject>("ChangeLogWindow");
-
+            chatWindow = _assets.LoadAsset<GameObject>("ChatWindow");
+            DontDestroyOnLoad(chatWindow);
+            
             NetworkManager.Initialize();
             
         }
