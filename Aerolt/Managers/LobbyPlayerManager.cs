@@ -16,11 +16,11 @@ namespace Aerolt.Managers
 	{
 		public GameObject playerEntryPrefab;
 		public Transform playerEntryParent;
-		public UserChangedEvent userChanged;
 		public readonly Dictionary<NetworkUser, PlayerConfigBinding> users = new();
 		private ToggleGroup toggleGroup;
 		private NetworkUser selectedUser;
 		private MenuInfo info;
+		private LobbyPlayerPageManager _pageManager;
 
 		public void ModuleStart()
 		{
@@ -30,14 +30,11 @@ namespace Aerolt.Managers
 			//NetworkUser.onNetworkUserDiscovered += UserAdded;
 			NetworkUser.onNetworkUserLost += UserLost;
 
-			info = GetComponent<MenuInfo>();
+			info = GetComponentInParent<MenuInfo>();
 			toggleGroup = GetComponent<ToggleGroup>();
 
-			if (userChanged == null) // I give up
-			{
-				userChanged = new UserChangedEvent();
-				userChanged.AddListener(GetComponent<LobbyPlayerPageManager>().SetUser);
-			}
+			// I give up
+			_pageManager = GetComponent<LobbyPlayerPageManager>();
 			
 			foreach (var networkUser in NetworkUser.instancesList) UserAdded(networkUser);
 			// gameObject.SetActive(wasActive);
@@ -67,14 +64,22 @@ namespace Aerolt.Managers
 			if (users.ContainsKey(user)) return;
 			var button = Instantiate(playerEntryPrefab, playerEntryParent, false).GetComponent<CustomButton>();
 			users[user] = new PlayerConfigBinding(user, button);
-			var body = user.master.GetBody();
-			if (body)
-				LobbyPlayerPageManager.ApplyValues(body, users[user]); // TODO move this somewhere, it doesnt work for multiplayer, fires too early.
 			var toggle = button.GetComponent<Toggle>();
-			toggle.onValueChanged.AddListener(val => { if (val) SetUser(user); });
 			toggle.group = toggleGroup;
-			if (user == info.Owner) toggle.isOn = true;
+			toggle.onValueChanged.AddListener(val => { if (val) SetUser(user); });
+			if (user == info.Owner) toggle.Set(true);
+			if (NetworkServer.active) BodyStart(user.master.GetBody());
+			user.master.onBodyStart += BodyStart;
 		}
+
+		private void BodyStart(CharacterBody body)
+		{
+			if (!body) return;
+			var user = body.master.playerCharacterMasterController.networkUser;
+			if (user.isLocalPlayer)
+				LobbyPlayerPageManager.ApplyValues(body, users[user]);
+		}
+
 		private void UserLost(NetworkUser user)
 		{
 			if (!users.ContainsKey(user)) return;
@@ -82,14 +87,12 @@ namespace Aerolt.Managers
 			users.Remove(user);
 			if (selectedUser == user && users.Any())
 				SetUser(users.Keys.Last());
+			user.master.onBodyStart -= BodyStart;
 		}
 		private void SetUser(NetworkUser user)
 		{
 			selectedUser = user;
-			userChanged?.Invoke(user);
+			_pageManager.SetUser(user);
 		}
-
-		[Serializable]
-		public class UserChangedEvent : UnityEvent<NetworkUser> {}
 	}
 }
