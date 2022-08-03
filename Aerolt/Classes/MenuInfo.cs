@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using RoR2;
 using RoR2.UI;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Aerolt.Classes
 {

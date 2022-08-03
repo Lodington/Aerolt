@@ -20,6 +20,7 @@ namespace Aerolt.Managers
 		public readonly Dictionary<NetworkUser, PlayerConfigBinding> users = new();
 		private ToggleGroup toggleGroup;
 		private NetworkUser selectedUser;
+		private MenuInfo info;
 
 		public void ModuleStart()
 		{
@@ -29,6 +30,7 @@ namespace Aerolt.Managers
 			//NetworkUser.onNetworkUserDiscovered += UserAdded;
 			NetworkUser.onNetworkUserLost += UserLost;
 
+			info = GetComponent<MenuInfo>();
 			toggleGroup = GetComponent<ToggleGroup>();
 
 			if (userChanged == null) // I give up
@@ -71,7 +73,7 @@ namespace Aerolt.Managers
 			var toggle = button.GetComponent<Toggle>();
 			toggle.onValueChanged.AddListener(val => { if (val) SetUser(user); });
 			toggle.group = toggleGroup;
-			if (users.Count == 1) toggle.isOn = true;
+			if (user == info.Owner) toggle.isOn = true;
 		}
 		private void UserLost(NetworkUser user)
 		{
