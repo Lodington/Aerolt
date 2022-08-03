@@ -1,120 +1,61 @@
-using System;
-using Aerolt.Classes;
-using Aerolt.Managers;
 using RoR2;
-using RoR2.UI;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
 using WebSocketSharp;
+
 
 namespace Aerolt.Social
 {
-    public class WebSocketClient : MonoBehaviour {
+    public static class WebSocketClient {
         
-        public TMP_Text messagePanel;
-        public TMP_InputField inputField;
-        public Button sendButton;
-        public TMP_Text usernamePanel;
-        public TMP_Text userCount;
-        
+        public static string UsernameText;
+        public static string UserCountText;
+        public static string MessageText;
+
         public static string ip = "aerolt.lodington.dev";
         public static string port = "5000";
-        public class ClientName 
-        {
-            public static string Name = ""; 
-        }
+        
+        public static readonly WebSocket Disconnect = new($"ws://{ip}:{port}/Disconnect");
+        public static readonly WebSocket Message = new($"ws://{ip}:{port}/Message");
+        public static readonly WebSocket UserCount = new($"ws://{ip}:{port}/UserCount");
+        public static readonly WebSocket Usernames = new($"ws://{ip}:{port}/Usernames");
 
-        // Initiate socket allowing connection
-        public class Connect
+        public static string _username;
+        static WebSocketClient()
         {
-            public static readonly WebSocket Socket = new WebSocket($"ws://{ip}:{port}/Connect");
+            Usernames.OnMessage += (sender, e) =>
+                UsernameText = e.Data + "\n";
+            UserCount.OnMessage += (sender, e) =>
+                UserCountText = e.Data;
+            Message.OnMessage += (sender, e) =>
+                MessageText += e.Data + "\n"; // Retrieve input from all clients
         }
         
-        // Initiate socket allowing messages to be received
-        public class Message 
-        {
-            public static readonly WebSocket Socket = new WebSocket($"ws://{ip}:{port}/Message");
-        }
+        public static void ConnectClient()
+        { // Set name variable
 
-        // Initiate socket allowing usernames to be received
-        public class Usernames 
-        {
-            public static readonly WebSocket Socket = new WebSocket($"ws://{ip}:{port}/Usernames");
-        }
-        public class UserCount 
-        {
-            public static readonly WebSocket Socket = new WebSocket($"ws://{ip}:{port}/UserCount");
-        }
-
-        // Initiate socket allowing disconnection
-        public class Disconnect
-        {
-            public static readonly WebSocket Socket = new WebSocket($"ws://{ip}:{port}/Disconnect");
-        }
-
-        public void Start()
-        {
-            var username = RoR2Application.GetBestUserName();
-            ClientName.Name = username; // Set name variable
-
-            // Connect to Connect SocketBehaviour
-            Connect.Socket.Connect();
-            Connect.Socket.Send(username);
-            Connect.Socket.OnMessage += (sender, e) =>
-                messagePanel.text += e.Data + "\n";
+            _username = RoR2Application.GetBestUserName();
 
             // Connect to Usernames SocketBehaviour
-            Usernames.Socket.Connect();
-            Usernames.Socket.Send(username);
-            Usernames.Socket.OnMessage += (sender, e) =>
-                usernamePanel.text = e.Data + "\n";
-            
-            UserCount.Socket.Connect();
-            UserCount.Socket.Send(username);
-            UserCount.Socket.OnMessage += (sender, e) =>
-                userCount.text = e.Data;
+            Usernames.Connect();
+            Usernames.Send(_username);
 
-                // Connect to Message SocketBehaviour
-            Message.Socket.Connect();
-            Message.Socket.OnMessage += (sender, e) =>
-                messagePanel.text += e.Data + "\n"; // Retrieve input from all clients
-            
-            sendButton.onClick.AddListener(SendMessageOnClick);
-        }
-        
-        private void SendMessageOnClick()
-        {
-            if(String.IsNullOrEmpty(inputField.text))
-                return;
-            // Send message via /Message on button click
-            Message.Socket.Send(ClientName.Name + "  ->  " + inputField.text);
-            inputField.text = string.Empty; // Clear input
+            UserCount.Connect();
+            UserCount.Send(_username);
+
+            // Connect to Message SocketBehaviour
+            Message.Connect();
         }
 
-        private void OnDestroy()
+        public static void DisconnectClient()
         {
-            DisconnectClient();
-        }
-
-        public void DisconnectClient()
-        {
-            Disconnect.Socket.Connect();
+            Disconnect.Connect();
             
             // Send username of client disconnecting
-            Disconnect.Socket.Send(ClientName.Name);
+            Disconnect.Send(_username);
 
             // Close all sockets and exit application
-            Connect.Socket.Close();
-            Message.Socket.Close();
-            Usernames.Socket.Close();
-            Disconnect.Socket.Close();
-        }
-
-        private void DisconnectOnCLick(object sender, EventArgs e)
-        {
-            // Connect to Disconnect SocketBehaviour
-            DisconnectClient();
+            Message.Close();
+            Usernames.Close();
+            Disconnect.Close();
         }
     }
 }

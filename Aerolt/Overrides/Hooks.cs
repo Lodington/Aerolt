@@ -16,8 +16,8 @@ namespace Aerolt.Overrides
 
             GameObject.Instantiate(Load.chatWindow, transform);
             
-            RectTransform chatwindowRect = Load.changeLogWindow.GetComponent (typeof (RectTransform)) as RectTransform;
-            Load.changeLogWindow.transform.localPosition =
+            RectTransform chatwindowRect = Load.chatWindow.GetComponent (typeof (RectTransform)) as RectTransform;
+            Load.chatWindow.transform.localPosition =
                 Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height,
                     Camera.main.nearClipPlane));
             chatwindowRect.SetSize(746,480);

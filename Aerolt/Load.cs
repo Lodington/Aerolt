@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security;
 using System.Security.Permissions;
@@ -38,8 +39,7 @@ namespace Aerolt
         public static ManualLogSource Log;
         public static GameObject _co;
         public static AssetBundle _assets;
-
-        public static GameObject changeLogWindow;
+        
         public static GameObject chatWindow;
         public static GameObject settingsRoot;
         
@@ -61,9 +61,9 @@ namespace Aerolt
             var path = System.IO.Path.GetDirectoryName(Info.Location);
             _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
             Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
-            _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); _assets.LoadAsset<GameObject>("AeroltUI");
+            _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); 
+            _assets.LoadAsset<GameObject>("AeroltUI");
 
-            changeLogWindow = _assets.LoadAsset<GameObject>("ChangeLogWindow");
             chatWindow = _assets.LoadAsset<GameObject>("ChatWindow");
             DontDestroyOnLoad(chatWindow);
             
@@ -100,7 +100,12 @@ namespace Aerolt
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
 
-           
+            WebSocketClient.ConnectClient();
+        }
+
+        private void OnDestroy()
+        {
+            WebSocketClient.DisconnectClient();
         }
 
         private void CreateKeyBindSettings()
