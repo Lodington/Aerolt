@@ -63,10 +63,9 @@ namespace Aerolt
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); _assets.LoadAsset<GameObject>("AeroltUI");
 
             changeLogWindow = _assets.LoadAsset<GameObject>("ChangeLogWindow");
-            
-            
-            
+
             NetworkManager.Initialize();
+            
         }
         public void OnGUI()
         {
@@ -84,12 +83,8 @@ namespace Aerolt
         public static bool GetKeyPressed(ZioConfigEntry<KeyboardShortcut> entry)
         {
             foreach (var item in entry.Value.Modifiers)
-            {
                 if (!Input.GetKey(item))
-                {
                     return false;
-                }
-            }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
         
@@ -97,13 +92,12 @@ namespace Aerolt
         {
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             CreateKeyBindSettings();
-            // new SocketClient().LocalConnectionToServer();
             Colors.InitColors();
             
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
 
-            //AsynchronousClient.StartClient();
+           
         }
 
         private void CreateKeyBindSettings()
@@ -115,10 +109,7 @@ namespace Aerolt
 
         private void MakeRiskOfOptions()
         {
-            foreach (var value in KeyBinds.Values)
-            {
-                ModSettingsManager.AddOption(new ZioKeyBindOption(value));
-            }
+            foreach (var value in KeyBinds.Values) ModSettingsManager.AddOption(new ZioKeyBindOption(value));
         }
 
 
