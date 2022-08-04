@@ -27,6 +27,11 @@ namespace Aerolt.Social
             if (Input.GetKeyDown(KeyCode.Return)) SendMessage();
         }
 
+        private void OnEnable()
+        {
+            UpdateChatWindow();
+        }
+
         private void SendMessage()
         {
             if(String.IsNullOrEmpty(inputField.text))
@@ -54,9 +59,6 @@ namespace Aerolt.Social
 
         private void MarkTextDirty(object sender, MessageEventArgs e)
         {
-            WebSocketClient.Message.OnMessage -= MarkTextDirty;
-            WebSocketClient.UserCount.OnMessage -= MarkTextDirty;
-            WebSocketClient.Usernames.OnMessage -= MarkTextDirty;
             isTextDirty = true;
         }
         private void UpdateChatWindow()

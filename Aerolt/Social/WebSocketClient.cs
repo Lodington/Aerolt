@@ -52,19 +52,10 @@ namespace Aerolt.Social
             int currentTry = 1; 
             while (currentTry < MaxTrys)
             {
-                try
-                {
-                    Connect.Connect();
-                    Usernames.Connect();
-                    UserCount.Connect();
-                    Message.Connect();
- 
-                }
-                catch (Exception e)
-                {
-        
-                }
-                
+                Connect.Connect();
+                Usernames.Connect();
+                UserCount.Connect();
+                Message.Connect();
 
                 if (Connect.IsAlive && Usernames.IsAlive && UserCount.IsAlive && Message.IsAlive)
                 {
@@ -85,14 +76,12 @@ namespace Aerolt.Social
         public static void DisconnectClient()
         {
             Disconnect.Connect();
-            
-            // Send username of client disconnecting
             Disconnect.Send(_username);
 
-            // Close all sockets and exit application
             Message.Close();
             Usernames.Close();
             Disconnect.Close();
+            Connect.Close();
         }
     }
 }
