@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Text;
 using RoR2;
 using WebSocketSharp;
 
@@ -21,6 +24,7 @@ namespace Aerolt.Social
         public static string _username;
         static WebSocketClient()
         {
+            
             Usernames.OnMessage += (sender, e) =>
                 UsernameText = e.Data + "\n";
             UserCount.OnMessage += (sender, e) =>
@@ -32,7 +36,7 @@ namespace Aerolt.Social
         public static void ConnectClient()
         { // Set name variable
 
-            _username = RoR2Application.GetBestUserName();
+            _username = $"{RoR2Application.GetBestUserName()}";
 
             // Connect to Usernames SocketBehaviour
             Usernames.Connect();
@@ -44,6 +48,7 @@ namespace Aerolt.Social
             // Connect to Message SocketBehaviour
             Message.Connect();
         }
+        
 
         public static void DisconnectClient()
         {

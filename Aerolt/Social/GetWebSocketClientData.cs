@@ -29,7 +29,7 @@ namespace Aerolt.Social
         {
             if(String.IsNullOrEmpty(inputField.text))
                 return;
-            WebSocketClient.Message.Send($"{WebSocketClient._username} -> {inputField.text}");
+            WebSocketClient.Message.Send($" {WebSocketClient._username} -> {inputField.text}");
             inputField.text = String.Empty;
         }
         
@@ -56,7 +56,7 @@ namespace Aerolt.Social
         {
             chatWindowText.text = WebSocketClient.MessageText;
             userWindowText.text = WebSocketClient.UsernameText;
-            userCount.text = WebSocketClient.UserCountText;
+            userCount.text = $"Users Online : {WebSocketClient.UserCountText}";
         }
     }
 }
