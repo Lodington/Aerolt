@@ -18,7 +18,7 @@ namespace Aerolt.Helpers
             Target = transform;
 
             var menuInfo = Target.transform.parent ? GetComponentInParent<MenuInfo>() : GetComponent<MenuInfo>();
-            var configFile = menuInfo ? menuInfo.ConfigFile : Load.Instance.configFile;
+            var configFile = menuInfo ? menuInfo.ConfigFile : Load.configFile;
             configEntry = configFile.Bind("Window Positions", Target.name, (Vector2) Target.transform.localPosition, "Stored position of this window.");
             Target.transform.localPosition = new Vector3(configEntry.Value.x, configEntry.Value.y, 0); 
         }

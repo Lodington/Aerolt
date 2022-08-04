@@ -48,7 +48,7 @@ namespace Aerolt
         
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
         private static GameObject settingsUI;
-        public ZioConfigFile.ZioConfigFile configFile;
+        public static ZioConfigFile.ZioConfigFile configFile;
         public static NetworkUser tempViewer;
         public static HUD tempHud;
 
