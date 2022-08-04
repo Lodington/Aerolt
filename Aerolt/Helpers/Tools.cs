@@ -19,7 +19,7 @@ namespace Aerolt.Helpers
             return matches.ToArray();
         }
 
-        public static void Log(Enum level, object s)
+        public static void Log(LogLevel level, object s)
         {
             switch (level) 
             {
@@ -30,9 +30,6 @@ namespace Aerolt.Helpers
                     Load.Log.LogError(s.ToString());
                     break;
                 case LogLevel.Information:
-                    Load.Log.LogMessage(s.ToString());
-                    break;
-                default:
                     Load.Log.LogMessage(s.ToString());
                     break;
             }

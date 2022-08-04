@@ -1,12 +1,14 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using Object = UnityEngine.Object;
+using WebSocketSharp;
+using Logger = WebSocketSharp.Logger;
 
 namespace Aerolt.Helpers
 {
@@ -69,7 +71,11 @@ namespace Aerolt.Helpers
             source.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             source.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         }
- 
+        public static void Disable(this Logger logger)
+        {
+            var field = logger.GetType().GetField("_output", BindingFlags.NonPublic | BindingFlags.Instance);
+            field?.SetValue(logger, new Action<LogData, string>((d, s) => { }));
+        }
         public static void SetWidth(this RectTransform source, float width) {
             source.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
         }

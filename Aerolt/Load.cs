@@ -100,7 +100,7 @@ namespace Aerolt
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
 
-            WebSocketClient.ConnectClient();
+            StartCoroutine(WebSocketClient.ConnectClient());
         }
 
         private void OnDestroy()

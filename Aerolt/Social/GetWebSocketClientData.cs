@@ -13,14 +13,16 @@ namespace Aerolt.Social
         public TMP_Text userWindowText;
         public Button sendButton;
         public TMP_Text userCount;
-        private bool textDirty;
+        public TMP_Text WelcomeText;
+
+        private bool isTextDirty;
 
         private void Update()
         {
-            if (textDirty)
+            if (isTextDirty)
             {
                 UpdateChatWindow();
-                textDirty = false;
+                isTextDirty = false;
             }
             if (Input.GetKeyDown(KeyCode.Return)) SendMessage();
         }
@@ -29,7 +31,7 @@ namespace Aerolt.Social
         {
             if(String.IsNullOrEmpty(inputField.text))
                 return;
-            WebSocketClient.Message.Send($" {WebSocketClient._username} -> {inputField.text}");
+            WebSocketClient.Message.Send($" [{WebSocketClient._username}] -> {inputField.text}");
             inputField.text = String.Empty;
         }
         
@@ -38,12 +40,8 @@ namespace Aerolt.Social
             WebSocketClient.Message.OnMessage += MarkTextDirty;
             WebSocketClient.UserCount.OnMessage += MarkTextDirty;
             WebSocketClient.Usernames.OnMessage += MarkTextDirty;
+            WebSocketClient.Connect.OnMessage += MarkTextDirty;
             sendButton.onClick.AddListener(SendMessage);
-        }
-
-        private void MarkTextDirty(object sender, MessageEventArgs e)
-        {
-            textDirty = true;
         }
 
         private void OnDestroy()
@@ -51,12 +49,23 @@ namespace Aerolt.Social
             WebSocketClient.Message.OnMessage -= MarkTextDirty;
             WebSocketClient.UserCount.OnMessage -= MarkTextDirty;
             WebSocketClient.Usernames.OnMessage -= MarkTextDirty;
+            WebSocketClient.Connect.OnMessage -= MarkTextDirty;
+        }
+
+        private void MarkTextDirty(object sender, MessageEventArgs e)
+        {
+            WebSocketClient.Message.OnMessage -= MarkTextDirty;
+            WebSocketClient.UserCount.OnMessage -= MarkTextDirty;
+            WebSocketClient.Usernames.OnMessage -= MarkTextDirty;
+            isTextDirty = true;
         }
         private void UpdateChatWindow()
         {
             chatWindowText.text = WebSocketClient.MessageText;
             userWindowText.text = WebSocketClient.UsernameText;
             userCount.text = $"Users Online : {WebSocketClient.UserCountText}";
+            //WelcomeText.text = $"Welcome {WebSocketClient._username} to the server!";
+
         }
     }
 }
