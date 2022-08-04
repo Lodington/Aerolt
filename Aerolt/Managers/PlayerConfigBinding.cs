@@ -67,22 +67,37 @@ namespace Aerolt.Managers
 			Noclip.Sync();
 		}
 		
-		public static void SetAimbot(CharacterBody bod, bool enable, float weight) => bod.ToggleComponent<AimbotBehavior>(enable, comp => comp.weight = weight);
+		public static void SetAimbot(CharacterBody bod, bool enable, float weight)
+		{
+			if (bod) bod.ToggleComponent<AimbotBehavior>(enable, comp => comp.weight = weight);
+		}
+
 		public static void SetAimbotWeight(CharacterBody bod, float weight)
 		{
+			if (!bod) return; 
 			var behavior = bod.GetComponent<AimbotBehavior>();
 			if (behavior)
 				behavior.weight = weight;
 		}
-		public static void SetGodMode(CharacterBody bod, bool enable) => new GodModeMessage(bod.master, enable).SendToServer();
-		public static void SetNoclip(CharacterBody bod, bool enable) => bod.ToggleComponent<NoclipBehavior>(enable);
+		public static void SetGodMode(CharacterBody bod, bool enable)
+		{
+			if (bod) new GodModeMessage(bod.master, enable).SendToServer();
+		}
+		public static void SetNoclip(CharacterBody bod, bool enable)
+		{
+			if (bod) bod.ToggleComponent<NoclipBehavior>(enable);
+		}
+
 		public static void SetInfiniteSkills(CharacterBody bod, bool enable)
 		{
 			if (enable && bod) bod.onSkillActivatedAuthority += InfiniteSkillsActivated;
 			else if (bod) bod.onSkillActivatedAuthority -= InfiniteSkillsActivated;
 		}
-		public static void SetAlwaysSprint(CharacterBody bod, bool enable) => bod.ToggleComponent<AlwaysSprintBehavior>(enable);
-		
+		public static void SetAlwaysSprint(CharacterBody bod, bool enable)
+		{
+			if (bod) bod.ToggleComponent<AlwaysSprintBehavior>(enable);
+		}
+
 		public static void InfiniteSkillsActivated(GenericSkill obj) => obj.AddOneStock();
 	}
 }
