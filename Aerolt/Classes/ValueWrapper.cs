@@ -42,7 +42,7 @@ namespace Aerolt.Classes
 		{
 			return $"{nameof(ValueWrapper)}({identifier}: {Value})";
 		}
-
+		
 		public ValueWrapper(string category, string name, T defaultValue, string description, NetworkUser who = null)
 		{
 			user = who;
@@ -98,6 +98,7 @@ namespace Aerolt.Classes
 		private int type;
 		private string value;
 
+		public ValueWrapperSyncMessage(){}
 		public ValueWrapperSyncMessage(string valueWrapperKey, object value)
 		{
 			key = valueWrapperKey;
