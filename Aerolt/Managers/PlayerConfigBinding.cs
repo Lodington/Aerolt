@@ -1,123 +1,88 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Aerolt.Buttons;
 using Aerolt.Classes;
+using Aerolt.Helpers;
 using Aerolt.Messages;
 using RoR2;
-using ZioConfigFile;
 
 namespace Aerolt.Managers
 {
 	public class PlayerConfigBinding // TODO network the values;
 	{
 		public CustomButton customButton; // this probably shouldn't be in here, but it was convenient
-
-		public bool isLocalUser;
-		private ZioConfigFile.ZioConfigFile configFile;
 		private NetworkUser user;
-		
-		public static readonly string[] entriesNames = {
-			"Noclip",
-			"Aimbot",
-			"InfiniteSkills",
-			"AlwaysSprint",
-			"GodMode"
-		};
-
-		private Dictionary<string, ZioConfigEntry<bool>> entries;
-		private Dictionary<string, bool> values = new();
-		private ZioConfigEntry<float> aimbotWeightEntry;
-		private float _aimbotWeightValue;
-
-		public bool NoclipOn
-		{
-			get => this["Noclip"];
-			set => this["Noclip"] = value;
-		}
-		public bool AimbotOn
-		{
-			get => this["Aimbot"];
-			set => this["Aimbot"] = value;
-		}
-
-		public bool InfiniteSkillsOn
-		{
-			get => this["InfiniteSkills"];
-			set => this["InfiniteSkills"] = value;
-		}
-
-		public bool GodModeOn
-		{
-			get => this["GodMode"];
-			set => this["GodMode"] = value;
-		}
-
-		public bool AlwaysSprintOn
-		{
-			get => this["AlwaysSprint"];
-			set => this["AlwaysSprint"] = value;
-		}
-
-		public bool NoclipInteractDownOn
-		{
-			get => this["NoclipInteractDown"];
-			set => this["NoclipInteractDown"] = value;
-		}
-
-		public float AimbotWeight
-		{
-			get => isLocalUser ? aimbotWeightEntry.Value : _aimbotWeightValue;
-			set
-			{
-				new PlayerConfigBindingSyncMessage(user, "AimbotWeight", value).SendToEveryone();
-				SetValue("AimbotWeight", value);
-			}
-		}
+		public ValueWrapper<bool> Noclip;
+		public ValueWrapper<float> AimbotWeight;
+		public ValueWrapper<bool> Aimbot;
+		public ValueWrapper<bool> InfiniteSkills;
+		public ValueWrapper<bool> AlwaysSprint;
+		public ValueWrapper<bool> GodMode;
 
 		public PlayerConfigBinding(NetworkUser currentUser, CustomButton button)
 		{
 			customButton = button;
 			user = currentUser;
-			if (currentUser.localUser != null && MenuInfo.Files.TryGetValue(currentUser.localUser, out var configFile))
-			{
-				isLocalUser = true;
-
-				this.configFile = configFile;
-				entries = new Dictionary<string, ZioConfigEntry<bool>>
-				{
-					{"NoclipInteractDown", configFile.Bind("PlayerMenu", "NoclipInteractDown", true, "Should holding interact move you down when noclipping.")}
-				};
-				foreach (var entriesName in entriesNames)
-				{
-					entries[entriesName] = configFile.Bind("PlayerMenu", entriesName, false, "");
-				}
-				
-				aimbotWeightEntry = configFile.Bind("PlayerMenu", "AimbotWeight", 0.5f, "0 is weighted entirely to distance, while 1 is entirely to angle.");
-			}
-		}
-		public bool this[string name]
-		{
-			get => isLocalUser ? entries[name].Value : values.ContainsKey(name) && values[name];
-			set
-			{
-				new PlayerConfigBindingSyncMessage(user, name, value).SendToEveryone();
-				SetValue(name, value);
-			}
+			
+			AimbotWeight = ValueWrapper.Get("PlayerMenu", "AimbotWeight", 0.5f, "", user);
+			AimbotWeight.settingChanged += () => SetAimbotWeight(user.master.GetBody(), AimbotWeight.Value);
+			Aimbot = ValueWrapper.Get("PlayerMenu", "Aimbot", false, "", user);
+			Aimbot.settingChanged += () => SetAimbot(user.master.GetBody(), Aimbot.Value, AimbotWeight.Value);
+			InfiniteSkills = ValueWrapper.Get("PlayerMenu", "InfiniteSkills", false, "", user);
+			InfiniteSkills.settingChanged += () => SetInfiniteSkills(user.master.GetBody(), InfiniteSkills.Value);
+			AlwaysSprint = ValueWrapper.Get("PlayerMenu", "AlwaysSprint", false, "", user);
+			AlwaysSprint.settingChanged += () => SetAlwaysSprint(user.master.GetBody(), AlwaysSprint.Value);
+			GodMode = ValueWrapper.Get("PlayerMenu", "GodMode", false, "", user);
+			GodMode.settingChanged += () => SetGodMode(user.master.GetBody(), GodMode.Value);
+			Noclip = ValueWrapper.Get("PlayerMenu", "Noclip", false, "", user);
+			Noclip.settingChanged += () => SetNoclip(user.master.GetBody(), Noclip.Value);
 		}
 
-		public void SetValue(string name, bool value)
+		public void Bind(Action updateCheckboxValues)
 		{
-			if (isLocalUser) entries[name].Value = value;
-			else values[name] = value;
-			LobbyPlayerPageManager.ApplyValues(user.GetCurrentBody(), this);
+			AimbotWeight.settingChanged += updateCheckboxValues;
+			Aimbot.settingChanged += updateCheckboxValues;
+			InfiniteSkills.settingChanged += updateCheckboxValues;
+			AlwaysSprint.settingChanged += updateCheckboxValues;
+			GodMode.settingChanged += updateCheckboxValues;
+			Noclip.settingChanged += updateCheckboxValues;
 		}
 
-		public void SetValue(string name, float value)
+		public void UnBind(Action updateCheckboxValues)
 		{
-			if (isLocalUser) aimbotWeightEntry.Value = value; // TODO make this not retarded
-			else _aimbotWeightValue = value;
-			LobbyPlayerPageManager.ApplyValues(user.GetCurrentBody(), this);
+			AimbotWeight.settingChanged -= updateCheckboxValues;
+			Aimbot.settingChanged -= updateCheckboxValues;
+			InfiniteSkills.settingChanged -= updateCheckboxValues;
+			AlwaysSprint.settingChanged -= updateCheckboxValues;
+			GodMode.settingChanged -= updateCheckboxValues;
+			Noclip.settingChanged -= updateCheckboxValues;
 		}
+
+		public void Sync()
+		{
+			AimbotWeight.Sync();
+			Aimbot.Sync();
+			InfiniteSkills.Sync();
+			AlwaysSprint.Sync();
+			GodMode.Sync();
+			Noclip.Sync();
+		}
+		
+		public static void SetAimbot(CharacterBody bod, bool enable, float weight) => bod.ToggleComponent<AimbotBehavior>(enable, comp => comp.weight = weight);
+		public static void SetAimbotWeight(CharacterBody bod, float weight)
+		{
+			var behavior = bod.GetComponent<AimbotBehavior>();
+			if (behavior)
+				behavior.weight = weight;
+		}
+		public static void SetGodMode(CharacterBody bod, bool enable) => new GodModeMessage(bod.master, enable).SendToServer();
+		public static void SetNoclip(CharacterBody bod, bool enable) => bod.ToggleComponent<NoclipBehavior>(enable);
+		public static void SetInfiniteSkills(CharacterBody bod, bool enable)
+		{
+			if (enable && bod) bod.onSkillActivatedAuthority += InfiniteSkillsActivated;
+			else if (bod) bod.onSkillActivatedAuthority -= InfiniteSkillsActivated;
+		}
+		public static void SetAlwaysSprint(CharacterBody bod, bool enable) => bod.ToggleComponent<AlwaysSprintBehavior>(enable);
+		
+		public static void InfiniteSkillsActivated(GenericSkill obj) => obj.AddOneStock();
 	}
 }

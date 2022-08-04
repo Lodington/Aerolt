@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
+using Object = UnityEngine.Object;
 
 namespace Aerolt.Helpers
 {
@@ -73,6 +76,19 @@ namespace Aerolt.Helpers
  
         public static void SetHeight(this RectTransform source, float height) {
             source.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        }
+        
+        public static void ToggleComponent<T>(this Component bod, bool enable, Action<T>? onFirstSetup = null) where T : MonoBehaviour
+        {
+            if (!bod) return;
+            var behavior = bod.GetComponent<T>();
+            if (behavior && !enable)
+                Object.Destroy(behavior);
+            else if (enable && !behavior)
+            {
+                var comp = bod.gameObject.AddComponent<T>();
+                onFirstSetup?.Invoke(comp);
+            }
         }
     }
 }

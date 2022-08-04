@@ -76,8 +76,7 @@ namespace Aerolt.Managers
 		{
 			if (!body) return;
 			var user = body.master.playerCharacterMasterController.networkUser;
-			if (user.isLocalPlayer)
-				LobbyPlayerPageManager.ApplyValues(body, users[user]);
+			users[user].Sync();
 		}
 
 		private void UserLost(NetworkUser user)

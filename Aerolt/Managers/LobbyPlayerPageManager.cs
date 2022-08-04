@@ -8,6 +8,7 @@ using RoR2;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace Aerolt.Managers
@@ -59,15 +60,43 @@ namespace Aerolt.Managers
 		private ViewState _state = ViewState.Main;
 		private LobbyPlayerManager playerManager;
 		private bool ownerIsSelected;
-		private PlayerConfigBinding PlayerConfig => playerManager.users[currentUser];
+		private PlayerConfigBinding _playerConfig;
+		private ValueWrapper<bool> disableMobSpawns;
+
+		private PlayerConfigBinding PlayerConfig
+		{
+			get => _playerConfig;
+			set
+			{
+				if (_playerConfig != null && _playerConfig != value)
+				{
+					_playerConfig.UnBind(UpdateCheckboxValues);
+				}
+				_playerConfig = value;
+				_playerConfig.Bind(UpdateCheckboxValues);
+				UpdateCheckboxValues();
+			}
+		}
+
+		private void UpdateCheckboxValues()
+		{
+			godToggle.SetIsOnWithoutNotify(PlayerConfig.GodMode.Value);
+			aimbotToggle.SetIsOnWithoutNotify(PlayerConfig.Aimbot.Value);
+			noclipToggle.SetIsOnWithoutNotify(PlayerConfig.Noclip.Value);
+			infiniteSkillsToggle.SetIsOnWithoutNotify(PlayerConfig.InfiniteSkills.Value);
+			alwaysSprintToggle.SetIsOnWithoutNotify(PlayerConfig.AlwaysSprint.Value);
+			
+			aimbotWeightSlider.SetValueWithoutNotify(PlayerConfig.AimbotWeight.Value);
+		}
 
 		public void SetUser(NetworkUser user)
 		{
-			SwapViewState();
-			ownerIsSelected = user == info.Owner;
-			bodyStats.SetTogglesActive(ownerIsSelected);
 			if (currentUser != null) currentUser.master.onBodyStart -= SetBody;
 			currentUser = user;
+			PlayerConfig = playerManager.users[currentUser];
+			SwapViewState();
+			ownerIsSelected = currentUser == info.Owner;
+			bodyStats.SetTogglesActive(ownerIsSelected);
 			master = currentUser.master;
 
 			var inv = master.inventory;
@@ -77,14 +106,7 @@ namespace Aerolt.Managers
 			master.onBodyStart += SetBody;
 			var bodyIn = master.GetBody();
 			if (bodyIn) SetBody(bodyIn);
-			
-			godToggle.SetIsOnWithoutNotify(PlayerConfig.GodModeOn);
-			aimbotToggle.SetIsOnWithoutNotify(PlayerConfig.AimbotOn);
-			aimbotWeightSlider.SetValueWithoutNotify(PlayerConfig.AimbotWeight);
-			noclipToggle.SetIsOnWithoutNotify(PlayerConfig.NoclipOn);
-			infiniteSkillsToggle.SetIsOnWithoutNotify(PlayerConfig.InfiniteSkillsOn);
-			alwaysSprintToggle.SetIsOnWithoutNotify(PlayerConfig.AlwaysSprintOn);
-			
+
 			UpdateLevelValues();
 		}
 
@@ -106,7 +128,6 @@ namespace Aerolt.Managers
 			buffDisplay.source = body;
 			bodyStats.TargetBody = body;
 			teamDropdown.SetValueWithoutNotify((int) body.teamComponent.teamIndex);
-			if (PlayerConfig.InfiniteSkillsOn) body.onSkillActivatedAuthority += InfiniteSkillsActivated;
 		}
 
 		private void OnEnable()
@@ -125,19 +146,12 @@ namespace Aerolt.Managers
 			teamDropdown.options.Clear(); // ensure it was empty to begin with.
 			teamDropdown.AddOptions(Enum.GetNames(typeof(TeamIndex)).Where(x => x != "None").ToList());
 
-			godToggle.onValueChanged.AddListener(val => PlayerConfig.GodModeOn = val);
-			aimbotToggle.onValueChanged.AddListener(val => PlayerConfig.AimbotOn = val);
-			aimbotWeightSlider.onValueChanged.AddListener(val => PlayerConfig.AimbotWeight = val);
-			noclipToggle.onValueChanged.AddListener(val => PlayerConfig.NoclipOn = val);
-			infiniteSkillsToggle.onValueChanged.AddListener(val => PlayerConfig.InfiniteSkillsOn = val);
-			alwaysSprintToggle.onValueChanged.AddListener(val => PlayerConfig.AlwaysSprintOn = val);
-			
-			godToggle.onValueChanged.AddListener(GodMode);
-			aimbotToggle.onValueChanged.AddListener(Aimbot);
-			aimbotWeightSlider.onValueChanged.AddListener(AimbotWeight);
-			noclipToggle.onValueChanged.AddListener(Noclip);
-			infiniteSkillsToggle.onValueChanged.AddListener(InfiniteSkills);
-			alwaysSprintToggle.onValueChanged.AddListener(AlwaysSprint);
+			godToggle.onValueChanged.AddListener(val => PlayerConfig.GodMode.Value = val);
+			aimbotToggle.onValueChanged.AddListener(val => PlayerConfig.Aimbot.Value = val);
+			aimbotWeightSlider.onValueChanged.AddListener(val => PlayerConfig.AimbotWeight.Value = val);
+			noclipToggle.onValueChanged.AddListener(val => PlayerConfig.Noclip.Value = val);
+			infiniteSkillsToggle.onValueChanged.AddListener(val => PlayerConfig.InfiniteSkills.Value = val);
+			alwaysSprintToggle.onValueChanged.AddListener(val => PlayerConfig.AlwaysSprint.Value = val);
 
 			moneyInputField.onEndEdit.AddListener(amt =>
 			{
@@ -164,19 +178,38 @@ namespace Aerolt.Managers
 			teamDropdown.onValueChanged.AddListener(TeamChanged);
 			TeamComponent.onJoinTeamGlobal += TeamJoined;
 
+			disableMobSpawns = ValueWrapper.Get("PlayerMenu", "DisableMobSpawns", false, "");
+			disableMobSpawns.settingChanged += MobSpawnsChanged;
+			disableMobSpawnToggle.onValueChanged.AddListener(val => disableMobSpawns.Value = val);
+			disableMobSpawns.Sync();
+		}
+
+		void IModuleStartup.ModuleEnd()
+		{
+			disableMobSpawns.settingChanged -= MobSpawnsChanged;
+		}
+
+		private void MobSpawnsChanged()
+		{
+			disableMobSpawnToggle.SetIsOnWithoutNotify(disableMobSpawns.Value);
+			if (!NetworkServer.active) return;
+			foreach (var director in CombatDirector.instancesList) director.monsterSpawnTimer = disableMobSpawns.Value ? float.PositiveInfinity : 0f;
 		}
 
 		private void TeamJoined(TeamComponent who, TeamIndex team)
 		{
 			if (who.body == body) teamDropdown.SetValueWithoutNotify((int) team);
 		}
-
+		public void SetCurrency(CurrencyType currencyType, string strAmount)
+		{
+			if (!uint.TryParse(strAmount, out var amount)) return;
+			new CurrencyMessage(master, currencyType, amount).SendToServer(); // Send to server now just calls handle if we're on a server already
+		}
 		public void SetXp()
 		{
 			SetCurrency(CurrencyType.Experience,  Mathf.RoundToInt(xpSlider.value).ToString()); 
 			
 			UpdateLevelValues();
-
 		}
 		
 		private void OnTeamLevelUp(TeamIndex obj)
@@ -248,13 +281,6 @@ namespace Aerolt.Managers
 			}
 			
 			_state = newState;
-		}
-
-		
-		
-		public void ApplyMobSpawns()
-		{
-			new ToggleMobSpawnsMessage(disableMobSpawnToggle.isOn).SendToEveryone();
 		}
 		public void KillAllMobs()
 		{
