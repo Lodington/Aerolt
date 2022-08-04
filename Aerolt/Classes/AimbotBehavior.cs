@@ -18,6 +18,7 @@ namespace Aerolt.Classes
 		private void Awake()
 		{
 			body = GetComponent<CharacterBody>();
+			if (!body.master.playerCharacterMasterController.networkUser.cameraRigController) Destroy(this);
 			inputBank = body.inputBank;
 			team = body.teamComponent.teamIndex;
 		}
@@ -25,6 +26,7 @@ namespace Aerolt.Classes
 		private void FixedUpdate()
 		{
 			if (!body.isPlayerControlled) return;
+			if (!body.master.playerCharacterMasterController.networkUser.cameraRigController) return;
 			var ray = inputBank.GetAimRay();
 			ray.direction = (body.master.playerCharacterMasterController.networkUser.cameraRigController.crosshairWorldPosition - ray.origin).normalized;
 			var targets = HurtBox.sniperTargetsList.Union(HurtBox.bullseyesList).Select(x =>
