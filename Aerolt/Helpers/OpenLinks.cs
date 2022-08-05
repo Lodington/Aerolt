@@ -1,22 +1,32 @@
+using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Aerolt.Social;
-using RoR2;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
+using Console = RoR2.Console;
 
 namespace Aerolt.Helpers
 {
     [RequireComponent(typeof(TextMeshProUGUI))]
-    public class JoinLobbyOnClick : MonoBehaviour, IPointerClickHandler {
+    [RequireComponent(typeof(EventTrigger))]
+    public class JoinLobbyOnClick : MonoBehaviour {
 
         [SerializeField]
         private TextMeshProUGUI textMessage;
 
+        private EventTrigger _eventTrigger;
+        void Start()
+        {
+            _eventTrigger = GetComponent<EventTrigger>();
+            _eventTrigger.AddEventTrigger(OnPointerClick, EventTriggerType.PointerClick);
+        }
+
         // Get link and open page
-        public void OnPointerClick (PointerEventData eventData) {
-            if (eventData.button == PointerEventData.InputButton.Left)
+        public void OnPointerClick (BaseEventData eventData) {
+            if (eventData.currentInputModule.input.GetMouseButton((int) MouseButton.LeftMouse))
             {
                 Debug.Log("YEs");
                 int linkIndex = TMP_TextUtilities.FindIntersectingLink (textMessage, Input.mousePosition, null);
