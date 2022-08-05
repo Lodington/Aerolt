@@ -19,13 +19,20 @@ namespace Aerolt.Classes
 
 		public static ValueWrapper<T> Get<T>(string category, string name, T defaultValue, string description, NetworkUser who = null)
 		{
-			if (Instances.TryGetValue((who ? who.id.strValue : string.Empty) + category + name, out var entry))
+			if (Instances.TryGetValue(GetId(who) + category + name, out var entry))
 			{
 				var centry = (ValueWrapper<T>) entry;
 				return centry;
 			}
 			var val = new ValueWrapper<T>(category, name, defaultValue, description, who);
 			return val;
+		}
+
+		public static string GetId(NetworkUser user)
+		{
+			if (!user) return string.Empty; 
+			var id = user.id;
+			return (id.value != 0UL ? id.value.ToString() : id.strValue) + id.subId;
 		}
 	}
 	public class ValueWrapper<T> : ValueWrapper
@@ -57,7 +64,7 @@ namespace Aerolt.Classes
 				fallbackValue = defaultValue;
 			}
 
-			identifier = (who ? who.id.strValue : string.Empty) + category + name;
+			identifier = GetId(who) + category + name;
 			Instances.Add(identifier, this);
 		}
 
