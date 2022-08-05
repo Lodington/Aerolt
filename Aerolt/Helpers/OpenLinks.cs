@@ -1,4 +1,5 @@
 using System.Globalization;
+using Aerolt.Enums;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -26,14 +27,13 @@ namespace Aerolt.Helpers
         {
             if (eventData.currentInputModule.input.GetMouseButtonDown((int) MouseButton.LeftMouse)) 
             {
-                Debug.Log("YEs");
                 int linkIndex = TMP_TextUtilities.FindIntersectingLink (textMessage, Input.mousePosition, null);
                 if (linkIndex == -1) 
                     return;
                 var linkInfo = textMessage.textInfo.linkInfo[linkIndex];
                 string selectedLink = linkInfo.GetLinkID();
                 if (selectedLink != "") {
-                    Debug.LogFormat ("Joining Lobby {0}", selectedLink);
+                    Tools.Log(LogLevel.Information, $"Joining Lobby {selectedLink}");
                     Console.instance.SubmitCmd(null, string.Format(CultureInfo.InvariantCulture, "steam_lobby_join {0}", selectedLink), true);
                 }
             }
