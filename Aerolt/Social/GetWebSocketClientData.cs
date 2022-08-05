@@ -1,3 +1,4 @@
+using RoR2;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +26,8 @@ namespace Aerolt.Social
             Connect.OnMessage += MarkTextDirty;
             sendButton.onClick.AddListener(SendMessage);
         }
+
+        public void InsertLobbyID() => inputField.text += $"#{PlatformSystems.lobbyManager.GetLobbyID()}";
 
         private void Update()
         {
