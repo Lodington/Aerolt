@@ -74,14 +74,14 @@ namespace Aerolt.Classes
 			set
 			{
 				//if (value.Equals(Value)) return;
-				if (!duckChange)
-				{
-					Sync();
-				}
 				if (isLocalBinding)
 					configEntry.Value = value;
 				else
 					fallbackValue = value;
+				if (!duckChange)
+				{
+					Sync();
+				}
 				settingChanged?.Invoke();
 			}
 		}
