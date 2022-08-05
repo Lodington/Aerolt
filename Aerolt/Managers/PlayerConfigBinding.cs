@@ -49,31 +49,37 @@ namespace Aerolt.Managers
 
         private void OnNoclipChanged()
         {
+            if (!user.master) return;
             SetNoclip(user.master.GetBody(), Noclip.Value);
         }
 
         private void OnGodModeChanged()
         {
+            if (!user.master) return;
             SetGodMode(user.master.GetBody(), GodMode.Value);
         }
 
         private void OnAlwaysSprintChanged()
         {
+            if (!user.master) return;
             SetAlwaysSprint(user.master.GetBody(), AlwaysSprint.Value);
         }
 
         private void OnInfiniteSkillsChanged()
         {
+            if (!user.master) return;
             SetInfiniteSkills(user.master.GetBody(), InfiniteSkills.Value);
         }
 
         private void OnAimbotChanged()
         {
+            if (!user.master) return;
             SetAimbot(user.master.GetBody(), Aimbot.Value, AimbotWeight.Value);
         }
 
         private void OnAimbotWeightChanged()
         {
+            if (!user.master) return;
             SetAimbotWeight(user.master.GetBody(), AimbotWeight.Value);
         }
 

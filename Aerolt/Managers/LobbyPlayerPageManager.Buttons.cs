@@ -38,6 +38,7 @@ namespace Aerolt.Managers
 
         public void Kill()
         {
+            if (!master) return;
             new KillMessage(master)
                 .SendToServer(); // Todo, test to see if this needs to be sent on auth(the function calls to inventory add item inside truekill make me feel like no, but its also not working?)
         }
@@ -51,12 +52,14 @@ namespace Aerolt.Managers
 
         public void GiveAllItems()
         {
+            if (!master) return;
             var items = ContentManager.itemDefs.ToDictionary(x => x, def => master.inventory.GetItemCount(def) + 1);
             new SetItemCountMessage(master.inventory, items).SendToServer();
         }
 
         public void GiveRandomItems()
         {
+            if (!master) return;
             var items = new Dictionary<ItemDef, int>();
             for (var i = 0; i < Random.Range(0, 100); i++)
             {

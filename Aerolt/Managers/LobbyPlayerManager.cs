@@ -56,7 +56,7 @@ namespace Aerolt.Managers
         {
             var button = users[user].customButton;
             button.buttonText.text = user.userName;
-            if (user.master.bodyPrefab)
+            if (user.master && user.master.bodyPrefab)
                 button.rawImage.texture = user.master.bodyPrefab.GetComponent<CharacterBody>().portraitIcon;
         }
 
@@ -72,6 +72,7 @@ namespace Aerolt.Managers
                 if (val) SetUser(user);
             });
             if (user == info.Owner) toggle.Set(true);
+            if (!user.master) return;
             if (NetworkServer.active) BodyStart(user.master.GetBody());
             user.master.onBodyStart += BodyStart;
         }
@@ -91,7 +92,8 @@ namespace Aerolt.Managers
             users.Remove(user);
             if (selectedUser == user && users.Any())
                 SetUser(users.Keys.Last());
-            user.master.onBodyStart -= BodyStart;
+            if (user.master)
+                user.master.onBodyStart -= BodyStart;
         }
 
         private void SetUser(NetworkUser user)

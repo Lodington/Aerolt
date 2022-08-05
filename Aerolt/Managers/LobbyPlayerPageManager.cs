@@ -78,7 +78,7 @@ namespace Aerolt.Managers
 
         public void Update()
         {
-            if (!currentUser) return;
+            if (!currentUser || !master) return;
             ((TextMeshProUGUI) moneyInputField.placeholder).text = master.money.ToString();
             ((TextMeshProUGUI) voidMarkersInputField.placeholder).text = master.voidCoins.ToString();
             ((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = currentUser.lunarCoins.ToString();
@@ -158,7 +158,7 @@ namespace Aerolt.Managers
 
         public void SetUser(NetworkUser user)
         {
-            if (currentUser != null) currentUser.master.onBodyStart -= SetBody;
+            if (currentUser != null && currentUser.master) currentUser.master.onBodyStart -= SetBody;
             currentUser = user;
             PlayerConfig = playerManager.users[currentUser];
             SwapViewState();
@@ -166,6 +166,9 @@ namespace Aerolt.Managers
             bodyStats.SetTogglesActive(ownerIsSelected);
             master = currentUser.master;
 
+            UpdateLevelValues();
+            
+            if (!master) return;
             var inv = master.inventory;
             inventoryDisplay.SetSubscribedInventory(inv);
             equipmentIcon.targetInventory = inv;
@@ -173,8 +176,6 @@ namespace Aerolt.Managers
             master.onBodyStart += SetBody;
             var bodyIn = master.GetBody();
             if (bodyIn) SetBody(bodyIn);
-
-            UpdateLevelValues();
         }
 
         private void SetBody(CharacterBody bodyIn)
@@ -229,6 +230,7 @@ namespace Aerolt.Managers
 
         public void TeamChanged(int team)
         {
+            if (!master) return;
             var index = (TeamIndex) team;
             new TeamSwitchMessage(master, index).SendToServer();
             UpdateLevelValues();
