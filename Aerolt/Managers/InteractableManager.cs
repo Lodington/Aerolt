@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Buttons;
 using Aerolt.Classes;
+using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Messages;
 using BepInEx;
@@ -17,27 +18,37 @@ namespace Aerolt.Managers
 {
     public class InteractableManager : MonoBehaviour, IModuleStartup
     {
+        [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
         public GameObject buttonPrefab;
         public GameObject buttonParent;
         public TMP_InputField searchFilter;
-
-        
-        [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
         private MenuInfo _info;
-        private Dictionary<SpawnCard, CustomButton> cardDefRef = new();
-        public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool.GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value).Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x).Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x).Select(x => x.spawnCard).Union(FindObjectOfType<SceneDirector>().GenerateInteractableCardSelection().choices.Where(x => x.value != null && x.value.spawnCard != null).Select(x => x.value.spawnCard)).ToArray();
+        private readonly Dictionary<SpawnCard, CustomButton> cardDefRef = new();
 
         static InteractableManager()
         {
-            Run.onRunStartGlobal += _ => _spawnCards = null; // clear the spawncards so they can be filled if you disable/enable expansions
+            Run.onRunStartGlobal +=
+                _ => _spawnCards = null; // clear the spawncards so they can be filled if you disable/enable expansions
         }
+
+        public static SpawnCard[] cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool
+            .GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value)
+            .Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x)
+            .Where(x => !x.Equals(null) && !x.cards.Equals(null)).Select(x => x.cards).SelectMany(x => x)
+            .Select(x => x.spawnCard).Union(FindObjectOfType<SceneDirector>().GenerateInteractableCardSelection()
+                .choices.Where(x => x.value != null && x.value.spawnCard != null).Select(x => x.value.spawnCard))
+            .ToArray();
+
         public void ModuleStart()
         {
             _info = GetComponentInParent<MenuInfo>();
-            foreach (var card in cards.OrderBy(x => x.prefab.GetComponentInChildren<IDisplayNameProvider>() != null ? x.prefab.GetComponentInChildren<IDisplayNameProvider>().GetDisplayName() : x.name))
+            foreach (var card in cards.OrderBy(x =>
+                x.prefab.GetComponentInChildren<IDisplayNameProvider>() != null
+                    ? x.prefab.GetComponentInChildren<IDisplayNameProvider>().GetDisplayName()
+                    : x.name))
             {
                 if (card.Equals(null) || card.Equals(default)) continue;
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
 
                 var buttonComponet = newButton.GetComponent<CustomButton>();
@@ -46,7 +57,8 @@ namespace Aerolt.Managers
                 buttonComponet.button.onClick.AddListener(() => SpawnInteractable(card));
                 cardDefRef[card] = buttonComponet;
             }
-            if(searchFilter)
+
+            if (searchFilter)
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
@@ -54,29 +66,26 @@ namespace Aerolt.Managers
         {
             if (!_info.Master)
             {
-                Tools.Log(Aerolt.Enums.LogLevel.Error, $"Cant Spawn Interactable Localuser Master is null");
+                Tools.Log(LogLevel.Error, "Cant Spawn Interactable Localuser Master is null");
                 return;
             }
 
             var body = _info.Body;
             if (!body) //wats a erorr catch?
             {
-                Tools.Log(Aerolt.Enums.LogLevel.Error, $"Cant Spawn Interactable Localuser Body is null");
+                Tools.Log(LogLevel.Error, "Cant Spawn Interactable Localuser Body is null");
                 return;
             }
 
             var position = body.transform.position;
             var aimRay = body.inputBank.GetAimRay().direction * 1.6f;
 
-            
+
             if (NetworkServer.active)
-            {
                 Spawn((uint) Array.IndexOf(cards, card), position + aimRay);
-            }
             else
-            {
-                ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage((uint) Array.IndexOf(cards, card), position + aimRay));
-            }
+                ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage((uint) Array.IndexOf(cards, card),
+                    position + aimRay));
         }
 
         public static void Spawn(uint index, Vector3 position)
@@ -95,25 +104,18 @@ namespace Aerolt.Managers
                 RoR2Application.rng)
             );
         }
-        
+
         private void FilterUpdated(string text)
         {
             if (text.IsNullOrWhiteSpace())
             {
-                foreach (var buttonGen in cardDefRef)
-                {
-                    buttonGen.Value.gameObject.SetActive(true);
-                }
+                foreach (var buttonGen in cardDefRef) buttonGen.Value.gameObject.SetActive(true);
                 return;
             }
-            
+
             var arr = cardDefRef.Values.ToArray();
             var matches = Tools.FindMatches(arr, x => x.buttonText.text, text);
-            foreach (var buttonGen in arr)
-            {
-                buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
-            }
+            foreach (var buttonGen in arr) buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
         }
     }
-
 }

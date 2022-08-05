@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -16,23 +15,49 @@ namespace Aerolt.Buttons
 {
     public class PlayerValuesGenerator : MonoBehaviour
     {
+        private static readonly FieldInfo[] Fields =
+            _fields ??= typeof(CharacterBody).GetFields().Where(x => x.FieldType == typeof(float)).ToArray();
+
+        [CanBeNull] private static readonly FieldInfo[] _fields;
         public GameObject parent;
         public GameObject playerValuePrefab;
         public ToggleGroup profileGroup;
-        private bool setup;
-        private CharacterBody _target;
-        private readonly Dictionary<FieldInfo, TMP_InputField> _entries = new();
-        private static readonly FieldInfo[] Fields = _fields ??= typeof(CharacterBody).GetFields().Where(x => x.FieldType == typeof(float)).ToArray();
-        [CanBeNull] private static readonly FieldInfo[] _fields;
-        private MenuInfo info;
-        private ZioConfigEntry<int> selectedProfile;
-        private List<StatProfile> profiles = new();
         public List<Toggle> toggles;
+        private readonly Dictionary<FieldInfo, TMP_InputField> _entries = new();
+        private CharacterBody _target;
+        private MenuInfo info;
+        private readonly List<StatProfile> profiles = new();
+        private ZioConfigEntry<int> selectedProfile;
+        private bool setup;
+
+        public CharacterBody TargetBody
+        {
+            get => _target;
+            set
+            {
+                _target = value;
+                UpdateText();
+            }
+        }
+
+        public void Awake()
+        {
+            toggles[0].SetIsOnWithoutNotify(false);
+            toggles[selectedProfile.Value].SetIsOnWithoutNotify(true);
+        }
+
+        public void Update()
+        {
+            if (setup) return;
+            if (!TargetBody) return;
+            UpdateText();
+            setup = true;
+        }
 
         public void Setup()
         {
             foreach (var field in Fields) CreateNewStatPrefab(field);
-            
+
             info = GetComponentInParent<MenuInfo>();
             var i = 0;
             foreach (var toggle in toggles)
@@ -48,22 +73,14 @@ namespace Aerolt.Buttons
                 i++;
             }
 
-            selectedProfile = info.ConfigFile.Bind("Player", "Selected Profile", 0, "Which profile is selected for the body stats.");
+            selectedProfile = info.ConfigFile.Bind("Player", "Selected Profile", 0,
+                "Which profile is selected for the body stats.");
             ProfileSelected(selectedProfile.Value);
         }
 
         public void SetTogglesActive(bool enable)
         {
-            foreach (var toggle in toggles)
-            {
-                toggle.interactable = enable;
-            }
-        }
-
-        public void Awake()
-        {
-            toggles[0].SetIsOnWithoutNotify(false);
-            toggles[selectedProfile.Value].SetIsOnWithoutNotify(true);
+            foreach (var toggle in toggles) toggle.interactable = enable;
         }
 
         public void ProfileSelected(int i, bool applyValuesToBody = true)
@@ -76,37 +93,22 @@ namespace Aerolt.Buttons
                 foreach (var (entry, text) in _entries)
                 {
                     text.SetText(entry.GetValue(defaultBody).ToString());
-                    if(applyValuesToBody)
+                    if (applyValuesToBody)
                         text.ReleaseSelection();
                 }
             }
             else
             {
-                profiles[i-1].Apply(_entries, applyValuesToBody);
-            }
-        }
-
-        public CharacterBody TargetBody
-        {
-            get => _target;
-            set
-            {
-                _target = value;
-                UpdateText();
+                profiles[i - 1].Apply(_entries, applyValuesToBody);
             }
         }
 
         private void UpdateText()
         {
-            foreach (var (field, inputField) in _entries) ((TextMeshProUGUI) inputField.placeholder).text = field.GetValue(TargetBody).ToString(); // this might but probably wont fuck up the profiles, if you die and come back to life
-        }
-
-        public void Update()
-        {
-            if (setup) return;
-            if (!TargetBody) return;
-            UpdateText();
-            setup = true;
+            foreach (var (field, inputField) in _entries)
+                ((TextMeshProUGUI) inputField.placeholder).text =
+                    field.GetValue(TargetBody)
+                        .ToString(); // this might but probably wont fuck up the profiles, if you die and come back to life
         }
 
         private void CreateNewStatPrefab(FieldInfo field)
@@ -117,7 +119,7 @@ namespace Aerolt.Buttons
             input.onEndEdit.AddListener(result =>
             {
                 if (!TargetBody || !float.TryParse(result, out var value)) return;
-                
+
                 if (selectedProfile.Value > 0) profiles[selectedProfile.Value - 1].entries[field].Value = value;
                 new BodyStatMessage(TargetBody, field.Name, value).SendToEveryone();
                 input.text = string.Empty;
@@ -129,10 +131,13 @@ namespace Aerolt.Buttons
         public class StatProfile
         {
             public Dictionary<FieldInfo, ZioConfigEntry<float>> entries = new();
+
             public StatProfile(int profileIndex, ZioConfigFile.ZioConfigFile configFile)
             {
-                foreach (var field in Fields) entries[field] = configFile.Bind("PlayerProfile" + profileIndex, field.Name, 1f, "");
+                foreach (var field in Fields)
+                    entries[field] = configFile.Bind("PlayerProfile" + profileIndex, field.Name, 1f, "");
             }
+
             public void Apply(Dictionary<FieldInfo, TMP_InputField> bodyEntries, bool applyValuesToBody)
             {
                 foreach (var (entry, text) in bodyEntries)

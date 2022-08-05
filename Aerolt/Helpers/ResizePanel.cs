@@ -1,44 +1,36 @@
 using System;
 using Aerolt.Enums;
-using HarmonyLib;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using RoR2;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Aerolt.Helpers
 {
-
-    
-
     [RequireComponent(typeof(EventTrigger))]
     public class ResizePanel : MonoBehaviour
     {
         public HandlerType Type;
         public RectTransform Target;
-        public Vector2 MinimumDimmensions = new Vector2(50, 50);
-        public Vector2 MaximumDimmensions = new Vector2(800, 800);
+        public Vector2 MinimumDimmensions = new(50, 50);
+        public Vector2 MaximumDimmensions = new(800, 800);
 
         private EventTrigger _eventTrigger;
 
         private void Awake()
         {
-            Target = (RectTransform)transform.parent;
+            Target = (RectTransform) transform.parent;
         }
 
 
-        void Start()
+        private void Start()
         {
             _eventTrigger = GetComponent<EventTrigger>();
             _eventTrigger.AddEventTrigger(OnDrag, EventTriggerType.Drag);
         }
 
 
-        
-        void OnDrag(BaseEventData data)
+        private void OnDrag(BaseEventData data)
         {
-            PointerEventData ped = (PointerEventData) data;
+            var ped = (PointerEventData) data;
             //Target.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Target.rect.width + ped.delta.x);
             //Target.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Target.rect.height + ped.delta.y);
             RectTransform.Edge? horizontalEdge = null;

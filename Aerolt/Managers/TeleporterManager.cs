@@ -8,7 +8,6 @@ using RoR2;
 using TMPro;
 using UnityEngine;
 
-
 namespace Aerolt.Managers
 {
     public class TeleporterManager : MonoBehaviour
@@ -16,25 +15,30 @@ namespace Aerolt.Managers
         public GameObject buttonPrefab;
         public GameObject buttonParent;
         public TMP_InputField searchFilter;
-        private Dictionary<SceneDef, CustomButton> sceneDefRef = new();
+        private readonly Dictionary<SceneDef, CustomButton> sceneDefRef = new();
 
         public void Start()
         {
             foreach (var scene in SceneCatalog.allSceneDefs.OrderByDescending(x => x.sceneType))
             {
-                if(!scene)
+                if (!scene)
                     continue;
-                
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
+
+                var newButton = Instantiate(buttonPrefab, buttonParent.transform);
 
                 var buttonComponet = newButton.GetComponent<CustomButton>();
-                buttonComponet.buttonText.text = !string.IsNullOrEmpty(scene.nameToken) ? Language.GetString(scene.nameToken) : scene.cachedName;
-                if(scene.previewTexture)
-                    buttonComponet.image.sprite = Sprite.Create((Texture2D)scene.previewTexture, new Rect(0, 0,scene.previewTexture.width, scene.previewTexture.height), new Vector2(0.5f, 0.5f));
+                buttonComponet.buttonText.text = !string.IsNullOrEmpty(scene.nameToken)
+                    ? Language.GetString(scene.nameToken)
+                    : scene.cachedName;
+                if (scene.previewTexture)
+                    buttonComponet.image.sprite = Sprite.Create((Texture2D) scene.previewTexture,
+                        new Rect(0, 0, scene.previewTexture.width, scene.previewTexture.height),
+                        new Vector2(0.5f, 0.5f));
                 buttonComponet.button.onClick.AddListener(() => SetScene(scene));
                 sceneDefRef[scene] = buttonComponet;
             }
-            if(searchFilter)
+
+            if (searchFilter)
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
@@ -48,38 +52,35 @@ namespace Aerolt.Managers
             new TeleporterChargeMessage().SendToServer();
             Chat.AddMessage("<color=yellow>Charged teleporter</color>");
         }
+
         public void SkipStage()
         {
             new SceneChangeMessage().SendToServer();
             Chat.AddMessage("<color=yellow>Skipping Stage</color>");
         }
+
         public void AddMountain()
         {
             TeleporterInteraction.instance.AddShrineStack();
             Chat.AddMessage("<color=yellow>Added Mountain stack</color>");
         }
+
         public void SpawnPortals(string portal)
         {
             new PortalSpawnMessage(portal).SendToServer();
         }
-        
+
         private void FilterUpdated(string text)
         {
             if (text.IsNullOrWhiteSpace())
             {
-                foreach (var buttonGen in sceneDefRef)
-                {
-                    buttonGen.Value.gameObject.SetActive(true);
-                }
+                foreach (var buttonGen in sceneDefRef) buttonGen.Value.gameObject.SetActive(true);
                 return;
             }
-            
+
             var arr = sceneDefRef.Values.ToArray();
             var matches = Tools.FindMatches(arr, x => x.buttonText.text, text);
-            foreach (var buttonGen in arr)
-            {
-                buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
-            }
+            foreach (var buttonGen in arr) buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
         }
     }
 }

@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aerolt", "Aerolt\Aerolt.csproj", "{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AeroltChatServer", "..\AeroltChatServer\AeroltChatServer\AeroltChatServer.csproj", "{8A96BBB0-2104-4650-ABD5-809D4396353A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "websocket-sharp", "..\websocket-sharp\websocket-sharp\websocket-sharp.csproj", "{B357BAC7-529E-4D81-A0D2-71041B19C8DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A96BBB0-2104-4650-ABD5-809D4396353A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A96BBB0-2104-4650-ABD5-809D4396353A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A96BBB0-2104-4650-ABD5-809D4396353A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A96BBB0-2104-4650-ABD5-809D4396353A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B357BAC7-529E-4D81-A0D2-71041B19C8DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B357BAC7-529E-4D81-A0D2-71041B19C8DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B357BAC7-529E-4D81-A0D2-71041B19C8DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B357BAC7-529E-4D81-A0D2-71041B19C8DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

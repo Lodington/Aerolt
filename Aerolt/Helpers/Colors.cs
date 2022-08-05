@@ -9,8 +9,7 @@ namespace Aerolt.Helpers
 {
     public static class Colors
     {
-        
-        public static readonly Dictionary<string, Color32> DefaultColors = new Dictionary<string, Color32>()
+        public static readonly Dictionary<string, Color32> DefaultColors = new()
         {
             {"Chest", Color.red},
             {"Shop", Color.red},
@@ -20,7 +19,7 @@ namespace Aerolt.Helpers
             {"NewtAlter", Color.white},
             {"Shrine", Color.white},
             {"Drone", Color.white},
-            {"Printer", Color.white},
+            {"Printer", Color.white}
         };
 
         public static readonly Dictionary<string, ZioConfigEntry<Color>> GlobalColors = new();
@@ -29,11 +28,12 @@ namespace Aerolt.Helpers
         {
             return "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + text + "</color>";
         }
+
         public static Color32 GetColor(string identifier)
         {
             if (Load.configFile == null) return Color.magenta;
             if (GlobalColors.TryGetValue(identifier, out var color)) return color.Value;
-            
+
             color = Load.configFile.Bind("EspColors", identifier, (Color) DefaultColors[identifier], "");
             GlobalColors[identifier] = color;
             if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
@@ -46,20 +46,20 @@ namespace Aerolt.Helpers
             ModSettingsManager.AddOption(new ZioColorOption(value));
         }
 
-        public static void SetColor(string id, Color32 c) => GlobalColors[id].Value = c;
+        public static void SetColor(string id, Color32 c)
+        {
+            GlobalColors[id].Value = c;
+        }
 
         public static string ColorToHex(Color32 color)
         {
-            string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
+            var hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
             return hex;
         }
 
         public static void InitColors()
         {
-            foreach (var key in DefaultColors.Keys)
-            {
-                GetColor(key);
-            }
+            foreach (var key in DefaultColors.Keys) GetColor(key);
         }
     }
 }

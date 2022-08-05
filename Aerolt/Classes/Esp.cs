@@ -1,27 +1,26 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aerolt.Helpers;
 using Aerolt.Managers;
-using AK.Wwise;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using ZioConfigFile;
-using Object = UnityEngine.Object;
 
 namespace Aerolt.Classes
 {
     public class Esp : MonoBehaviour, IModuleStartup
     {
-
         public static List<PurchaseInteraction> PurchaseInteractions;
         public static List<BarrelInteraction> BarrelInteractions;
         public static List<PressurePlateController> SecretButtons;
         public static List<ScrapperController> Scrappers;
         public static List<MultiShopController> MultiShops;
+
+
+        public static Esp Instance;
 
         public Toggle showAdvancedToggle;
         public Toggle showTeleporterToggle;
@@ -33,27 +32,80 @@ namespace Aerolt.Classes
         public Toggle showDuplicatorToggle;
         public Toggle showDroneToggle;
         public Toggle showShrineToggle;
-        [FormerlySerializedAs("showClensingPoolToggle")] public Toggle showNewtAlterToggle;
 
-        
-        public static Esp Instance;
+        [FormerlySerializedAs("showClensingPoolToggle")]
+        public Toggle showNewtAlterToggle;
+
         private ZioConfigEntry<bool> advancedEntry;
-        private ZioConfigEntry<bool> teleporterEntry;
-        private ZioConfigEntry<bool> chestEntry;
-        private ZioConfigEntry<bool> shopEntry;
         private ZioConfigEntry<bool> barrelEntry;
+        private ZioConfigEntry<bool> chestEntry;
+        private ZioConfigEntry<bool> droneEntry;
+        private ZioConfigEntry<bool> duplicatorEntry;
         private ZioConfigEntry<bool> scrapperEntry;
         private ZioConfigEntry<bool> secretEntry;
-        private ZioConfigEntry<bool> duplicatorEntry;
-        private ZioConfigEntry<bool> droneEntry;
-        private ZioConfigEntry<bool> shrineEntry;
+        private ZioConfigEntry<bool> shopEntry;
         private ZioConfigEntry<bool> showNewtAlterEntry;
+        private ZioConfigEntry<bool> shrineEntry;
+        private ZioConfigEntry<bool> teleporterEntry;
+
+        public void ModuleStart()
+        {
+            var configFile = Load.configFile;
+
+            teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");
+            showTeleporterToggle.Set(teleporterEntry.Value);
+            chestEntry = configFile.Bind("ESP", "showChest", false, "");
+            showChestToggle.Set(chestEntry.Value);
+            shopEntry = configFile.Bind("ESP", "showShop", false, "");
+            showMultiShopToggle.Set(shopEntry.Value);
+            advancedEntry = configFile.Bind("ESP", "showAdvanced", false, "");
+            showAdvancedToggle.Set(advancedEntry.Value);
+
+            barrelEntry = configFile.Bind("ESP", "showBarrel", false, "");
+            showBarrelToggle.Set(barrelEntry.Value);
+            scrapperEntry = configFile.Bind("ESP", "showScrapper", false, "");
+            showScrapperToggle.Set(scrapperEntry.Value);
+            secretEntry = configFile.Bind("ESP", "showSecret", false, "");
+            ShowSecretToggle.Set(secretEntry.Value);
+
+            duplicatorEntry = configFile.Bind("ESP", "showDuplicator", false, "");
+            showDuplicatorToggle.Set(duplicatorEntry.Value);
+            droneEntry = configFile.Bind("ESP", "showDrone", false, "");
+            showDroneToggle.Set(droneEntry.Value);
+            shrineEntry = configFile.Bind("ESP", "showShrine", false, "");
+            showShrineToggle.Set(shrineEntry.Value);
+
+            showNewtAlterEntry = configFile.Bind("ESP", "showNewtAlter", false, "");
+            showNewtAlterToggle.Set(showNewtAlterEntry.Value);
+
+
+            if (Instance) return;
+            Instance = this;
+
+            showTeleporterToggle.onValueChanged.AddListener(val => teleporterEntry.Value = val);
+            showChestToggle.onValueChanged.AddListener(val => chestEntry.Value = val);
+            showMultiShopToggle.onValueChanged.AddListener(val => shopEntry.Value = val);
+            showAdvancedToggle.onValueChanged.AddListener(val => advancedEntry.Value = val);
+
+
+            showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
+            showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
+            ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
+            showDuplicatorToggle.onValueChanged.AddListener(val => duplicatorEntry.Value = val);
+            showDroneToggle.onValueChanged.AddListener(val => droneEntry.Value = val);
+            showShrineToggle.onValueChanged.AddListener(val => shrineEntry.Value = val);
+
+            showNewtAlterToggle.onValueChanged.AddListener(val => showNewtAlterEntry.Value = val);
+
+            GatherObjects(); // these objects should exist by hud awake
+        }
 
         public static void Draw()
         {
             if (Instance.showTeleporterToggle.isOn)
                 ShowTeleporter();
-            if (Instance.showChestToggle.isOn || Instance.showDuplicatorToggle.isOn || Instance.showDroneToggle.isOn || Instance.showShrineToggle.isOn || Instance.showNewtAlterToggle.isOn)
+            if (Instance.showChestToggle.isOn || Instance.showDuplicatorToggle.isOn || Instance.showDroneToggle.isOn ||
+                Instance.showShrineToggle.isOn || Instance.showNewtAlterToggle.isOn)
                 DrawPurchaseInteractables();
             if (Instance.showMultiShopToggle.isOn)
                 DrawShops();
@@ -99,66 +151,19 @@ namespace Aerolt.Classes
                             break;
                         }
                     }
+
                     if (pickupDef.itemIndex != ItemIndex.None)
-                        str.AppendLine("- " + Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken));
+                        str.AppendLine("- " +
+                                       Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken));
                     if (pickupDef.equipmentIndex != EquipmentIndex.None)
-                        str.AppendLine("- " + Language.GetString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).nameToken));
+                        str.AppendLine("- " +
+                                       Language.GetString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex)
+                                           .nameToken));
                 }
+
                 if (!costSet) continue;
                 EspHelper.DrawESPLabel(position, Colors.GetColor("Shop"), Color.clear, str.ToString());
             }
-        }
-
-        public void ModuleStart()
-        {
-            var configFile = Load.configFile;
-            
-            teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");
-            showTeleporterToggle.Set(teleporterEntry.Value);
-            chestEntry = configFile.Bind("ESP", "showChest", false, "");
-            showChestToggle.Set(chestEntry.Value);
-            shopEntry = configFile.Bind("ESP", "showShop", false, "");
-            showMultiShopToggle.Set(shopEntry.Value);
-            advancedEntry = configFile.Bind("ESP", "showAdvanced", false, "");
-            showAdvancedToggle.Set(advancedEntry.Value);
-
-            barrelEntry = configFile.Bind("ESP", "showBarrel", false, "");
-            showBarrelToggle.Set(barrelEntry.Value);
-            scrapperEntry = configFile.Bind("ESP", "showScrapper", false, "");
-            showScrapperToggle.Set(scrapperEntry.Value);
-            secretEntry = configFile.Bind("ESP", "showSecret", false, "");
-            ShowSecretToggle.Set(secretEntry.Value);
-            
-            duplicatorEntry = configFile.Bind("ESP", "showDuplicator", false, "");
-            showDuplicatorToggle.Set(duplicatorEntry.Value);
-            droneEntry = configFile.Bind("ESP", "showDrone", false, "");
-            showDroneToggle.Set(droneEntry.Value);
-            shrineEntry = configFile.Bind("ESP", "showShrine", false, "");
-            showShrineToggle.Set(shrineEntry.Value);
-        
-            showNewtAlterEntry = configFile.Bind("ESP", "showNewtAlter", false, "");
-            showNewtAlterToggle.Set(showNewtAlterEntry.Value);
-            
-            
-            if (Instance) return;
-            Instance = this;
-            
-            showTeleporterToggle.onValueChanged.AddListener(val => teleporterEntry.Value = val);
-            showChestToggle.onValueChanged.AddListener(val => chestEntry.Value = val);
-            showMultiShopToggle.onValueChanged.AddListener(val => shopEntry.Value = val);
-            showAdvancedToggle.onValueChanged.AddListener(val => advancedEntry.Value = val);
-            
-            
-            showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
-            showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
-            ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
-            showDuplicatorToggle.onValueChanged.AddListener(val => duplicatorEntry.Value = val);
-            showDroneToggle.onValueChanged.AddListener(val => droneEntry.Value = val);
-            showShrineToggle.onValueChanged.AddListener(val => shrineEntry.Value = val);
-            
-            showNewtAlterToggle.onValueChanged.AddListener(val => showNewtAlterEntry.Value = val);
-            
-            GatherObjects(); // these objects should exist by hud awake
         }
 
         private void GatherObjects()
@@ -175,19 +180,20 @@ namespace Aerolt.Classes
             if (TeleporterInteraction.instance)
             {
                 var teleporterInteraction = TeleporterInteraction.instance;
-                float distanceToObject = Vector3.Distance(Camera.main.transform.position, teleporterInteraction.transform.position);
-                int distance = (int)distanceToObject;
-                String friendlyName = "Teleporter";
+                var distanceToObject = Vector3.Distance(Camera.main.transform.position,
+                    teleporterInteraction.transform.position);
+                var distance = (int) distanceToObject;
+                var friendlyName = "Teleporter";
 
                 Color teleporterColor;
-                
-                switch(TeleporterInteraction.instance.currentState)
+
+                switch (TeleporterInteraction.instance.currentState)
                 {
                     case TeleporterInteraction.IdleState:
                         teleporterColor = Color.magenta;
                         break;
                     case TeleporterInteraction.ChargingState:
-                    case TeleporterInteraction.IdleToChargingState :
+                    case TeleporterInteraction.IdleToChargingState:
                         teleporterColor = Color.yellow;
                         break;
                     case TeleporterInteraction.ChargedState:
@@ -197,88 +203,88 @@ namespace Aerolt.Classes
                         teleporterColor = Color.red;
                         break;
                 }
-                
-                string status = TeleporterInteraction.instance.activationState.ToString();
-                
-                string boxText = $"{friendlyName}\n{status}\n{distance}m";
+
+                var status = TeleporterInteraction.instance.activationState.ToString();
+
+                var boxText = $"{friendlyName}\n{status}\n{distance}m";
                 EspHelper.DrawESPLabel(teleporterInteraction.transform.position, teleporterColor, Color.clear, boxText);
-                
             }
         }
-        
+
         private static void DrawBarrelInteractables()
         {
-            foreach (BarrelInteraction barrel in BarrelInteractions)
+            foreach (var barrel in BarrelInteractions)
             {
                 if (!barrel) continue;
                 if (!barrel.Networkopened)
                 {
-                    string friendlyName = "Barrel";
-                    float distance = (int)Vector3.Distance(Camera.main.transform.position, barrel.transform.position);
-                    string boxText = $"{friendlyName}\n{distance}m";
-                    
+                    var friendlyName = "Barrel";
+                    float distance = (int) Vector3.Distance(Camera.main.transform.position, barrel.transform.position);
+                    var boxText = $"{friendlyName}\n{distance}m";
+
                     if (Instance.showBarrelToggle.isOn || CheckCursorPosition(barrel.transform.position))
-                        EspHelper.DrawESPLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear,boxText);
+                        EspHelper.DrawESPLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear,
+                            boxText);
                     else
                         EspHelper.DrawESPLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear, "+");
                 }
             }
         }
+
         private static void DrawSecretInteractables()
         {
-            foreach (PressurePlateController secretButton in SecretButtons)
-            {
+            foreach (var secretButton in SecretButtons)
                 if (secretButton)
                 {
-                    string friendlyName = "Secret Button";
+                    var friendlyName = "Secret Button";
 
-                    float distance = (int)Vector3.Distance(Camera.main.transform.position, secretButton.transform.position);
-                    string boxText = $"{friendlyName}\n{distance}m";
-                    EspHelper.DrawESPLabel(secretButton.transform.position, Colors.GetColor("Secret_Plates"), Color.clear, boxText);
-                    
+                    float distance =
+                        (int) Vector3.Distance(Camera.main.transform.position, secretButton.transform.position);
+                    var boxText = $"{friendlyName}\n{distance}m";
+                    EspHelper.DrawESPLabel(secretButton.transform.position, Colors.GetColor("Secret_Plates"),
+                        Color.clear, boxText);
                 }
-            }
         }
+
         private static void DrawScrapperInteractables()
         {
-            foreach (ScrapperController scrapper in Scrappers)
-            {
+            foreach (var scrapper in Scrappers)
                 if (scrapper)
                 {
-                    string friendlyName = "Scrapper";
+                    var friendlyName = "Scrapper";
 
                     var position = scrapper.transform.position;
-                    float distance = (int)Vector3.Distance(Camera.main.transform.position, position);
-                    string boxText = $"{friendlyName}\n{distance}m";
+                    float distance = (int) Vector3.Distance(Camera.main.transform.position, position);
+                    var boxText = $"{friendlyName}\n{distance}m";
                     EspHelper.DrawESPLabel(position, Colors.GetColor("Scrappers"), Color.clear, boxText);
                 }
-            }
         }
+
         public static void DrawPurchaseInteractables()
         {
             foreach (var purchaseInteraction in PurchaseInteractions)
             {
                 if (!purchaseInteraction || !purchaseInteraction.available) continue;
-                
+
                 var chest = purchaseInteraction.GetComponent<ChestBehavior>();
-                if (chest && Instance.showChestToggle.isOn) 
+                if (chest && Instance.showChestToggle.isOn)
                     ShowChest(chest, purchaseInteraction);
 
                 var optionChest = purchaseInteraction.GetComponent<OptionChestBehavior>();
-                if (optionChest && Instance.showChestToggle.isOn) 
+                if (optionChest && Instance.showChestToggle.isOn)
                     ShowChest(optionChest, purchaseInteraction);
-                
+
                 var casinoChest = purchaseInteraction.GetComponent<RouletteChestController>();
-                if (casinoChest && Instance.showChestToggle.isOn) 
+                if (casinoChest && Instance.showChestToggle.isOn)
                     ShowChest(casinoChest, purchaseInteraction);
-                
-                var timedChest = purchaseInteraction.GetComponent<TimedChestController>(); // TODO this is not a purchase interaction
-                if (timedChest && Instance.showChestToggle.isOn) 
+
+                var timedChest =
+                    purchaseInteraction.GetComponent<TimedChestController>(); // TODO this is not a purchase interaction
+                if (timedChest && Instance.showChestToggle.isOn)
                     ShowChest(timedChest, purchaseInteraction);
 
                 var shopTerminal = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
                 if (shopTerminal)
-                {
                     if (Instance.showDuplicatorToggle.isOn)
                     {
                         if (purchaseInteraction.displayNameToken == "DUPLICATOR_NAME")
@@ -286,28 +292,17 @@ namespace Aerolt.Classes
                         if (purchaseInteraction.displayNameToken == "BAZAAR_CAULDRON_NAME")
                             ShowDuplicator("BAZAAR_CAULDRON_NAME", shopTerminal);
                     }
-                }
-                
+
                 var masterSummon = purchaseInteraction.GetComponent<SummonMasterBehavior>();
-                if (masterSummon && Instance.showDroneToggle.isOn)
-                {
-                    ShowDrone(purchaseInteraction);
-                }
+                if (masterSummon && Instance.showDroneToggle.isOn) ShowDrone(purchaseInteraction);
 
                 var nameProvider = purchaseInteraction.GetComponent<GenericDisplayNameProvider>();
                 if (nameProvider)
-                {
                     if (Instance.showShrineToggle.isOn && nameProvider.displayToken.ToUpper().Contains("SHRINE"))
-                    {
                         ShowShrine(purchaseInteraction);
-                    }
-                }
 
                 var portalBehaviour = purchaseInteraction.GetComponent<PortalStatueBehavior>();
-                if (portalBehaviour && Instance.showNewtAlterToggle.isOn)
-                {
-                    ShowNewtAlter(purchaseInteraction);
-                }
+                if (portalBehaviour && Instance.showNewtAlterToggle.isOn) ShowNewtAlter(purchaseInteraction);
             }
         }
 
@@ -320,56 +315,77 @@ namespace Aerolt.Classes
                     GetDistance(purchaseInteraction) + "\n-" + items + "s");
             }
             else
-                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");   
+            {
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    "+");
+            }
         }
 
-        private static void ShowChest(RouletteChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
+        private static void ShowChest(RouletteChestController optionChestBehavior,
+            PurchaseInteraction purchaseInteraction)
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
-                var items = optionChestBehavior.entries != null ? optionChestBehavior.entries.OrderByDescending(x =>
-                {
-                    var def = PickupCatalog.GetPickupDef(x.pickupIndex);
-                    return def != null && def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
-                }).Take(3).OrderBy(x => x.endTime.timeUntil).Select(x =>
-                {
-                    var def = PickupCatalog.GetPickupDef(x.pickupIndex);
-                    var tier = def != null && def.itemIndex != ItemIndex.None ? ItemCatalog.GetItemDef(def.itemIndex).tier : ItemTier.Tier1;
-                    var itemName = def != null && def.itemIndex != ItemIndex.None ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken) : Language.GetString(EquipmentCatalog.GetEquipmentDef(def?.equipmentIndex ?? EquipmentIndex.None).nameToken);
-                    return $"{itemName} : {tier} : {x.endTime.timeUntil:0.##}s";
-                }).ToArray() : new string[0];
+                var items = optionChestBehavior.entries != null
+                    ? optionChestBehavior.entries.OrderByDescending(x =>
+                    {
+                        var def = PickupCatalog.GetPickupDef(x.pickupIndex);
+                        return def != null && def.itemIndex != ItemIndex.None
+                            ? ItemCatalog.GetItemDef(def.itemIndex).tier
+                            : ItemTier.Tier1;
+                    }).Take(3).OrderBy(x => x.endTime.timeUntil).Select(x =>
+                    {
+                        var def = PickupCatalog.GetPickupDef(x.pickupIndex);
+                        var tier = def != null && def.itemIndex != ItemIndex.None
+                            ? ItemCatalog.GetItemDef(def.itemIndex).tier
+                            : ItemTier.Tier1;
+                        var itemName = def != null && def.itemIndex != ItemIndex.None
+                            ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
+                            : Language.GetString(EquipmentCatalog
+                                .GetEquipmentDef(def?.equipmentIndex ?? EquipmentIndex.None).nameToken);
+                        return $"{itemName} : {tier} : {x.endTime.timeUntil:0.##}s";
+                    }).ToArray()
+                    : new string[0];
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
                     GetDistance(purchaseInteraction) + "\n-" + string.Join("\n-", items));
             }
             else
-                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");        }
+            {
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    "+");
+            }
+        }
 
         private static void ShowNewtAlter(PurchaseInteraction purchaseInteraction)
         {
-            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("NewtAlter"), Color.clear, GetDistance(purchaseInteraction));
+            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("NewtAlter"), Color.clear,
+                GetDistance(purchaseInteraction));
         }
 
         private static void ShowShrine(PurchaseInteraction purchaseInteraction)
         {
             var position = purchaseInteraction.transform.position;
-            EspHelper.DrawESPLabel(position, Colors.GetColor("Shrine"), Color.clear, purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
+            EspHelper.DrawESPLabel(position, Colors.GetColor("Shrine"), Color.clear,
+                purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
         }
 
         private static void ShowDrone(PurchaseInteraction purchaseInteraction)
         {
-            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Drone"), Color.clear, GetDistance(purchaseInteraction));
+            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Drone"), Color.clear,
+                GetDistance(purchaseInteraction));
         }
 
         private static void ShowDuplicator(string token, ShopTerminalBehavior shopTerminal)
         {
-            var text = $"{Language.GetString(token)}\n{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n{shopTerminal.itemTier.ToString()}\n{GetDistance(shopTerminal.transform.position)}m";
+            var text =
+                $"{Language.GetString(token)}\n{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n{shopTerminal.itemTier.ToString()}\n{GetDistance(shopTerminal.transform.position)}m";
             EspHelper.DrawESPLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear, text);
         }
 
         public static float GetDistance(Vector3 position)
         {
             var distanceToObject = Vector3.Distance(Camera.main.transform.position, position);
-            var distance = (int)distanceToObject;
+            var distance = (int) distanceToObject;
             return distance;
         }
 
@@ -378,50 +394,65 @@ namespace Aerolt.Classes
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var def = PickupCatalog.GetPickupDef(chest.dropPickup);
-                var item = def != null ? def.itemIndex != ItemIndex.None ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken) : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken): "";
+                var item = def != null
+                    ? def.itemIndex != ItemIndex.None
+                        ?
+                        Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
+                        : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken)
+                    : "";
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
                     GetDistance(purchaseInteraction) + "\n" + item);
             }
             else
-                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
+            {
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    "+");
+            }
         }
+
         public static void ShowChest(OptionChestBehavior optionChestBehavior, PurchaseInteraction purchaseInteraction)
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
-                var items = optionChestBehavior.generatedDrops != null ? optionChestBehavior.generatedDrops.Select(x =>
-                {
-                    var def = PickupCatalog.GetPickupDef(x);
-                    return def.itemIndex != ItemIndex.None
-                        ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
-                        : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken);
-                }).ToArray() : new string[0];
+                var items = optionChestBehavior.generatedDrops != null
+                    ? optionChestBehavior.generatedDrops.Select(x =>
+                    {
+                        var def = PickupCatalog.GetPickupDef(x);
+                        return def.itemIndex != ItemIndex.None
+                            ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
+                            : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken);
+                    }).ToArray()
+                    : new string[0];
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
                     GetDistance(purchaseInteraction) + "\n-" + string.Join("\n-", items));
             }
             else
-                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear, "+");
+            {
+                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                    "+");
+            }
         }
+
         public static string GetDistance(PurchaseInteraction purchaseInteraction)
         {
-            float distanceToObject = Vector3.Distance(Camera.main.transform.position, purchaseInteraction.transform.position);
-            int distance = (int)distanceToObject;
-            String friendlyName = purchaseInteraction.GetDisplayName();
-            int cost = purchaseInteraction.cost;
+            var distanceToObject =
+                Vector3.Distance(Camera.main.transform.position, purchaseInteraction.transform.position);
+            var distance = (int) distanceToObject;
+            var friendlyName = purchaseInteraction.GetDisplayName();
+            var cost = purchaseInteraction.cost;
 
             return $"{friendlyName}\n${cost}\n{distance}m";
         }
-        
+
 
         public static bool CheckCursorPosition(Vector3 worldPos)
         {
             var mpEventSystem = LocalUserManager.GetFirstLocalUser().eventSystem;
             mpEventSystem.GetCursorPosition(out var cursorPos);
             cursorPos.y = Camera.main.pixelRect.height - cursorPos.y;
-            if (!mpEventSystem.isCursorVisible) 
+            if (!mpEventSystem.isCursorVisible)
                 cursorPos = Camera.main.pixelRect.center;
             return Vector3.Distance(EspHelper.WorldToScreen(worldPos), cursorPos) < 50;
         }
-        
     }
 }

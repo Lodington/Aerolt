@@ -1,8 +1,5 @@
-using System;
-using RoR2;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 namespace Aerolt.Overrides
 {
@@ -13,18 +10,14 @@ namespace Aerolt.Overrides
 
         public void Awake()
         {
-            int ran = Random.Range(0, 99);
+            var ran = Random.Range(0, 99);
 
-            if (ran < 1)
-            {
-                SwapThisImage();
-            }
+            if (ran < 1) SwapThisImage();
         }
-        
+
         public void SwapThisImage()
         {
             discord.sprite = imageToSwapTo;
         }
-        
     }
 }

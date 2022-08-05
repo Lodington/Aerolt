@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Aerolt.Classes;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
-using JetBrains.Annotations;
+using RiskOfOptions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,150 +12,162 @@ using ZioRiskOfOptions;
 
 namespace Aerolt.Helpers
 {
-	// Its set up this way, so we can put all the child recolorers on the prefabs we use in the variants and then on the variants just have this component, resulting in considerably less unity setup
-	public class ComponentColorer : MonoBehaviour, IModuleStartup
-	{
-		public string configName;
+    // Its set up this way, so we can put all the child recolorers on the prefabs we use in the variants and then on the variants just have this component, resulting in considerably less unity setup
+    public class ComponentColorer : MonoBehaviour, IModuleStartup
+    {
+        private static readonly Dictionary<ColorLayer, Color> defaultColors = new()
+        {
+            {ColorLayer.Foreground, new Color(0.3490196f, 0.3372549f, 0.9372549f)},
+            {
+                ColorLayer.Background, new Color(0.1176471f, 0.1098039f, 0.1490196f, 0.8509804f)
+            }, //new Color(0, 0, 0, 0.1960784f)},
+            {ColorLayer.Text, Color.white},
+            {ColorLayer.TextGrey, new Color(0.6705883f, 0.6666667f, 0.6941177f)},
+            {ColorLayer.Accent, new Color(0.9254902f, 0.3215686f, 0.4705882f)}
+        };
 
-		private static Dictionary<ColorLayer, Color> defaultColors = new()
-		{
-			{ColorLayer.Foreground, new Color(0.3490196f, 0.3372549f, 0.9372549f)},
-			{ColorLayer.Background, new Color(0.1176471f, 0.1098039f, 0.1490196f, 0.8509804f)}, //new Color(0, 0, 0, 0.1960784f)},
-			{ColorLayer.Text, Color.white},
-			{ColorLayer.TextGrey, new Color(0.6705883f, 0.6666667f, 0.6941177f)},
-			{ColorLayer.Accent, new Color(0.9254902f, 0.3215686f, 0.4705882f)},
-		};
-		public Dictionary<ColorLayer, ZioConfigEntryBase> colorEntries = new();
-		public Image toggleImage; // Might want to put these under their own config entry/color, especially this one considering its paired to the grey text color which is ew.
-		public Image toggleOnImage;
-		private MenuInfo menuInfo;
-		private bool initialized;
+        public string configName;
 
-		private void Awake()
-		{
-			ModuleStart();
-		}
+        public Image
+            toggleImage; // Might want to put these under their own config entry/color, especially this one considering its paired to the grey text color which is ew.
 
-		public void ModuleStart()
-		{
-			if (initialized) return;
-			menuInfo = GetComponentInParent<MenuInfo>();
-			var configFile = menuInfo.ConfigFile;
-			if (configFile == null) return;
+        public Image toggleOnImage;
+        public Dictionary<ColorLayer, ZioConfigEntryBase> colorEntries = new();
+        private bool initialized;
+        private MenuInfo menuInfo;
 
-			var i = 0;
-			foreach (var colorName in Enum.GetNames(typeof(ColorLayer)))
-			{
-				var definition = new ConfigDefinition($"{configName} Colors".Trim(), colorName);
+        private void Awake()
+        {
+            ModuleStart();
+        }
 
-				if (!configFile.TryGetValue(definition, out var entry))
-				{
-					entry = configFile.Bind(definition, defaultColors[(ColorLayer) i], new ConfigDescription($"{colorName} color of the window."));
-					if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions")) MakeRiskOfOptions(entry);
-				}
-				
-				colorEntries[(ColorLayer) i] = entry; 
-				i++;
-			}
+        public void ModuleStart()
+        {
+            if (initialized) return;
+            menuInfo = GetComponentInParent<MenuInfo>();
+            var configFile = menuInfo.ConfigFile;
+            if (configFile == null) return;
 
-			colorEntries[ColorLayer.TextGrey].SettingChanged += ColorChanged;
-			ColorChanged(colorEntries[ColorLayer.TextGrey], null, false);
-			colorEntries[ColorLayer.Foreground].SettingChanged += ColorChangedOn;
-			ColorChangedOn(colorEntries[ColorLayer.Foreground], null, false);
-			initialized = true;
-		}
+            var i = 0;
+            foreach (var colorName in Enum.GetNames(typeof(ColorLayer)))
+            {
+                var definition = new ConfigDefinition($"{configName} Colors".Trim(), colorName);
 
-		private void MakeRiskOfOptions(ZioConfigEntryBase value)
-		{
-			var who = menuInfo ? Load.Name + " " + menuInfo.Owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
-			RiskOfOptions.ModSettingsManager.AddOption(new ZioColorOption((ZioConfigEntry<Color>) value), who, who);
-		}
+                if (!configFile.TryGetValue(definition, out var entry))
+                {
+                    entry = configFile.Bind(definition, defaultColors[(ColorLayer) i],
+                        new ConfigDescription($"{colorName} color of the window."));
+                    if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions")) MakeRiskOfOptions(entry);
+                }
 
-		private void ColorChangedOn(ZioConfigEntryBase arg1, object arg2, bool arg3)
-		{
-			if (!toggleOnImage) return;
-			toggleOnImage.color = (Color) arg1.BoxedValue;
-		}
+                colorEntries[(ColorLayer) i] = entry;
+                i++;
+            }
 
-		private void ColorChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
-		{
-			if (!toggleImage) return;
-			toggleImage.color = (Color) arg1.BoxedValue;
-		}
+            colorEntries[ColorLayer.TextGrey].SettingChanged += ColorChanged;
+            ColorChanged(colorEntries[ColorLayer.TextGrey], null, false);
+            colorEntries[ColorLayer.Foreground].SettingChanged += ColorChangedOn;
+            ColorChangedOn(colorEntries[ColorLayer.Foreground], null, false);
+            initialized = true;
+        }
 
-		public void ModuleEnd()
-		{
-			colorEntries[ColorLayer.TextGrey].SettingChanged -= ColorChanged;
-			colorEntries[ColorLayer.Foreground].SettingChanged -= ColorChangedOn;
-		}
-	}
+        public void ModuleEnd()
+        {
+            colorEntries[ColorLayer.TextGrey].SettingChanged -= ColorChanged;
+            colorEntries[ColorLayer.Foreground].SettingChanged -= ColorChangedOn;
+        }
 
-	public abstract class ColorableComponent : MonoBehaviour
-	{
-		private ZioConfigEntryBase parent;
+        private void MakeRiskOfOptions(ZioConfigEntryBase value)
+        {
+            var who = menuInfo ? Load.Name + " " + menuInfo.Owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
+            ModSettingsManager.AddOption(new ZioColorOption((ZioConfigEntry<Color>) value), who, who);
+        }
 
-		private void Awake()
-		{
-			var colorer = GetComponentInParent<ComponentColorer>();
-			if (!colorer)
-			{
-				failedToSetUp = true;
-				return;
-			}
-			if (colorer.colorEntries.TryGetValue(colorLayer, out parent))
-				parent.SettingChanged += Colorize;
-		}
+        private void ColorChangedOn(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        {
+            if (!toggleOnImage) return;
+            toggleOnImage.color = (Color) arg1.BoxedValue;
+        }
 
-		private void OnEnable()
-		{
-			if (parent != null)
-				Colorize(parent, null, false);
-		}
+        private void ColorChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        {
+            if (!toggleImage) return;
+            toggleImage.color = (Color) arg1.BoxedValue;
+        }
+    }
 
-		private void LateUpdate() // Catch the dropdown entries, they dont have a parent when awake is fired.
-		{
-			if (!failedToSetUp) return;
-			failedToSetUp = false;
-			Awake();
-			if (!failedToSetUp) OnEnable();
-			else throw new InvalidOperationException("Colorable Component still failed to set up after late update.");
-		}
+    public abstract class ColorableComponent : MonoBehaviour
+    {
+        public ColorLayer
+            colorLayer =
+                ColorLayer.Foreground; // this cant be a property for some fucking reason unity wont serialize it
 
-		private void OnDestroy()
-		{
-			if (parent != null)
-				parent.SettingChanged -= Colorize;
-		}
+        protected Color Color;
+        private bool failedToSetUp;
+        private ZioConfigEntryBase parent;
 
-		public ColorLayer colorLayer = ColorLayer.Foreground; // this cant be a property for some fucking reason unity wont serialize it
-		public abstract void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _);
+        private void Awake()
+        {
+            var colorer = GetComponentInParent<ComponentColorer>();
+            if (!colorer)
+            {
+                failedToSetUp = true;
+                return;
+            }
 
-		protected Color Color;
-		private bool failedToSetUp;
-	}
+            if (colorer.colorEntries.TryGetValue(colorLayer, out parent))
+                parent.SettingChanged += Colorize;
+        }
 
-	public class ColorableText : ColorableComponent
-	{
-		public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
-		{
-			GetComponent<TextMeshProUGUI>().color = (Color) configEntry.BoxedValue;
-		}
-	}
-	public class ColorableImage : ColorableComponent
-	{
-		public float alphaMult = 1f;
-		public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
-		{
-			var color = (Color) configEntry.BoxedValue;
-			color.a *= alphaMult;
-			GetComponent<Image>().color = color;
-		}
-	}
-	public class ColorableRawImage : ColorableComponent
-	{
-		public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
-		{
-			GetComponent<RawImage>().color = (Color) configEntry.BoxedValue;
-		}
-	}
+        private void LateUpdate() // Catch the dropdown entries, they dont have a parent when awake is fired.
+        {
+            if (!failedToSetUp) return;
+            failedToSetUp = false;
+            Awake();
+            if (!failedToSetUp) OnEnable();
+            else throw new InvalidOperationException("Colorable Component still failed to set up after late update.");
+        }
+
+        private void OnEnable()
+        {
+            if (parent != null)
+                Colorize(parent, null, false);
+        }
+
+        private void OnDestroy()
+        {
+            if (parent != null)
+                parent.SettingChanged -= Colorize;
+        }
+
+        public abstract void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _);
+    }
+
+    public class ColorableText : ColorableComponent
+    {
+        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        {
+            GetComponent<TextMeshProUGUI>().color = (Color) configEntry.BoxedValue;
+        }
+    }
+
+    public class ColorableImage : ColorableComponent
+    {
+        public float alphaMult = 1f;
+
+        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        {
+            var color = (Color) configEntry.BoxedValue;
+            color.a *= alphaMult;
+            GetComponent<Image>().color = color;
+        }
+    }
+
+    public class ColorableRawImage : ColorableComponent
+    {
+        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        {
+            GetComponent<RawImage>().color = (Color) configEntry.BoxedValue;
+        }
+    }
 }

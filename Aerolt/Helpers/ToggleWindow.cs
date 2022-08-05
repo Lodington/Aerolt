@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Aerolt.Enums;
-using Aerolt.Managers;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using RiskOfOptions;
@@ -15,13 +14,28 @@ namespace Aerolt.Classes
 {
     public class ToggleWindow : MonoBehaviour
     {
-        private bool _menuIsOpen = true;
+        private static readonly List<ConfigDefinition> roo = new();
 
         public GameObject panel;
-        [NonSerialized] public NetworkUser owner;
+        private bool _menuIsOpen = true;
         private MenuInfo menuInfo;
-        private static List<ConfigDefinition> roo = new();
+        [NonSerialized] public NetworkUser owner;
         private ZioConfigEntry<bool> visible;
+
+        public void Update()
+        {
+            if (!owner) return;
+            var localUser = LocalUserManager.GetFirstLocalUser();
+            var isFirst = localUser == owner.localUser;
+            if (isFirst && Load.GetKeyPressed(Load.KeyBinds[ButtonNames.OpenMenu]))
+                WindowToggle();
+        }
+
+        private void OnDestroy()
+        {
+            Load.aeroltUIs.Remove(owner);
+            visible.SettingChanged -= VisibleOnSettingChanged;
+        }
 
         public void Init(NetworkUser owner, MenuInfo info)
         {
@@ -34,8 +48,10 @@ namespace Aerolt.Classes
                 Destroy(transform.parent.gameObject);
                 return;
             }
+
             Invoke(nameof(WindowToggle), 0.01f);
-            visible = menuInfo.ConfigFile.Bind("General", "Show Icon", true, "You should probably leave this on if you're using a gamepad.");
+            visible = menuInfo.ConfigFile.Bind("General", "Show Icon", true,
+                "You should probably leave this on if you're using a gamepad.");
             visible.SettingChanged += VisibleOnSettingChanged;
             if (!roo.Contains(visible.Definition) && Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
                 MakeRiskOfOptions(visible);
@@ -53,27 +69,12 @@ namespace Aerolt.Classes
             roo.Add(visible.Definition);
         }
 
-        public void Update()
-        {
-            if (!owner) return;
-            var localUser = LocalUserManager.GetFirstLocalUser();
-            var isFirst = localUser == owner.localUser;
-            if (isFirst && Load.GetKeyPressed(Load.KeyBinds[ButtonNames.OpenMenu]))
-                WindowToggle();
-        }
-        
         public void WindowToggle()
         {
             _menuIsOpen = !_menuIsOpen;
             panel.SetActive(_menuIsOpen);
             if (_menuIsOpen)
                 menuInfo.FuckingUnitySorting();
-        }
-
-        private void OnDestroy()
-        {
-            Load.aeroltUIs.Remove(owner);
-            visible.SettingChanged -= VisibleOnSettingChanged;
         }
     }
 }

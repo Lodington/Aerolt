@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Aerolt.Enums;
-using UnityEngine;
 
 namespace Aerolt.Helpers
 {
@@ -10,18 +9,17 @@ namespace Aerolt.Helpers
     {
         public static T[] FindMatches<T>(T[] toMatch, Func<T, string> toString, string filter)
         {
-            Regex filterRegex = new Regex(filter, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            List<T> matches = new List<T>();
-            foreach (T obj in toMatch)
-            {
-                if (filterRegex.IsMatch(toString(obj))) matches.Add(obj);
-            }
+            var filterRegex = new Regex(filter, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            var matches = new List<T>();
+            foreach (var obj in toMatch)
+                if (filterRegex.IsMatch(toString(obj)))
+                    matches.Add(obj);
             return matches.ToArray();
         }
 
         public static void Log(LogLevel level, object s)
         {
-            switch (level) 
+            switch (level)
             {
                 case LogLevel.Warning:
                     Load.Log.LogWarning(s.ToString());

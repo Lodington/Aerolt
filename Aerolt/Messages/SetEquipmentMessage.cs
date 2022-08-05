@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Generic;
 using Aerolt.Managers;
 using RoR2;
 using UnityEngine.Networking;
@@ -8,10 +7,12 @@ namespace Aerolt.Messages
 {
     public class SetEquipmentMessage : AeroltMessageBase
     {
-        private Inventory inventory;
         private Dictionary<EquipmentDef, int> equipmentCounts;
+        private Inventory inventory;
 
-        public SetEquipmentMessage() {}
+        public SetEquipmentMessage()
+        {
+        }
 
         public SetEquipmentMessage(Inventory inventory, Dictionary<EquipmentDef, int> equipmentCounts)
         {
@@ -48,9 +49,7 @@ namespace Aerolt.Messages
         {
             base.Handle();
             foreach (var equipment in equipmentCounts)
-            {
                 inventory.SetEquipmentIndex(equipment.Key ? equipment.Key.equipmentIndex : EquipmentIndex.None);
-            }
         }
     }
 }

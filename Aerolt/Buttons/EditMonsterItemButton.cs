@@ -19,29 +19,31 @@ namespace Aerolt.Buttons
         public GameObject buttonParent;
 
         public GameObject itemListParent;
-
-        public virtual Dictionary<ItemDef, int> itemDef => MonsterButtonGenerator.ItemDef;
         protected Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
         private ZioConfigEntry<int> sortModeEntry;
+
+        public virtual Dictionary<ItemDef, int> itemDef => MonsterButtonGenerator.ItemDef;
 
         public void Awake()
         {
             if (sortMode)
             {
                 sortMode.options.Clear();
-                sortMode.AddOptions(new List<string>()
+                sortMode.AddOptions(new List<string>
                 {
                     "Tier Descending",
                     "Name Descending",
                     "Tier Ascending",
-                    "Name Ascending",
+                    "Name Ascending"
                 });
                 sortMode.onValueChanged.AddListener(Sort);
             }
-            if(searchFilter)
+
+            if (searchFilter)
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
             foreach (var def in ContentManager._itemDefs)
-                itemDefRef[def] = new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
+                itemDefRef[def] =
+                    new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
         }
 
         public void Sort(int _)
@@ -53,19 +55,13 @@ namespace Aerolt.Buttons
         {
             if (text.IsNullOrWhiteSpace())
             {
-                foreach (var buttonGen in itemDefRef)
-                {
-                    buttonGen.Value.button.SetActive(true);
-                }
+                foreach (var buttonGen in itemDefRef) buttonGen.Value.button.SetActive(true);
                 return;
             }
 
             var arr = itemDefRef.Values.ToArray();
             var matches = Tools.FindMatches(arr, x => Language.GetString(x.def.nameToken), text);
-            foreach (var buttonGen in arr)
-            {
-                buttonGen.button.SetActive(matches.Contains(buttonGen));
-            }
+            foreach (var buttonGen in arr) buttonGen.button.SetActive(matches.Contains(buttonGen));
         }
 
         public void Sort()

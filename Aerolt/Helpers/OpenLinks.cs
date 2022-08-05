@@ -1,44 +1,44 @@
 using System.Globalization;
 using Aerolt.Enums;
+using RoR2;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
-using Console = RoR2.Console;
 
 namespace Aerolt.Helpers
 {
     [RequireComponent(typeof(TextMeshProUGUI))]
     [RequireComponent(typeof(EventTrigger))]
-    public class JoinLobbyOnClick : MonoBehaviour {
-
-        [SerializeField]
-        private TextMeshProUGUI textMessage;
+    public class JoinLobbyOnClick : MonoBehaviour
+    {
+        [SerializeField] private TextMeshProUGUI textMessage;
 
         private EventTrigger _eventTrigger;
-        void Start()
+
+        private void Start()
         {
             _eventTrigger = GetComponent<EventTrigger>();
             _eventTrigger.AddEventTrigger(OnPointerClick, EventTriggerType.PointerDown);
         }
 
         // Get link and open page
-        public void OnPointerClick (BaseEventData eventData)
+        public void OnPointerClick(BaseEventData eventData)
         {
-            if (eventData.currentInputModule.input.GetMouseButtonDown((int) MouseButton.LeftMouse)) 
+            if (eventData.currentInputModule.input.GetMouseButtonDown((int) MouseButton.LeftMouse))
             {
-                int linkIndex = TMP_TextUtilities.FindIntersectingLink (textMessage, Input.mousePosition, null);
-                if (linkIndex == -1) 
+                var linkIndex = TMP_TextUtilities.FindIntersectingLink(textMessage, Input.mousePosition, null);
+                if (linkIndex == -1)
                     return;
                 var linkInfo = textMessage.textInfo.linkInfo[linkIndex];
-                string selectedLink = linkInfo.GetLinkID();
-                if (selectedLink != "") {
+                var selectedLink = linkInfo.GetLinkID();
+                if (selectedLink != "")
+                {
                     Tools.Log(LogLevel.Information, $"Joining Lobby {selectedLink}");
-                    Console.instance.SubmitCmd(null, string.Format(CultureInfo.InvariantCulture, "steam_lobby_join {0}", selectedLink), true);
+                    Console.instance.SubmitCmd(null,
+                        string.Format(CultureInfo.InvariantCulture, "steam_lobby_join {0}", selectedLink), true);
                 }
             }
-           
         }
-
     }
 }

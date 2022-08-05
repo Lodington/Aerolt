@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
+﻿using System.Collections.Generic;
 using System.Security;
 using System.Security.Permissions;
-using System.Threading.Tasks;
 using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Managers;
 using Aerolt.Overrides;
+using Aerolt.Social;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -17,17 +15,18 @@ using HarmonyLib;
 using RiskOfOptions;
 using RoR2;
 using RoR2.UI;
-using RoR2.UI.MainMenu;
 using UnityEngine;
 using ZioConfigFile;
 using ZioRiskOfOptions;
-using Aerolt.Social;
+using LogLevel = Aerolt.Enums.LogLevel;
+using Path = System.IO.Path;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 #pragma warning restore CS0618 // Type or member is obsolete
 [module: UnverifiableCode]
-namespace Aerolt 
+
+namespace Aerolt
 {
     [BepInPlugin(Guid, Name, Version)]
     [BepInDependency("bubbet.zioriskofoptions")]
@@ -39,13 +38,13 @@ namespace Aerolt
         public static ManualLogSource Log;
         public static GameObject _co;
         public static AssetBundle _assets;
-        
+
         public static GameObject chatWindow;
         public static GameObject settingsRoot;
-        
+
         public static Load Instance;
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
-        
+
         public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
         private static GameObject settingsUI;
         public static ZioConfigFile.ZioConfigFile configFile;
@@ -58,29 +57,34 @@ namespace Aerolt
             Instance = this;
             Log = Logger;
 
-            var path = System.IO.Path.GetDirectoryName(Info.Location);
-            _assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(path!, "aeroltbundle"));
-            Tools.Log(Enums.LogLevel.Information, "Loaded AssetBundle");
-            _co = _assets.LoadAsset<GameObject>("PlayerCanvas"); 
+            var path = Path.GetDirectoryName(Info.Location);
+            _assets = AssetBundle.LoadFromFile(Path.Combine(path!, "aeroltbundle"));
+            Tools.Log(LogLevel.Information, "Loaded AssetBundle");
+            _co = _assets.LoadAsset<GameObject>("PlayerCanvas");
             _assets.LoadAsset<GameObject>("AeroltUI");
 
             chatWindow = _assets.LoadAsset<GameObject>("ChatWindow");
             DontDestroyOnLoad(chatWindow);
-            
+
             NetworkManager.Initialize();
-            
-        }
-        public void OnGUI()
-        {
-            if(!Esp.Instance)
-                return;
-            Esp.Draw();
         }
 
         public void Start()
         {
             RoR2Application.onLoad += GameLoad;
             HUD.shouldHudDisplay += CreateHud;
+        }
+
+        private void OnDestroy()
+        {
+            WebSocketClient.DisconnectClient();
+        }
+
+        public void OnGUI()
+        {
+            if (!Esp.Instance)
+                return;
+            Esp.Draw();
         }
 
         public static bool GetKeyPressed(ZioConfigEntry<KeyboardShortcut> entry)
@@ -90,27 +94,23 @@ namespace Aerolt
                     return false;
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        
+
         private void GameLoad()
         {
             configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             CreateKeyBindSettings();
             Colors.InitColors();
-            
+
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
 
             StartCoroutine(WebSocketClient.ConnectClient());
         }
 
-        private void OnDestroy()
-        {
-            WebSocketClient.DisconnectClient();
-        }
-
         private void CreateKeyBindSettings()
         {
-            KeyBinds.Add(ButtonNames.OpenMenu, configFile.Bind("Keybinds", "OpenMenu", new KeyboardShortcut(KeyCode.F1)));
+            KeyBinds.Add(ButtonNames.OpenMenu,
+                configFile.Bind("Keybinds", "OpenMenu", new KeyboardShortcut(KeyCode.F1)));
             if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
                 MakeRiskOfOptions();
         }
@@ -136,7 +136,7 @@ namespace Aerolt
             tempViewer = null;
             tempHud = null;
             aeroltUIs.Add(viewer, ui);
-            Tools.Log(Enums.LogLevel.Information, "Created UI");
+            Tools.Log(LogLevel.Information, "Created UI");
         }
     }
 }

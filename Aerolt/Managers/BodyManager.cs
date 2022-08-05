@@ -12,27 +12,29 @@ namespace Aerolt.Managers
 {
     public class BodyManager : MonoBehaviour
     {
-
         public GameObject buttonPrefab;
         public GameObject buttonParent;
-        
-        private GameObject _newBody;
-        private NetworkUser target;
         public TMP_InputField searchFilter;
-        private Dictionary<CharacterBody, CustomButton> bodyDefRef = new();
+
+        private GameObject _newBody;
+        private readonly Dictionary<CharacterBody, CustomButton> bodyDefRef = new();
+        private NetworkUser target;
 
         private void Awake()
         {
-            foreach(var body in BodyCatalog.allBodyPrefabBodyBodyComponents.OrderBy(x => Language.GetString(x.baseNameToken)))
+            foreach (var body in BodyCatalog.allBodyPrefabBodyBodyComponents.OrderBy(x =>
+                Language.GetString(x.baseNameToken)))
             {
-                GameObject newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                var customButton = newButton.GetComponent<CustomButton>(); 
+                var newButton = Instantiate(buttonPrefab, buttonParent.transform);
+                var customButton = newButton.GetComponent<CustomButton>();
                 customButton.buttonText.text = Language.GetString(body.baseNameToken);
-                customButton.image.sprite = Sprite.Create((Texture2D)body.portraitIcon, new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
+                customButton.image.sprite = Sprite.Create((Texture2D) body.portraitIcon,
+                    new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 customButton.button.onClick.AddListener(() => SetBodyDef(body));
                 bodyDefRef[body] = customButton;
             }
-            if(searchFilter)
+
+            if (searchFilter)
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
@@ -52,24 +54,18 @@ namespace Aerolt.Managers
         {
             target = currentUser;
         }
+
         private void FilterUpdated(string text)
         {
             if (text.IsNullOrWhiteSpace())
             {
-                foreach (var buttonGen in bodyDefRef)
-                {
-                    buttonGen.Value.gameObject.SetActive(true);
-                }
+                foreach (var buttonGen in bodyDefRef) buttonGen.Value.gameObject.SetActive(true);
                 return;
             }
-            
+
             var arr = bodyDefRef.Values.ToArray();
             var matches = Tools.FindMatches(arr, x => x.buttonText.text, text);
-            foreach (var buttonGen in arr)
-            {
-                buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
-            }
+            foreach (var buttonGen in arr) buttonGen.gameObject.SetActive(matches.Contains(buttonGen));
         }
     }
-    
 }

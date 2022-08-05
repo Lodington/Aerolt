@@ -1,48 +1,41 @@
-using System;
 using System.Linq;
 using Aerolt.Classes;
-using Aerolt.Managers;
 using BepInEx.Bootstrap;
 using RiskOfOptions.Components.Panel;
 using RoR2;
 using RoR2.UI;
 using UnityEngine;
-using Console = RoR2.Console;
 
 namespace Aerolt.Helpers
 {
     public class SettingsOpener : MonoBehaviour
     {
-        private OpenState openSettings;
-        private LocalUser localuser;
         private Transform headerTransform;
+        private LocalUser localuser;
+        private OpenState openSettings;
 
         public void Awake()
         {
             localuser = GetComponentInParent<MenuInfo>().Owner.localUser;
         }
 
-        public void OpenSettingsForced()
-        {
-            Console.instance.SubmitCmd(null, "pause", false); // This is how you do it, apparently splitscreen users do not have their own pause screen despite it being mostly implemented that way.
-            if (localuser != null)
-                openSettings = OpenState.WaitingForPause;
-        }
-
         private void Update()
         {
             if (openSettings == OpenState.Idle) return;
-            var screen = PauseScreenController.instancesList.FirstOrDefault(x => x.eventSystemProvider.resolvedEventSystem == localuser?.eventSystem);
+            var screen = PauseScreenController.instancesList.FirstOrDefault(x =>
+                x.eventSystemProvider.resolvedEventSystem == localuser?.eventSystem);
             switch (openSettings)
             {
                 case OpenState.WaitingForPause:
                     if (screen && Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
                     {
                         screen.OpenSettingsMenu();
-                        headerTransform = screen.submenuObject.transform.Find("SafeArea/HeaderContainer/Header (JUICED)");
+                        headerTransform =
+                            screen.submenuObject.transform.Find("SafeArea/HeaderContainer/Header (JUICED)");
                         openSettings = OpenState.WaitingForRoO;
                         return;
                     }
+
                     break;
                 case OpenState.WaitingForRoO:
                     var modSettings = headerTransform.Find("GenericHeaderButton (Mod Options)");
@@ -51,12 +44,22 @@ namespace Aerolt.Helpers
                         modSettings.GetComponent<HGButton>().InvokeClick();
                         openSettings = OpenState.WaitingForCategory;
                     }
+
                     return;
                 case OpenState.WaitingForCategory:
                     OpenSettings(screen);
                     return;
             }
+
             openSettings = OpenState.Idle;
+        }
+
+        public void OpenSettingsForced()
+        {
+            Console.instance.SubmitCmd(null,
+                "pause"); // This is how you do it, apparently splitscreen users do not have their own pause screen despite it being mostly implemented that way.
+            if (localuser != null)
+                openSettings = OpenState.WaitingForPause;
         }
 
         private void OpenSettings(PauseScreenController screen)

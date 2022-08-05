@@ -1,6 +1,6 @@
 namespace Aerolt.Enums
 {
-    public enum LogLevel 
+    public enum LogLevel
     {
         Warning,
         Information,

@@ -9,7 +9,6 @@ using RoR2;
 using RoR2.ContentManagement;
 using TMPro;
 using UnityEngine;
-
 using ZioConfigFile;
 
 namespace Aerolt.Buttons
@@ -22,48 +21,44 @@ namespace Aerolt.Buttons
         public GameObject buttonParent;
 
         public GameObject itemListParent;
-        
-        private Dictionary<ItemDef, int> itemDef = new();
-        private Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
-        private NetworkUser user;
+
+        private readonly Dictionary<ItemDef, int> itemDef = new();
+        private readonly Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
         private ZioConfigEntry<int> sortModeEntry;
+        private NetworkUser user;
 
         public void Awake()
         {
             if (sortMode)
             {
                 sortMode.options.Clear();
-                sortMode.AddOptions(new List<string>()
+                sortMode.AddOptions(new List<string>
                 {
                     "Tier Descending",
                     "Name Descending",
                     "Tier Ascending",
-                    "Name Ascending",
+                    "Name Ascending"
                 });
             }
-            if(searchFilter)
+
+            if (searchFilter)
                 searchFilter.m_OnEndEdit.AddListener(FilterUpdated);
             foreach (var def in ContentManager._itemDefs)
-                itemDefRef[def] = new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
+                itemDefRef[def] =
+                    new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
         }
 
         private void FilterUpdated(string text)
         {
             if (text.IsNullOrWhiteSpace())
             {
-                foreach (var buttonGen in itemDefRef)
-                {
-                    buttonGen.Value.button.SetActive(true);
-                }
+                foreach (var buttonGen in itemDefRef) buttonGen.Value.button.SetActive(true);
                 return;
             }
 
             var arr = itemDefRef.Values.ToArray();
-            var matches = Tools.FindMatches(arr, (x) => Language.GetString(x.def.nameToken), text);
-            foreach (var buttonGen in arr)
-            {
-                buttonGen.button.SetActive(matches.Contains(buttonGen));
-            }
+            var matches = Tools.FindMatches(arr, x => Language.GetString(x.def.nameToken), text);
+            foreach (var buttonGen in arr) buttonGen.button.SetActive(matches.Contains(buttonGen));
         }
 
         private void Sort()
@@ -97,10 +92,8 @@ namespace Aerolt.Buttons
         {
             user = currentUser;
             foreach (var def in ContentManager._itemDefs)
-            {
                 itemDefRef[def].SetAmount(user.master.inventory.GetItemCount(def));
-            }
-            
+
             Sort();
         }
     }

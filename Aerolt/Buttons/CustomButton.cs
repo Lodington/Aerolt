@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using JetBrains.Annotations;
-using RoR2;
 using RoR2.UI;
 using TMPro;
 using UnityEngine;
@@ -18,12 +16,35 @@ namespace Aerolt.Buttons
         public TMP_Text buttonText;
         public Image image;
         public RawImage rawImage;
-        public Button button => _button ??= GetComponent<Button>();
         public Button.ButtonClickedEvent onRightClick;
-        
-        private MPEventSystemLocator eventSystemLocator;
         [CanBeNull] private Button _button;
+
+        private MPEventSystemLocator eventSystemLocator;
+        public Button button => _button ??= GetComponent<Button>();
         public MPEventSystem EventSystem => eventSystemLocator.eventSystem;
+
+        public void Awake()
+        {
+            eventSystemLocator = GetComponent<MPEventSystemLocator>();
+        }
+
+        public void Update()
+        {
+            if (!eventSystemLocator) return;
+            if (!EventSystem) return;
+            if (!EventSystem.currentInputModule) return;
+            if ((EventSystem.currentInputModule.input.GetMouseButtonDown((int) MouseButton.RightMouse) ||
+                 EventSystem.currentInputSource == MPEventSystem.InputSource.Gamepad &&
+                 EventSystem.player.GetButtonDown(5)) &&
+                EventSystem.currentSelectedGameObject == gameObject) InvokeRightClick();
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (eventSystemLocator) return; // dont send the event if we're already handling it via mpeventsystem
+            if (eventData.button == PointerEventData.InputButton.Right) InvokeRightClick();
+        }
+
         public void InvokeRightClick()
         {
             onRightClick?.Invoke();
@@ -32,6 +53,7 @@ namespace Aerolt.Buttons
             button.DoStateTransition(Selectable.SelectionState.Pressed, false);
             StartCoroutine(OnFinishSubmit());
         }
+
         private IEnumerator OnFinishSubmit()
         {
             var fadeTime = button.colors.fadeDuration;
@@ -41,28 +63,8 @@ namespace Aerolt.Buttons
                 elapsedTime += Time.unscaledDeltaTime;
                 yield return null;
             }
-            button.DoStateTransition(button.currentSelectionState, false);
-        }
 
-        public void Awake()
-        {
-            eventSystemLocator = GetComponent<MPEventSystemLocator>();
-        }
-        public void Update()
-        {
-            if (!eventSystemLocator) return;
-            if (!EventSystem) return;
-            if (!EventSystem.currentInputModule) return;
-            if ((EventSystem.currentInputModule.input.GetMouseButtonDown((int) MouseButton.RightMouse) || EventSystem.currentInputSource == MPEventSystem.InputSource.Gamepad && EventSystem.player.GetButtonDown(5)) && EventSystem.currentSelectedGameObject == gameObject)
-            {
-                InvokeRightClick();
-            }
-        }
-        
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            if (eventSystemLocator) return; // dont send the event if we're already handling it via mpeventsystem
-            if (eventData.button == PointerEventData.InputButton.Right) InvokeRightClick();
+            button.DoStateTransition(button.currentSelectionState, false);
         }
     }
 }
