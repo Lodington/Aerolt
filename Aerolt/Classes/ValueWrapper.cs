@@ -17,14 +17,29 @@ namespace Aerolt.Classes
 			if (Instances.TryGetValue(key, out var wrapper)) wrapper.SetValue(value);
 		}
 
-		public static ValueWrapper<T> Get<T>(string category, string name, T defaultValue, string description, NetworkUser who = null)
+		/// <summary>
+		/// Get or Create a ValueWrapper.
+		/// </summary>
+		/// <param name="category">Config Category</param>
+		/// <param name="name">Config Name</param>
+		/// <param name="defaultValue"></param>
+		/// <param name="description">Config Description</param>
+		/// <param name="who">The network user its paired to, can be null and will fallback on Load.configFile and be stored on all clients.</param>
+		/// <param name="forceLocalOrRemote">
+		/// Null is default behaviour, and doesnt override if its stored locally or remote.
+		/// True forces it to be stored locally/on disk, either on the <paramref name="who"/> or fallback to Load.configFile.
+		/// False forces it to not be stored on disk, and discards <paramref name="who"/>. <paramref name="who"/> will only be used for the identifier. 
+		/// </param>
+		/// <typeparam name="T">Any <see cref="ZioConfigEntry{T}"/> serializable type.</typeparam>
+		/// <returns></returns>
+		public static ValueWrapper<T> Get<T>(string category, string name, T defaultValue, string description, NetworkUser who = null, bool? forceLocalOrRemote = null)
 		{
 			if (Instances.TryGetValue(GetId(who) + category + name, out var entry))
 			{
 				var centry = (ValueWrapper<T>) entry;
 				return centry;
 			}
-			var val = new ValueWrapper<T>(category, name, defaultValue, description, who);
+			var val = new ValueWrapper<T>(category, name, defaultValue, description, who, forceLocalOrRemote);
 			return val;
 		}
 
@@ -50,10 +65,10 @@ namespace Aerolt.Classes
 			return $"{nameof(ValueWrapper)}({identifier}: {Value})";
 		}
 		
-		public ValueWrapper(string category, string name, T defaultValue, string description, NetworkUser who = null)
+		public ValueWrapper(string category, string name, T defaultValue, string description, NetworkUser who = null, bool? forceLocalOrRemote = null) // force = true, it will be a local : force = false, it will be remote 
 		{
 			user = who;
-			if (!who || who.localUser != null)
+			if (forceLocalOrRemote.HasValue && forceLocalOrRemote.Value || !who && !forceLocalOrRemote.HasValue || !forceLocalOrRemote.HasValue && who.localUser != null)
 			{
 				isLocalBinding = true;
 				var file = who ? MenuInfo.Files[who.localUser!] : Load.configFile;
