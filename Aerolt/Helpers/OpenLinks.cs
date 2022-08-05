@@ -1,7 +1,4 @@
-using System;
 using System.Globalization;
-using System.Text.RegularExpressions;
-using Aerolt.Social;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -21,12 +18,13 @@ namespace Aerolt.Helpers
         void Start()
         {
             _eventTrigger = GetComponent<EventTrigger>();
-            _eventTrigger.AddEventTrigger(OnPointerClick, EventTriggerType.PointerClick);
+            _eventTrigger.AddEventTrigger(OnPointerClick, EventTriggerType.PointerDown);
         }
 
         // Get link and open page
-        public void OnPointerClick (BaseEventData eventData) {
-            if (eventData.currentInputModule.input.GetMouseButton((int) MouseButton.LeftMouse))
+        public void OnPointerClick (BaseEventData eventData)
+        {
+            if (eventData.currentInputModule.input.GetMouseButtonDown((int) MouseButton.LeftMouse)) 
             {
                 Debug.Log("YEs");
                 int linkIndex = TMP_TextUtilities.FindIntersectingLink (textMessage, Input.mousePosition, null);
