@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Aerolt.Helpers;
 using RoR2;
+using TMPro;
 using UnityEngine;
 using WebSocketSharp;
 using Console = System.Console;

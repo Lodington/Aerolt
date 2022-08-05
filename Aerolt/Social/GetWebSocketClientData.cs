@@ -1,8 +1,10 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using WebSocketSharp;
+using static Aerolt.Social.WebSocketClient;
 
 namespace Aerolt.Social
 {
@@ -26,7 +28,7 @@ namespace Aerolt.Social
             }
             if (Input.GetKeyDown(KeyCode.Return)) SendMessage();
         }
-
+        
         private void OnEnable()
         {
             UpdateChatWindow();
@@ -36,25 +38,25 @@ namespace Aerolt.Social
         {
             if(String.IsNullOrEmpty(inputField.text))
                 return;
-            WebSocketClient.Message.Send($" [{WebSocketClient._username}] -> {inputField.text}");
+            Message.Send($" [{_username}] -> {inputField.text}");
             inputField.text = String.Empty;
         }
         
         public void Awake()
         {
-            WebSocketClient.Message.OnMessage += MarkTextDirty;
-            WebSocketClient.UserCount.OnMessage += MarkTextDirty;
-            WebSocketClient.Usernames.OnMessage += MarkTextDirty;
-            WebSocketClient.Connect.OnMessage += MarkTextDirty;
+            Message.OnMessage += MarkTextDirty;
+            UserCount.OnMessage += MarkTextDirty;
+            Usernames.OnMessage += MarkTextDirty;
+            Connect.OnMessage += MarkTextDirty;
             sendButton.onClick.AddListener(SendMessage);
         }
 
         private void OnDestroy()
         {
-            WebSocketClient.Message.OnMessage -= MarkTextDirty;
-            WebSocketClient.UserCount.OnMessage -= MarkTextDirty;
-            WebSocketClient.Usernames.OnMessage -= MarkTextDirty;
-            WebSocketClient.Connect.OnMessage -= MarkTextDirty;
+            Message.OnMessage -= MarkTextDirty;
+            UserCount.OnMessage -= MarkTextDirty;
+            Usernames.OnMessage -= MarkTextDirty;
+            Connect.OnMessage -= MarkTextDirty;
         }
 
         private void MarkTextDirty(object sender, MessageEventArgs e)
@@ -63,9 +65,9 @@ namespace Aerolt.Social
         }
         private void UpdateChatWindow()
         {
-            chatWindowText.text = WebSocketClient.MessageText;
-            userWindowText.text = WebSocketClient.UsernameText;
-            userCount.text = $"Users Online : {WebSocketClient.UserCountText}";
+            chatWindowText.text = MessageText;
+            userWindowText.text = UsernameText;
+            userCount.text = $"Users Online : {UserCountText}";
             //WelcomeText.text = $"Welcome {WebSocketClient._username} to the server!";
 
         }
