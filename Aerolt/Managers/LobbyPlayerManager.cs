@@ -45,6 +45,8 @@ namespace Aerolt.Managers
 			NetworkUser.onPostNetworkUserStart -= UserAdded;
 			//NetworkUser.onNetworkUserDiscovered -= UserAdded;
 			NetworkUser.onNetworkUserLost -= UserLost;
+
+			foreach (var (_, binding) in users) binding.OnDestroy();
 		}
 
 		private void OnEnable()
@@ -83,6 +85,7 @@ namespace Aerolt.Managers
 		{
 			if (!users.ContainsKey(user)) return;
 			Destroy(users[user].customButton.gameObject);
+			users[user].OnDestroy();
 			users.Remove(user);
 			if (selectedUser == user && users.Any())
 				SetUser(users.Keys.Last());

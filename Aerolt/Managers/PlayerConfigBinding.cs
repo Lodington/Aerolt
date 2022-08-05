@@ -24,18 +24,35 @@ namespace Aerolt.Managers
 			user = currentUser;
 			
 			AimbotWeight = ValueWrapper.Get("PlayerMenu", "AimbotWeight", 0.5f, "", user);
-			AimbotWeight.settingChanged += () => SetAimbotWeight(user.master.GetBody(), AimbotWeight.Value);
+			AimbotWeight.settingChanged += OnAimbotWeightChanged;
 			Aimbot = ValueWrapper.Get("PlayerMenu", "Aimbot", false, "", user);
-			Aimbot.settingChanged += () => SetAimbot(user.master.GetBody(), Aimbot.Value, AimbotWeight.Value);
+			Aimbot.settingChanged += OnAimbotChanged;
 			InfiniteSkills = ValueWrapper.Get("PlayerMenu", "InfiniteSkills", false, "", user);
-			InfiniteSkills.settingChanged += () => SetInfiniteSkills(user.master.GetBody(), InfiniteSkills.Value);
+			InfiniteSkills.settingChanged += OnInfiniteSkillsChanged;
 			AlwaysSprint = ValueWrapper.Get("PlayerMenu", "AlwaysSprint", false, "", user);
-			AlwaysSprint.settingChanged += () => SetAlwaysSprint(user.master.GetBody(), AlwaysSprint.Value);
+			AlwaysSprint.settingChanged += OnAlwaysSprintChanged;
 			GodMode = ValueWrapper.Get("PlayerMenu", "GodMode", false, "", user);
-			GodMode.settingChanged += () => SetGodMode(user.master.GetBody(), GodMode.Value);
+			GodMode.settingChanged += OnGodModeChanged;
 			Noclip = ValueWrapper.Get("PlayerMenu", "Noclip", false, "", user);
-			Noclip.settingChanged += () => SetNoclip(user.master.GetBody(), Noclip.Value);
+			Noclip.settingChanged += OnNoclipChanged;
 		}
+
+		public void OnDestroy()
+		{
+			AimbotWeight.settingChanged -= OnAimbotWeightChanged;
+			Aimbot.settingChanged -= OnAimbotChanged;
+			InfiniteSkills.settingChanged -= OnInfiniteSkillsChanged;
+			AlwaysSprint.settingChanged -= OnAlwaysSprintChanged;
+			GodMode.settingChanged -= OnGodModeChanged;
+			Noclip.settingChanged -= OnNoclipChanged;
+		}
+
+		private void OnNoclipChanged() => SetNoclip(user.master.GetBody(), Noclip.Value);
+		private void OnGodModeChanged() => SetGodMode(user.master.GetBody(), GodMode.Value);
+		private void OnAlwaysSprintChanged() => SetAlwaysSprint(user.master.GetBody(), AlwaysSprint.Value);
+		private void OnInfiniteSkillsChanged() => SetInfiniteSkills(user.master.GetBody(), InfiniteSkills.Value);
+		private void OnAimbotChanged() => SetAimbot(user.master.GetBody(), Aimbot.Value, AimbotWeight.Value);
+		private void OnAimbotWeightChanged() => SetAimbotWeight(user.master.GetBody(), AimbotWeight.Value);
 
 		public void Bind(Action updateCheckboxValues)
 		{
