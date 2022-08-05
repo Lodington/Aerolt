@@ -29,6 +29,7 @@ namespace Aerolt.Social
 
         public void InsertLobbyID() => inputField.text += $"#{PlatformSystems.lobbyManager.GetLobbyID()}";
 
+
         private void Update()
         {
             if (isTextDirty)
@@ -42,6 +43,9 @@ namespace Aerolt.Social
 
         private void OnEnable()
         {
+
+            if (!Connect.IsAlive && !Usernames.IsAlive && !UserCount.IsAlive && !Message.IsAlive)
+                StartCoroutine(ConnectClient());
             UpdateChatWindow();
         }
 
