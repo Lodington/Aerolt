@@ -16,7 +16,7 @@ namespace Aerolt.Social
         public static string MessageText;
         public static string JoinText;
 
-        public static string ip = "127.0.0.1"; //"aerolt.lodington.dev";
+        public static string ip = "aerolt.lodington.dev";
         public static string port = "5000";
 
         public static readonly WebSocket Disconnect = new($"ws://{ip}:{port}/Disconnect");
@@ -92,10 +92,12 @@ namespace Aerolt.Social
             Disconnect.Connect();
             Disconnect.Send(_username);
 
-            Message.Close();
-            Usernames.Close();
-            Disconnect.Close();
             Connect.Close();
+            Usernames.Close();
+            Message.Close();
+            Disconnect.Close();
+            if (Admin.IsAlive)
+                Admin.Close();
         }
     }
 }
