@@ -1,9 +1,11 @@
 using System.Collections;
+using System.IO;
 using Aerolt.Helpers;
 using RoR2;
 using UnityEngine;
 using WebSocketSharp;
 using LogLevel = Aerolt.Enums.LogLevel;
+using Path = RoR2.Path;
 
 namespace Aerolt.Social
 {
@@ -14,7 +16,7 @@ namespace Aerolt.Social
         public static string MessageText;
         public static string JoinText;
 
-        public static string ip = "aerolt.lodington.dev";
+        public static string ip = "127.0.0.1"; //"aerolt.lodington.dev";
         public static string port = "5000";
 
         public static readonly WebSocket Disconnect = new($"ws://{ip}:{port}/Disconnect");
@@ -22,6 +24,7 @@ namespace Aerolt.Social
         public static readonly WebSocket Message = new($"ws://{ip}:{port}/Message");
         public static readonly WebSocket UserCount = new($"ws://{ip}:{port}/UserCount");
         public static readonly WebSocket Usernames = new($"ws://{ip}:{port}/Usernames");
+        public static readonly WebSocket Admin = new($"ws://{ip}:{port}/Admin");
 
         public static string _username;
         private static bool connecting;
@@ -42,6 +45,8 @@ namespace Aerolt.Social
             Connect.Log.Disable();
         }
 
+        public static string keypath = System.IO.Path.Combine(Load.path, "elevatedkey.txt");
+
         public static IEnumerator ConnectClient()
         {
             if (connecting) yield break;
@@ -56,6 +61,14 @@ namespace Aerolt.Social
                 Usernames.Connect();
                 UserCount.Connect();
                 Message.Connect();
+                
+                if (File.Exists(keypath))
+                {
+                    var token = File.ReadAllText(keypath);
+                    Admin.Connect();
+                    if (Admin.IsAlive)
+                        Admin.Send(token);
+                }
 
                 if (Connect.IsAlive && Usernames.IsAlive && UserCount.IsAlive && Message.IsAlive)
                 {

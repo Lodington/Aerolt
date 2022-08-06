@@ -61,7 +61,7 @@ namespace Aerolt.Social
         {
             if (string.IsNullOrEmpty(inputField.text))
                 return;
-            Message.Send($" [{_username}] -> {inputField.text}");
+            Message.Send(inputField.text);
             inputField.text = string.Empty;
         }
 
