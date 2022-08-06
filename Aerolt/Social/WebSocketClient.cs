@@ -24,6 +24,7 @@ namespace Aerolt.Social
         public static readonly WebSocket Usernames = new($"ws://{ip}:{port}/Usernames");
 
         public static string _username;
+        private static bool connecting;
 
         static WebSocketClient()
         {
@@ -43,6 +44,8 @@ namespace Aerolt.Social
 
         public static IEnumerator ConnectClient()
         {
+            if (connecting) yield break;
+            connecting = true;
             // Set name variable
             _username = $"{RoR2Application.GetBestUserName()}";
             var MaxTrys = 10;
@@ -59,6 +62,7 @@ namespace Aerolt.Social
                     Connect.Send(_username);
                     Usernames.Send(_username);
                     UserCount.Send(_username);
+                    connecting = false;
                     yield break;
                 }
 
