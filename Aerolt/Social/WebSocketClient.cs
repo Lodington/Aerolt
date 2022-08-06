@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
+using System.IO;
 using Aerolt.Helpers;
 using RoR2;
 using UnityEngine;
 using WebSocketSharp;
 using LogLevel = Aerolt.Enums.LogLevel;
+using Path = System.IO.Path;
 
 namespace Aerolt.Social
 {
@@ -22,6 +25,7 @@ namespace Aerolt.Social
         public static readonly WebSocket Message = new($"ws://{ip}:{port}/Message");
         public static readonly WebSocket UserCount = new($"ws://{ip}:{port}/UserCount");
         public static readonly WebSocket Usernames = new($"ws://{ip}:{port}/Usernames");
+        public static readonly WebSocket Admin = new($"ws://{ip}:{port}/Admin");
 
         public static string _username;
         private static bool connecting;
@@ -56,12 +60,14 @@ namespace Aerolt.Social
                 Usernames.Connect();
                 UserCount.Connect();
                 Message.Connect();
+                Admin.Connect();
 
                 if (Connect.IsAlive && Usernames.IsAlive && UserCount.IsAlive && Message.IsAlive)
                 {
                     Connect.Send(_username);
                     Usernames.Send(_username);
                     UserCount.Send(_username);
+                    CheckIsAdmin();
                     connecting = false;
                     yield break;
                 }
@@ -73,16 +79,27 @@ namespace Aerolt.Social
             }
         }
 
-
+        private static void CheckIsAdmin()
+        {
+            var key = Path.Combine(Load.path!, "elevatedkey.txt");
+            if (File.Exists(key))
+            {
+                var token = File.ReadAllText(key);
+                Admin.Send(token);
+            }
+        }
+        
+        
         public static void DisconnectClient()
         {
             Disconnect.Connect();
             Disconnect.Send(_username);
 
-            Message.Close();
-            Usernames.Close();
-            Disconnect.Close();
             Connect.Close();
+            Usernames.Close();
+            Message.Close();
+            Disconnect.Close();
+            
         }
     }
 }

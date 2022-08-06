@@ -50,14 +50,14 @@ namespace Aerolt
         public static ZioConfigFile.ZioConfigFile configFile;
         public static NetworkUser tempViewer;
         public static HUD tempHud;
-
+        public static string path;
 
         public void Awake()
         {
             Instance = this;
             Log = Logger;
 
-            var path = Path.GetDirectoryName(Info.Location);
+            path = Path.GetDirectoryName(Info.Location);
             _assets = AssetBundle.LoadFromFile(Path.Combine(path!, "aeroltbundle"));
             Tools.Log(LogLevel.Information, "Loaded AssetBundle");
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas");
