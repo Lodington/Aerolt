@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using RoR2;
 using TMPro;
 using UnityEngine;
@@ -45,7 +46,7 @@ namespace Aerolt.Social
         {
 
             if (!Connect.IsAlive && !Usernames.IsAlive && !UserCount.IsAlive && !Message.IsAlive)
-                StartCoroutine(ConnectClient());
+                Task.Run(ConnectClient);
             UpdateChatWindow();
         }
 

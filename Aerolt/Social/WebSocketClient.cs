@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 using Aerolt.Helpers;
 using RoR2;
 using UnityEngine;
@@ -47,9 +48,9 @@ namespace Aerolt.Social
 
         public static string keypath = System.IO.Path.Combine(Load.path, "elevatedkey.txt");
 
-        public static IEnumerator ConnectClient()
+        public static void ConnectClient()
         {
-            if (connecting) yield break;
+            if (connecting) return;
             connecting = true;
             // Set name variable
             _username = $"{RoR2Application.GetBestUserName()}";
@@ -76,13 +77,13 @@ namespace Aerolt.Social
                     Usernames.Send(_username);
                     UserCount.Send(_username);
                     connecting = false;
-                    yield break;
+                    return;
                 }
 
 
                 Tools.Log(LogLevel.Error, $"Couldnt Connect to Server. Retrying {MaxTrys - currentTry} times.");
                 currentTry++;
-                yield return new WaitForSeconds(5f);
+                Task.Delay(5000);
             }
         }
 

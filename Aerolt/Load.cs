@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Security;
 using System.Security.Permissions;
+using System.Threading;
+using System.Threading.Tasks;
 using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
@@ -105,7 +107,7 @@ namespace Aerolt
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
 
-            StartCoroutine(WebSocketClient.ConnectClient());
+            Task.Run(WebSocketClient.ConnectClient);
         }
 
         private void CreateKeyBindSettings()
