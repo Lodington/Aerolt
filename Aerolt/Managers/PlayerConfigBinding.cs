@@ -3,7 +3,9 @@ using Aerolt.Buttons;
 using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Messages;
+using RiskOfOptions;
 using RoR2;
+using ZioRiskOfOptions;
 
 namespace Aerolt.Managers
 {
@@ -16,6 +18,7 @@ namespace Aerolt.Managers
         public ValueWrapper<bool> GodMode;
         public ValueWrapper<bool> InfiniteSkills;
         public ValueWrapper<bool> Noclip;
+        public ValueWrapper<bool> NoclipInteractForDown;
         private readonly NetworkUser user;
 
         public PlayerConfigBinding(NetworkUser currentUser, CustomButton button)
@@ -35,6 +38,9 @@ namespace Aerolt.Managers
             GodMode.settingChanged += OnGodModeChanged;
             Noclip = ValueWrapper.Get("PlayerMenu", "Noclip", false, "", user);
             Noclip.settingChanged += OnNoclipChanged;
+            var who = user && user.localUser != null ? Load.Name + " " + user.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
+            NoclipInteractForDown = ValueWrapper.Get("PlayerMenu", "NoclipInteractForDown", true, "", user, firstSetup: config => ModSettingsManager.AddOption(new ZioCheckBoxOption(config), who, who));
+            NoclipInteractForDown.settingChanged += OnNoclipForInteractDownChanged;
         }
 
         public void OnDestroy()
@@ -45,12 +51,23 @@ namespace Aerolt.Managers
             AlwaysSprint.settingChanged -= OnAlwaysSprintChanged;
             GodMode.settingChanged -= OnGodModeChanged;
             Noclip.settingChanged -= OnNoclipChanged;
+            NoclipInteractForDown.settingChanged -= OnNoclipForInteractDownChanged;
+        }
+        
+        private void OnNoclipForInteractDownChanged()
+        {
+            if (!user.master) return;
+            var body = user.master.GetBody();
+            if (!body) return;
+            var comp = body.GetComponent<NoclipBehavior>();
+            if (comp) comp.shouldUseInteractForDown = NoclipInteractForDown.Value;
         }
 
         private void OnNoclipChanged()
         {
             if (!user.master) return;
             SetNoclip(user.master.GetBody(), Noclip.Value);
+            OnNoclipForInteractDownChanged();
         }
 
         private void OnGodModeChanged()

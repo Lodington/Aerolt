@@ -35,10 +35,14 @@ namespace Aerolt.Classes
         ///     False forces it to not be stored on disk, and discards <paramref name="who" />. <paramref name="who" /> will only
         ///     be used for the identifier.
         /// </param>
+        /// <param name="firstSetup">
+        ///     Called after first binding to a config entry, ie config setup.
+        ///     Only called for local values.
+        /// </param>
         /// <typeparam name="T">Any <see cref="ZioConfigEntry{T}" /> serializable type.</typeparam>
         /// <returns></returns>
         public static ValueWrapper<T> Get<T>(string category, string name, T defaultValue, string description,
-            NetworkUser who = null, bool? forceLocalOrRemote = null)
+            NetworkUser who = null, bool? forceLocalOrRemote = null, Action<ZioConfigEntry<T>> firstSetup = null)
         {
             if (Instances.TryGetValue(GetId(who) + category + name, out var entry))
             {
@@ -46,7 +50,7 @@ namespace Aerolt.Classes
                 return centry;
             }
 
-            var val = new ValueWrapper<T>(category, name, defaultValue, description, who, forceLocalOrRemote);
+            var val = new ValueWrapper<T>(category, name, defaultValue, description, who, forceLocalOrRemote, firstSetup);
             return val;
         }
 
@@ -62,13 +66,14 @@ namespace Aerolt.Classes
     {
         private readonly ZioConfigEntry<T> configEntry;
         private bool duckChange;
+        private bool duckConfigChange;
         private T fallbackValue;
         protected string identifier;
         private readonly bool isLocalBinding;
         public NetworkUser user;
 
         public ValueWrapper(string category, string name, T defaultValue, string description, NetworkUser who = null,
-            bool? forceLocalOrRemote = null) // force = true, it will be a local : force = false, it will be remote 
+            bool? forceLocalOrRemote = null, Action<ZioConfigEntry<T>> firstSetup = null) // force = true, it will be a local : force = false, it will be remote 
         {
             user = who;
             if (forceLocalOrRemote.HasValue && forceLocalOrRemote.Value || !who && !forceLocalOrRemote.HasValue ||
@@ -77,6 +82,13 @@ namespace Aerolt.Classes
                 isLocalBinding = true;
                 var file = who ? MenuInfo.Files[who.localUser!] : Load.configFile;
                 configEntry = file.Bind(category, name, defaultValue, description);
+                configEntry.SettingChanged += (_, _, _) =>
+                {
+                    if (duckConfigChange) return;
+                    Sync();
+                    settingChanged?.Invoke();
+                };
+                firstSetup?.Invoke(configEntry);
             }
             else
             {
@@ -94,7 +106,11 @@ namespace Aerolt.Classes
             {
                 //if (value.Equals(Value)) return;
                 if (isLocalBinding)
+                {
+                    duckConfigChange = true;
                     configEntry.Value = value;
+                    duckConfigChange = false;
+                }
                 else
                     fallbackValue = value;
                 if (!duckChange) Sync();
