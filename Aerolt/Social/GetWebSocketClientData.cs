@@ -22,7 +22,6 @@ namespace Aerolt.Social
         public void Awake()
         {
             Message.OnMessage += MarkTextDirty;
-            UserCount.OnMessage += MarkTextDirty;
             Usernames.OnMessage += MarkTextDirty;
             Connect.OnMessage += MarkTextDirty;
             sendButton.onClick.AddListener(SendMessage);
@@ -45,7 +44,7 @@ namespace Aerolt.Social
         private void OnEnable()
         {
 
-            if (!Connect.IsAlive && !Usernames.IsAlive && !UserCount.IsAlive && !Message.IsAlive)
+            if (!Connect.IsAlive && !Usernames.IsAlive && !Message.IsAlive)
                 Task.Run(ConnectClient);
             UpdateChatWindow();
         }
@@ -53,7 +52,6 @@ namespace Aerolt.Social
         private void OnDestroy()
         {
             Message.OnMessage -= MarkTextDirty;
-            UserCount.OnMessage -= MarkTextDirty;
             Usernames.OnMessage -= MarkTextDirty;
             Connect.OnMessage -= MarkTextDirty;
         }
