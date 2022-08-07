@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Aerolt.Helpers;
 using BepInEx;
@@ -37,8 +38,27 @@ namespace Aerolt.Social
             Connect.Log.Disable();
         }
 
+        public static void Bind(EventHandler<MessageEventArgs> action)
+        {
+            Message.OnMessage += action;
+            Usernames.OnMessage += action;
+            Connect.OnMessage += action;
+        }
+        public static void UnBind(EventHandler<MessageEventArgs> action)
+        {
+            Message.OnMessage -= action;
+            Usernames.OnMessage -= action;
+            Connect.OnMessage -= action;
+        }
+
         public static string keypath = System.IO.Path.Combine(Load.path, "elevatedkey.txt");
         private static ZioConfigEntry<string> authUUID;
+        
+        public static void TryConnect()
+        {
+            if (!Connect.IsAlive && !Usernames.IsAlive && !Message.IsAlive)
+                Task.Run(ConnectClient);
+        }
 
         public static void ConnectClient()
         {

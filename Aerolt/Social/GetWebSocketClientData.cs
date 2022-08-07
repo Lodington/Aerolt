@@ -21,9 +21,7 @@ namespace Aerolt.Social
 
         public void Awake()
         {
-            Message.OnMessage += MarkTextDirty;
-            Usernames.OnMessage += MarkTextDirty;
-            Connect.OnMessage += MarkTextDirty;
+            Bind(MarkTextDirty);
             sendButton.onClick.AddListener(SendMessage);
         }
 
@@ -43,17 +41,13 @@ namespace Aerolt.Social
 
         private void OnEnable()
         {
-
-            if (!Connect.IsAlive && !Usernames.IsAlive && !Message.IsAlive)
-                Task.Run(ConnectClient);
+            TryConnect();
             UpdateChatWindow();
         }
 
         private void OnDestroy()
         {
-            Message.OnMessage -= MarkTextDirty;
-            Usernames.OnMessage -= MarkTextDirty;
-            Connect.OnMessage -= MarkTextDirty;
+            UnBind(MarkTextDirty);
         }
 
         private void SendMessage()
