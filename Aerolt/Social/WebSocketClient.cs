@@ -26,13 +26,13 @@ namespace Aerolt.Social
 
         static WebSocketClient()
         {
-            Connect.OnMessage += (sender, e) => authUUID.Value = e.Data;
-            Usernames.OnMessage += (sender, e) =>
+            Connect.OnMessage += (_, e) => authUUID.Value = e.Data;
+            Usernames.OnMessage += (_, e) =>
             {
                 UsernameText = e.Data + "\n";
                 UserCountText = UsernameText.Split('\n').Length.ToString();
             };
-            Message.OnMessage += (sender, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients
+            Message.OnMessage += (_, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients
             Message.Log.Disable();
             Usernames.Log.Disable();
             Connect.Log.Disable();
@@ -50,8 +50,7 @@ namespace Aerolt.Social
             Usernames.OnMessage -= action;
             Connect.OnMessage -= action;
         }
-
-        public static string keypath = System.IO.Path.Combine(Load.path, "elevatedkey.txt");
+        
         private static ZioConfigEntry<string> authUUID;
         
         public static void TryConnect()
