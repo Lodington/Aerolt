@@ -26,7 +26,7 @@ namespace Aerolt.Social
 
         static WebSocketClient()
         {
-            Connect.OnMessage += (_, e) => authUUID.Value = e.Data;
+            Connect.OnMessage += (_, e) => authUUID.Value = Guid.TryParse(e.Data, out var _) ? e.Data : "";
             Usernames.OnMessage += (_, e) =>
             {
                 UsernameText = e.Data + "\n";

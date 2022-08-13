@@ -106,8 +106,6 @@ namespace Aerolt
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
-
-            WebSocketClient.TryConnect();
         }
 
         private void CreateKeyBindSettings()
