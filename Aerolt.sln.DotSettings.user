@@ -4,4 +4,5 @@
   &lt;Assembly Path="C:\Users\tyler\.nuget\packages\bubbet-zioconfigfile\1.0.0\lib\netstandard2.0\ZioConfigFile.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Users\tyler\.nuget\packages\websocketsharp\1.0.3-rc11\lib\websocket-sharp.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=8a96bbb0_002D2104_002D4650_002Dabd5_002D809d4396353a_0023AeroltChatServer/@EntryIndexedValue">True</s:Boolean>
 	</wpf:ResourceDictionary>
