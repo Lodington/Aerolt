@@ -4,3 +4,5 @@
 /Aerolt.manifest
 /aeroltbundle.manifest
 /copyAssetbundle.bat
+
+*.user
