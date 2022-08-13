@@ -11,6 +11,20 @@ namespace Aerolt.Social
 {
     public static class WebSocketClient
     {
+        #region Endpoint Specific
+        private static ZioConfigEntry<string> authUUID;
+        public static string AuthUuid
+        {
+            get => authUUID.Value;
+            set => authUUID.Value = value;
+        }
+        public static string GetUsername()
+        {
+            authUUID = Load.configFile.Bind("UserAuth", "UUID", "", ""); // This is fine to bind multiple times, it just needs to be done late enough that configFile is set.
+            return AuthUuid.IsNullOrWhiteSpace() ? RoR2Application.GetBestUserName() : AuthUuid;
+        }
+        #endregion
+        
         public static string UsernameText;
         public static string UserCountText;
         public static string MessageText;
@@ -26,7 +40,7 @@ namespace Aerolt.Social
 
         static WebSocketClient()
         {
-            Connect.OnMessage += (_, e) => authUUID.Value = Guid.TryParse(e.Data, out var _) ? e.Data : "";
+            Connect.OnMessage += (_, e) => AuthUuid = Guid.TryParse(e.Data, out var _) ? e.Data : "";
             Usernames.OnMessage += (_, e) =>
             {
                 UsernameText = e.Data + "\n";
@@ -50,9 +64,7 @@ namespace Aerolt.Social
             Usernames.OnMessage -= action;
             Connect.OnMessage -= action;
         }
-        
-        private static ZioConfigEntry<string> authUUID;
-        
+
         public static void TryConnect()
         {
             if (!Connect.IsAlive && !Usernames.IsAlive && !Message.IsAlive)
@@ -64,8 +76,7 @@ namespace Aerolt.Social
             if (connecting) return;
             connecting = true;
             // Set name variable
-            authUUID = Load.configFile.Bind("UserAuth", "UUID", "", ""); // This is fine to bind multiple times, it just needs to be done late enough that configFile is set.
-            var usernameToSend = authUUID.Value.IsNullOrWhiteSpace() ? RoR2Application.GetBestUserName() : authUUID.Value;
+            var usernameToSend = GetUsername();
             var MaxTrys = 10;
             var currentTry = 1;
             while (currentTry < MaxTrys)
