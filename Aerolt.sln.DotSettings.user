@@ -1,8 +1,0 @@
-﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005Ctyler_005CRiderProjects_005CAerolt_005CLeanTween_002Edll/@EntryIndexedValue">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
-  &lt;Assembly Path="C:\Users\tyler\.nuget\packages\bubbet-zioconfigfile\1.0.0\lib\netstandard2.0\ZioConfigFile.dll" /&gt;&#xD;
-  &lt;Assembly Path="C:\Users\tyler\.nuget\packages\websocketsharp\1.0.3-rc11\lib\websocket-sharp.dll" /&gt;&#xD;
-&lt;/AssemblyExplorer&gt;</s:String>
-	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=8a96bbb0_002D2104_002D4650_002Dabd5_002D809d4396353a_0023AeroltChatServer/@EntryIndexedValue">True</s:Boolean>
-	</wpf:ResourceDictionary>
