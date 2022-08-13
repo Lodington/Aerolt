@@ -1,0 +1,7 @@
+ManifestFileVersion: 0
+CRC: 561676811
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: aeroltbundle
+      Dependencies: {}

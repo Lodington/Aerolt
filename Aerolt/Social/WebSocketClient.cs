@@ -43,7 +43,7 @@ namespace Aerolt.Social
             Connect.OnMessage += (_, e) => AuthUuid = Guid.TryParse(e.Data, out var _) ? e.Data : "";
             Usernames.OnMessage += (_, e) =>
             {
-                UsernameText = e.Data + "\n";
+                UsernameText = e.Data;
                 UserCountText = UsernameText.Split('\n').Length.ToString();
             };
             Message.OnMessage += (_, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients

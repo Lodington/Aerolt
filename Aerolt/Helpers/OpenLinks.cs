@@ -10,7 +10,7 @@ namespace Aerolt.Helpers
 {
     [RequireComponent(typeof(TextMeshProUGUI))]
     [RequireComponent(typeof(EventTrigger))]
-    public class JoinLobbyOnClick : MonoBehaviour
+    public abstract class LinkHandlerOnClick : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI textMessage;
 
@@ -22,23 +22,33 @@ namespace Aerolt.Helpers
             _eventTrigger.AddEventTrigger(OnPointerClick, EventTriggerType.PointerDown);
         }
 
+        public abstract void HandleLink(string link);
+
         // Get link and open page
         public void OnPointerClick(BaseEventData eventData)
         {
-            if (eventData.currentInputModule.input.GetMouseButtonDown((int) MouseButton.LeftMouse))
-            {
-                var linkIndex = TMP_TextUtilities.FindIntersectingLink(textMessage, Input.mousePosition, null);
-                if (linkIndex == -1)
-                    return;
-                var linkInfo = textMessage.textInfo.linkInfo[linkIndex];
-                var selectedLink = linkInfo.GetLinkID();
-                if (selectedLink != "")
-                {
-                    Tools.Log(LogLevel.Information, $"Joining Lobby {selectedLink}");
-                    Console.instance.SubmitCmd(null,
-                        string.Format(CultureInfo.InvariantCulture, "steam_lobby_join {0}", selectedLink), true);
-                }
-            }
+            if (!eventData.currentInputModule.input.GetMouseButtonDown((int) MouseButton.LeftMouse)) return;
+            
+            var linkIndex = TMP_TextUtilities.FindIntersectingLink(textMessage, Input.mousePosition, null);
+            if (linkIndex == -1) return;
+            var linkInfo = textMessage.textInfo.linkInfo[linkIndex];
+            var selectedLink = linkInfo.GetLinkID();
+            if (selectedLink != "") HandleLink(selectedLink);
         }
+    }
+
+    public class JoinLobbyOnClick : LinkHandlerOnClick
+    {
+        public override void HandleLink(string selectedLink)
+        {
+            Tools.Log(LogLevel.Information, $"Joining Lobby {selectedLink}");
+            Console.instance.SubmitCmd(null,
+                string.Format(CultureInfo.InvariantCulture, "steam_lobby_join {0}", selectedLink), true);
+        }
+    }
+
+    public class CopyUsername : LinkHandlerOnClick
+    {
+        public override void HandleLink(string link) => GUIUtility.systemCopyBuffer = link;
     }
 }
