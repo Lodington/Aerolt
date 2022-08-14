@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using RoR2;
 using TMPro;
@@ -18,18 +19,26 @@ namespace Aerolt.Social
         public TMP_Text WelcomeText;
 
         private bool isTextDirty;
+        private ScrollRect scrollRect;
+        private bool setToBottom;
 
         public void Awake()
         {
             Bind(MarkTextDirty);
             sendButton.onClick.AddListener(SendMessage);
+            scrollRect = chatWindowText.gameObject.GetComponentInParent<ScrollRect>();
         }
 
         public void InsertLobbyID() => inputField.text += $"#{PlatformSystems.lobbyManager.GetLobbyID()}";
 
-
         private void Update()
         {
+            if (setToBottom && scrollRect.verticalScrollbar.value > 0f)
+            {
+                scrollRect.verticalScrollbar.value = 0f;
+                setToBottom = false;
+            }
+
             if (isTextDirty)
             {
                 UpdateChatWindow();
@@ -65,9 +74,12 @@ namespace Aerolt.Social
 
         private void UpdateChatWindow()
         {
+            var scrollToBottom = scrollRect.verticalScrollbar.value < 0.05f;
             chatWindowText.text = MessageText;
             userWindowText.text = UsernameText;
             userCount.text = $"Users Online : {UserCountText}";
+            if (scrollToBottom)
+                setToBottom = true;
             //WelcomeText.text = $"Welcome {WebSocketClient._username} to the server!";
         }
     }
