@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Aerolt.Helpers;
 using BepInEx;
@@ -30,23 +31,20 @@ namespace Aerolt.Social
         public static string MessageText;
 
         public static string ip = "aerolt.lodington.dev";
-        public static string port = "5000";
+        public static string port = "5001";
         
         public static readonly WebSocket Connect = new($"ws://{ip}:{port}/Connect");
         public static readonly WebSocket Message = new($"ws://{ip}:{port}/Message");
-        public static readonly WebSocket Usernames = new($"ws://{ip}:{port}/Usernames");
+        public static readonly WebSocket Usernames = new ($"ws://{ip}:{port}/Usernames");
 
         private static bool connecting;
 
         static WebSocketClient()
         {
             Connect.OnMessage += (_, e) => AuthUuid = Guid.TryParse(e.Data, out var _) ? e.Data : "";
-            Usernames.OnMessage += (_, e) =>
-            {
-                UsernameText = e.Data;
-                UserCountText = UsernameText.Split('\n').Length.ToString();
-            };
+            Usernames.OnMessage += (_, e) => UsernameText = e.Data;
             Message.OnMessage += (_, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients
+
             Message.Log.Disable();
             Usernames.Log.Disable();
             Connect.Log.Disable();
@@ -68,7 +66,13 @@ namespace Aerolt.Social
         public static void TryConnect()
         {
             if (!Connect.IsAlive && !Usernames.IsAlive && !Message.IsAlive)
+            {
+                Connect.Close();
+                Usernames.Close();
+                Message.Close();
+                
                 Task.Run(ConnectClient);
+            }
         }
 
         public static void ConnectClient()
@@ -91,8 +95,6 @@ namespace Aerolt.Social
                     connecting = false;
                     return;
                 }
-
-
                 Tools.Log(LogLevel.Error, $"Couldnt Connect to Server. Retrying {MaxTrys - currentTry} times.");
                 currentTry++;
                 Task.Delay(5000);

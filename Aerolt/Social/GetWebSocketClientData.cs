@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using RoR2;
 using TMPro;
 using UnityEngine;
@@ -54,10 +53,7 @@ namespace Aerolt.Social
             UpdateChatWindow();
         }
 
-        private void OnDestroy()
-        {
-            UnBind(MarkTextDirty);
-        }
+        private void OnDestroy() => UnBind(MarkTextDirty);
 
         private void SendMessage()
         {
@@ -67,17 +63,17 @@ namespace Aerolt.Social
             inputField.text = string.Empty;
         }
 
-        private void MarkTextDirty(object sender, MessageEventArgs e)
-        {
-            isTextDirty = true;
-        }
+        private void MarkTextDirty(object sender, MessageEventArgs e) => isTextDirty = true;
 
         private void UpdateChatWindow()
         {
             var scrollToBottom = scrollRect.verticalScrollbar.value < 0.05f;
             chatWindowText.text = MessageText;
             userWindowText.text = UsernameText;
-            userCount.text = $"Users Online : {UserCountText}";
+            var count = "0";
+            if (!string.IsNullOrEmpty(UsernameText))
+                //count = UsernameText.Split('\n').Count().ToString();
+            userCount.text = $"Users Online : {count}";
             if (scrollToBottom)
                 setToBottom = true;
             //WelcomeText.text = $"Welcome {WebSocketClient._username} to the server!";
