@@ -93,8 +93,8 @@ namespace Aerolt.Buttons
             UpdateText();
 
             if (itemCounts[def] > 0) return;
-            Object.Destroy(button);
-            countRemoveButton.countRemoveButton = null;
+            Object.Destroy(isDecrease ? button : countRemoveButton.button);
+            if (!isDecrease) countRemoveButton = null; else countRemoveButton.countRemoveButton = null;
         }
 
         public void UpdateText()
@@ -112,7 +112,7 @@ namespace Aerolt.Buttons
         public void SetAmount(int i)
         {
             var prev = itemCounts.ContainsKey(def) ? itemCounts[def] : 0;
-            if (i == 0 && prev == 0) return;
+            if (prev == i) return;
             Change(i - prev);
         }
     }
