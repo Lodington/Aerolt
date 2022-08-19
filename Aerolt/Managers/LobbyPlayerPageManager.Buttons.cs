@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Aerolt.Managers
 {
@@ -46,7 +47,7 @@ namespace Aerolt.Managers
         public void Revive()
         {
             var message = new SetBodyMessage(currentUser);
-            message.Handle();
+            if (!NetworkServer.active) message.Handle();
             message.SendToServer();
         }
 
