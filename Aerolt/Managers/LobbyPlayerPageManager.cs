@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Buttons;
 using Aerolt.Classes;
@@ -62,6 +63,15 @@ namespace Aerolt.Managers
         private CharacterMaster master;
         private bool ownerIsSelected;
         private LobbyPlayerManager playerManager;
+        private static List<ItemDef> _giveAllFilteredItems;
+        public static List<ItemDef> GiveAllFilteredItems => _giveAllFilteredItems ??= new List<ItemDef>
+        {
+            RoR2Content.Items.HealthDecay,
+            RoR2Content.Items.LunarPrimaryReplacement,
+            RoR2Content.Items.LunarSecondaryReplacement,
+            RoR2Content.Items.LunarUtilityReplacement,
+            RoR2Content.Items.LunarSpecialReplacement
+        };
 
         private PlayerConfigBinding PlayerConfig
         {

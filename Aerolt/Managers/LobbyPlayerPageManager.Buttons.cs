@@ -54,7 +54,7 @@ namespace Aerolt.Managers
         public void GiveAllItems()
         {
             if (!master) return;
-            var items = ContentManager.itemDefs.ToDictionary(x => x, def => master.inventory.GetItemCount(def) + 1);
+            var items = ContentManager.itemDefs.Except(GiveAllFilteredItems).ToDictionary(x => x, def => master.inventory.GetItemCount(def) + 1);
             new SetItemCountMessage(master.inventory, items).SendToServer();
         }
 
