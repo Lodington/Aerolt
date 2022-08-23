@@ -75,10 +75,6 @@ namespace Aerolt.Social
         {
             if (!Connect.IsAlive && !Usernames.IsAlive && !Message.IsAlive)
             {
-                Connect.Close();
-                Usernames.Close();
-                Message.Close();
-                
                 Task.Run(ConnectClient);
             }
         }

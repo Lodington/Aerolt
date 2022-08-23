@@ -17,13 +17,13 @@ namespace Aerolt.Helpers
     {
         private static readonly Dictionary<ColorLayer, Color> defaultColors = new()
         {
-            {ColorLayer.Foreground, new Color(0.3490196f, 0.3372549f, 0.9372549f)},
+            {ColorLayer.Foreground, new Color(0.322f, 0.322f, 0.322f)},
             {
-                ColorLayer.Background, new Color(0.1176471f, 0.1098039f, 0.1490196f, 0.8509804f)
+                ColorLayer.Background, new Color(0.149f, 0.149f, 0.149f, 0.8509804f)
             }, //new Color(0, 0, 0, 0.1960784f)},
             {ColorLayer.Text, Color.white},
             {ColorLayer.TextGrey, new Color(0.6705883f, 0.6666667f, 0.6941177f)},
-            {ColorLayer.Accent, new Color(0.9254902f, 0.3215686f, 0.4705882f)}
+            {ColorLayer.Accent, new Color(0.322f, 0.322f, 0.322f)}
         };
 
         public string configName;
