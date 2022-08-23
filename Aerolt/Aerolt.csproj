@@ -21,7 +21,7 @@
       <Reference Include="LeanTween, Version=1.0.6223.20226, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\LeanTween.dll</HintPath>
       </Reference>
-      <Reference Include="websocket-sharp, Version=1.0.2.25547, Culture=neutral, PublicKeyToken=5660b08a1845a91e">
+      <Reference Include="websocket-sharp, Version=1.0.2.25934, Culture=neutral, PublicKeyToken=5660b08a1845a91e">
         <HintPath>..\websocket-sharp.dll</HintPath>
       </Reference>
     </ItemGroup>
