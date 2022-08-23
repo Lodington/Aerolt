@@ -11,17 +11,18 @@
       <PackageReference Include="BepInEx.Core" Version="5.4.19" />
       <PackageReference Include="Bubbet-ZioConfigFile" Version="1.0.0" />
       <PackageReference Include="Bubbet-ZioRiskOfOptions" Version="1.0.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
       <PackageReference Include="RiskOfRain2.GameLibs" Version="1.2.4-r.0" />
       <PackageReference Include="Rune580-Risk_Of_Options" Version="2.5.3" />
       <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
-      <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
       <PackageReference Include="Zio" Version="0.7.3" />
     </ItemGroup>
 
     <ItemGroup>
       <Reference Include="LeanTween, Version=1.0.6223.20226, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\LeanTween.dll</HintPath>
+      </Reference>
+      <Reference Include="websocket-sharp, Version=1.0.2.25547, Culture=neutral, PublicKeyToken=5660b08a1845a91e">
+        <HintPath>..\websocket-sharp.dll</HintPath>
       </Reference>
     </ItemGroup>
 

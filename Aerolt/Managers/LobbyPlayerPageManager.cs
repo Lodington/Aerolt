@@ -66,6 +66,7 @@ namespace Aerolt.Managers
         private static List<ItemDef> _giveAllFilteredItems;
         public static List<ItemDef> GiveAllFilteredItems => _giveAllFilteredItems ??= new List<ItemDef>
         {
+            DLC1Content.Items.DroneWeaponsBoost, // some bullshit nre raised by this item in bazaar and i dont want to deal with it
             RoR2Content.Items.HealthDecay,
             RoR2Content.Items.LunarPrimaryReplacement,
             RoR2Content.Items.LunarSecondaryReplacement,
