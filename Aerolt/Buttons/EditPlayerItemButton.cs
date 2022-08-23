@@ -88,6 +88,8 @@ namespace Aerolt.Buttons
             GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
         }
 
+        public void CancelItemGive() => GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
+
         public void Initialize(NetworkUser currentUser)
         {
             user = currentUser;
