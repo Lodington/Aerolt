@@ -13,14 +13,13 @@ namespace Aerolt.Overrides
         public static void MenuTransform(BaseMainMenuScreen __instance)
         {
             var transform = __instance.transform;
-
-            Object.Instantiate(Load.chatWindow, transform);
-
-            var chatwindowRect = Load.chatWindow.GetComponent(typeof(RectTransform)) as RectTransform;
-            Load.chatWindow.transform.localPosition =
-                Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height,
-                    Camera.main.nearClipPlane));
+            var connectionWarningRectTransform = Load.ConnectionWarning.GetComponent(typeof(RectTransform)) as RectTransform;
+            connectionWarningRectTransform.SetSize(746, 480);
+            Object.Instantiate(Load.ConnectionWarning, transform);
+            
+            var chatwindowRect = Load.ConnectionWarning.GetComponent(typeof(RectTransform)) as RectTransform;
             chatwindowRect.SetSize(746, 480);
+            Object.Instantiate(Load.chatWindow, transform);
         }
     }
 }

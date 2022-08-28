@@ -90,12 +90,7 @@ namespace Aerolt.Helpers
             source.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             source.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         }
-
-        public static void Disable(this Logger logger)
-        {
-            var field = logger.GetType().GetField("_output", BindingFlags.NonPublic | BindingFlags.Instance);
-            field?.SetValue(logger, new Action<LogData, string>((d, s) => { }));
-        }
+        
 
         public static void SetWidth(this RectTransform source, float width)
         {

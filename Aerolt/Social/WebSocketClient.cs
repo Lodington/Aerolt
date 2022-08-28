@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Aerolt.Helpers;
@@ -30,14 +32,16 @@ namespace Aerolt.Social
         public static string UserCountText;
         public static string MessageText;
 
-        public static string ip = "aerolt.lodington.dev";
+        //public static string ip = "aerolt.lodington.dev";
+        public static string ip = IPAddress.Any.ToString();
         public static string port = "5001";
         
         public static readonly WebSocket Connect = new($"ws://{ip}:{port}/Connect");
         public static readonly WebSocket Message = new($"ws://{ip}:{port}/Message");
         public static readonly WebSocket Usernames = new ($"ws://{ip}:{port}/Usernames");
+        public static readonly WebSocket AssetBundle = new ($"ws://{ip}:{port}/AssetBundle");
 
-        private static bool connecting;
+        private static bool _isRetying;
 
         static WebSocketClient()
         {
@@ -49,13 +53,29 @@ namespace Aerolt.Social
                 Connect.guid = id;
                 Usernames.guid = id;
                 Message.guid = id;
+                AssetBundle.Send(id.ToString());
             };
             Usernames.OnMessage += (_, e) => UsernameText = e.Data;
             Message.OnMessage += (_, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients
+            Message.OnError += (sender, args) =>
+            {
+                var isInternalError = args.Message == "An exception has occurred while receiving a message.";
 
-            Message.Log.Disable();
-            Usernames.Log.Disable();
-            Connect.Log.Disable();
+                Tools.Log(LogLevel.Error, args.Message);
+                
+                var socket = (WebSocket) sender;
+                if (socket.ReadyState == WebSocketState.Open && !isInternalError) Task.Run(ConnectClient);
+            };
+
+            Message.OnClose += (sender, args) =>
+            {
+                Tools.Log(LogLevel.Warning, "Lost Connection to server.");
+                Task.Run(ConnectClient);
+            };
+            AssetBundle.OnMessage += (sender, e) =>
+            {
+                File.Create(e.Data);
+            };
         }
 
         public static void Bind(EventHandler<MessageEventArgs> action)
@@ -73,16 +93,13 @@ namespace Aerolt.Social
 
         public static void TryConnect()
         {
-            if (!Connect.IsAlive && !Usernames.IsAlive && !Message.IsAlive)
-            {
-                Task.Run(ConnectClient);
-            }
+            if (!_isRetying) Task.Run(ConnectClient);
         }
 
         public static void ConnectClient()
         {
-            if (connecting) return;
-            connecting = true;
+            if (_isRetying) return;
+            _isRetying = true;
             // Set name variable
             var usernameToSend = GetUsername();
             var MaxTrys = 10;
@@ -92,11 +109,13 @@ namespace Aerolt.Social
                 Connect.Connect();
                 Usernames.Connect();
                 Message.Connect();
+                AssetBundle.Connect();
 
                 if (Connect.IsAlive && Usernames.IsAlive && Message.IsAlive)
                 {
                     Connect.Send(usernameToSend);
-                    connecting = false;
+                    
+                    _isRetying = false;
                     return;
                 }
                 Tools.Log(LogLevel.Error, $"Couldnt Connect to Server. Retrying {MaxTrys - currentTry} times.");

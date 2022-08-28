@@ -12,7 +12,7 @@ namespace Aerolt.Overrides
         {
             var ran = Random.Range(0, 99);
 
-            if (ran < 1) SwapThisImage();
+            if (ran < 20) SwapThisImage();
         }
 
         public void SwapThisImage()

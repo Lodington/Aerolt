@@ -41,6 +41,7 @@ namespace Aerolt
         public static GameObject _co;
         public static AssetBundle _assets;
 
+        public static GameObject ConnectionWarning;
         public static GameObject chatWindow;
         public static GameObject settingsRoot;
 
@@ -66,7 +67,8 @@ namespace Aerolt
             _co = _assets.LoadAsset<GameObject>("PlayerCanvas");
             _assets.LoadAsset<GameObject>("AeroltUI");
 
-            chatWindow = _assets.LoadAsset<GameObject>("ChatWindow");
+            chatWindow = _assets.LoadAsset<GameObject>("ChatWindowV2");
+            ConnectionWarning = _assets.LoadAsset<GameObject>("ConnectionWarning");
             DontDestroyOnLoad(chatWindow);
 
             NetworkManager.Initialize();
@@ -78,10 +80,7 @@ namespace Aerolt
             HUD.shouldHudDisplay += CreateHud;
         }
 
-        private void OnDestroy()
-        {
-            WebSocketClient.DisconnectClient();
-        }
+        private void OnDestroy() => WebSocketClient.DisconnectClient();
 
         public void OnGUI()
         {
