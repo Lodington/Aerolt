@@ -15,15 +15,15 @@ namespace Aerolt.Social
     public static class WebSocketClient
     {
         #region Endpoint Specific
-        private static ZioConfigEntry<string> authUUID;
+        private static ZioConfigEntry<string> _authUuid;
         public static string AuthUuid
         {
-            get => authUUID.Value;
-            set => authUUID.Value = value;
+            get => _authUuid.Value;
+            set => _authUuid.Value = value;
         }
         public static string GetUsername()
         {
-            authUUID = Load.configFile.Bind("UserAuth", "UUID", "", ""); // This is fine to bind multiple times, it just needs to be done late enough that configFile is set.
+            _authUuid = Load.configFile.Bind("UserAuth", "UUID", "", ""); // This is fine to bind multiple times, it just needs to be done late enough that configFile is set.
             return AuthUuid.IsNullOrWhiteSpace() ? RoR2Application.GetBestUserName() : AuthUuid;
         }
         #endregion
@@ -32,14 +32,15 @@ namespace Aerolt.Social
         public static string UserCountText;
         public static string MessageText;
 
-        //public static string ip = "aerolt.lodington.dev";
-        public static string ip = IPAddress.Any.ToString();
+        public static string ip = "aerolt.lodington.dev";
+        //public static string ip = IPAddress.Any.ToString();
         public static string port = "5001";
         
         public static readonly WebSocket Connect = new($"ws://{ip}:{port}/Connect");
-        public static readonly WebSocket Message = new($"ws://{ip}:{port}/Message");
-        public static readonly WebSocket Usernames = new ($"ws://{ip}:{port}/Usernames");
+        public static WebSocket Message = new($"ws://{ip}:{port}/Message");
         public static readonly WebSocket AssetBundle = new ($"ws://{ip}:{port}/AssetBundle");
+
+        public static event Action<bool> OnCreatedAssetBundle; 
 
         private static bool _isRetying;
 
@@ -51,16 +52,13 @@ namespace Aerolt.Social
                 
                 if (AuthUuid == default) return;
                 Connect.guid = id;
-                Usernames.guid = id;
                 Message.guid = id;
                 AssetBundle.Send(id.ToString());
             };
-            Usernames.OnMessage += (_, e) => UsernameText = e.Data;
             Message.OnMessage += (_, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients
             Message.OnError += (sender, args) =>
             {
                 var isInternalError = args.Message == "An exception has occurred while receiving a message.";
-
                 Tools.Log(LogLevel.Error, args.Message);
                 
                 var socket = (WebSocket) sender;
@@ -71,23 +69,28 @@ namespace Aerolt.Social
             {
                 Tools.Log(LogLevel.Warning, "Lost Connection to server.");
                 Task.Run(ConnectClient);
+                Message = ReconnectSocket($"ws://{ip}:{port}/Message");
+                
             };
             AssetBundle.OnMessage += (sender, e) =>
             {
+                if(File.Exists(e.Data))
+                    File.Delete(e.Data);
                 File.Create(e.Data);
+                OnCreatedAssetBundle?.Invoke(true);
+                AssetBundle.Close();
             };
         }
-
+        
+        
         public static void Bind(EventHandler<MessageEventArgs> action)
         {
             Message.OnMessage += action;
-            Usernames.OnMessage += action;
             Connect.OnMessage += action;
         }
         public static void UnBind(EventHandler<MessageEventArgs> action)
         {
             Message.OnMessage -= action;
-            Usernames.OnMessage -= action;
             Connect.OnMessage -= action;
         }
 
@@ -100,18 +103,15 @@ namespace Aerolt.Social
         {
             if (_isRetying) return;
             _isRetying = true;
-            // Set name variable
             var usernameToSend = GetUsername();
             var MaxTrys = 10;
             var currentTry = 1;
             while (currentTry < MaxTrys)
             {
                 Connect.Connect();
-                Usernames.Connect();
                 Message.Connect();
-                AssetBundle.Connect();
 
-                if (Connect.IsAlive && Usernames.IsAlive && Message.IsAlive)
+                if (Connect.IsAlive && Message.IsAlive)
                 {
                     Connect.Send(usernameToSend);
                     
@@ -125,11 +125,13 @@ namespace Aerolt.Social
         }
 
 
+        private static WebSocket ReconnectSocket(string ipaddress) => new(ipaddress);
+
         public static void DisconnectClient()
         {
             Connect.Close();
-            Usernames.Close();
             Message.Close();
         }
+        
     }
 }
