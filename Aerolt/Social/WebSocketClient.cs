@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Aerolt.Helpers;
@@ -14,6 +15,16 @@ namespace Aerolt.Social
 {
     public static class WebSocketClient
     {
+        public static string UsernameText;
+        public static string MessageText;
+
+        public static string ip = "aerolt.lodington.dev";
+        public static string port = "5001";
+        
+        public static readonly WebSocket Connect = new($"ws://{ip}:{port}/Connect");
+        public static WebSocket Message = new($"ws://{ip}:{port}/Message");
+        public static readonly WebSocket AssetBundle = new ($"ws://{ip}:{port}/AssetBundle");
+        
         #region Endpoint Specific
         private static ZioConfigEntry<string> _authUuid;
         public static string AuthUuid
@@ -27,23 +38,9 @@ namespace Aerolt.Social
             return AuthUuid.IsNullOrWhiteSpace() ? RoR2Application.GetBestUserName() : AuthUuid;
         }
         #endregion
-        
-        public static string UsernameText;
-        public static string UserCountText;
-        public static string MessageText;
 
-        public static string ip = "aerolt.lodington.dev";
-        //public static string ip = IPAddress.Any.ToString();
-        public static string port = "5001";
-        
-        public static readonly WebSocket Connect = new($"ws://{ip}:{port}/Connect");
-        public static WebSocket Message = new($"ws://{ip}:{port}/Message");
-        public static readonly WebSocket AssetBundle = new ($"ws://{ip}:{port}/AssetBundle");
-
-        public static event Action<bool> OnCreatedAssetBundle; 
-
+        public static float DownloadProgress;
         private static bool _isRetying;
-
         static WebSocketClient()
         {
             Connect.OnMessage += (_, e) =>
@@ -53,7 +50,7 @@ namespace Aerolt.Social
                 if (AuthUuid == default) return;
                 Connect.guid = id;
                 Message.guid = id;
-                AssetBundle.Send(id.ToString());
+                Connect.Close();
             };
             Message.OnMessage += (_, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients
             Message.OnError += (sender, args) =>
@@ -65,24 +62,38 @@ namespace Aerolt.Social
                 if (socket.ReadyState == WebSocketState.Open && !isInternalError) Task.Run(ConnectClient);
             };
 
-            Message.OnClose += (sender, args) =>
-            {
-                Tools.Log(LogLevel.Warning, "Lost Connection to server.");
-                Task.Run(ConnectClient);
-                Message = ReconnectSocket($"ws://{ip}:{port}/Message");
-                
-            };
+            Message.OnClose += HandleClose("Message");
+
             AssetBundle.OnMessage += (sender, e) =>
             {
-                if(File.Exists(e.Data))
-                    File.Delete(e.Data);
-                File.Create(e.Data);
-                OnCreatedAssetBundle?.Invoke(true);
+                GetAssetBundle(e.Data);
                 AssetBundle.Close();
             };
         }
-        
-        
+
+        private static EventHandler<CloseEventArgs> HandleClose(string url) =>
+            delegate
+            {
+                Tools.Log(LogLevel.Warning, "Lost Connection to server.");
+                ReconnectSocket($"ws://{ip}:{port}/{url}");
+            };
+
+        private static void GetAssetBundle(string obj)
+        {
+            using var wc = new WebClient();
+            wc.DownloadProgressChanged += wc_DownloadProgressChanged;
+            wc.DownloadFileAsync (
+                new Uri(obj),
+                Load.path
+            );
+        }
+        private static void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) => DownloadProgress = e.ProgressPercentage;
+
+        private static void ConnectToAssetBundle()
+        {
+            AssetBundle.Connect();
+            AssetBundle.Send(GetUsername());
+        }
         public static void Bind(EventHandler<MessageEventArgs> action)
         {
             Message.OnMessage += action;

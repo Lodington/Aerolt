@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Security;
 using System.Security.Permissions;
-using System.Threading;
-using System.Threading.Tasks;
 using Aerolt.Classes;
 using Aerolt.Enums;
 using Aerolt.Helpers;
