@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -13,12 +14,13 @@ using LogLevel = Aerolt.Enums.LogLevel;
 
 namespace Aerolt.Social
 {
-    public static class WebSocketClient
+    public class WebSocketClient
     {
         public static string UsernameText;
         public static string MessageText;
 
-        public static string ip = "aerolt.lodington.dev";
+        //public static string ip = "aerolt.lodington.dev";
+        public static string ip = "localhost";
         public static string port = "5001";
         
         public static readonly WebSocket Connect = new($"ws://{ip}:{port}/Connect");
@@ -34,12 +36,13 @@ namespace Aerolt.Social
         }
         public static string GetUsername()
         {
-            _authUuid = Load.configFile.Bind("UserAuth", "UUID", "", ""); // This is fine to bind multiple times, it just needs to be done late enough that configFile is set.
+            _authUuid = Load.ConfigFile.Bind("UserAuth", "UUID", "", ""); // This is fine to bind multiple times, it just needs to be done late enough that configFile is set.
             return AuthUuid.IsNullOrWhiteSpace() ? RoR2Application.GetBestUserName() : AuthUuid;
         }
         #endregion
 
         public static float DownloadProgress;
+        public static Action DownloadComplete;
         private static bool _isRetying;
         static WebSocketClient()
         {
@@ -51,6 +54,7 @@ namespace Aerolt.Social
                 Connect.guid = id;
                 Message.guid = id;
                 Connect.Close();
+                ConnectToAssetBundle();
             };
             Message.OnMessage += (_, e) => MessageText += e.Data + "\n"; // Retrieve input from all clients
             Message.OnError += (sender, args) =>
@@ -82,11 +86,11 @@ namespace Aerolt.Social
         {
             using var wc = new WebClient();
             wc.DownloadProgressChanged += wc_DownloadProgressChanged;
-            wc.DownloadFileAsync (
-                new Uri(obj),
-                Load.path
-            );
+            wc.DownloadFileCompleted += DoneDownloading;
+            wc.DownloadFileAsync (new Uri(obj), wc.QueryString["File"]);
         }
+
+        private static void DoneDownloading(object sender, AsyncCompletedEventArgs e) => DownloadComplete?.Invoke();
         private static void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) => DownloadProgress = e.ProgressPercentage;
 
         private static void ConnectToAssetBundle()

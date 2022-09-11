@@ -25,8 +25,8 @@ namespace Aerolt.Classes
             PauseManager.onPauseStartGlobal += FuckingUnitySorting;
             FuckingUnitySorting();
 
-            Hud = Load.tempHud;
-            Owner = Load.tempViewer;
+            Hud = Load.TempHud;
+            Owner = Load.TempViewer;
 
             if (Owner.localUser == null) return;
             if (!Files.TryGetValue(Owner.localUser, out ConfigFile))

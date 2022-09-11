@@ -50,7 +50,7 @@ namespace Aerolt.Classes
 
         public void ModuleStart()
         {
-            var configFile = Load.configFile;
+            var configFile = Load.ConfigFile;
 
             teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");
             showTeleporterToggle.Set(teleporterEntry.Value);

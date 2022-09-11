@@ -36,22 +36,22 @@ namespace Aerolt
         public const string Guid = "com.Lodington." + Name;
         public const string Version = "4.0.5";
         public static ManualLogSource Log;
-        public static GameObject _co;
-        public static AssetBundle _assets;
+        public static GameObject Co;
+        public static AssetBundle Assets;
 
         public static GameObject ConnectionWarning;
-        public static GameObject chatWindow;
-        public static GameObject settingsRoot;
+        public static GameObject ChatWindow;
 
         public static Load Instance;
+        
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
-        public static Dictionary<NetworkUser, GameObject> aeroltUIs = new();
-        private static GameObject settingsUI;
-        public static ZioConfigFile.ZioConfigFile configFile;
-        public static NetworkUser tempViewer;
-        public static HUD tempHud;
-        public static string path;
+        public static Dictionary<NetworkUser, GameObject> AeroltUIs = new();
+        private static GameObject _settingsUI;
+        public static ZioConfigFile.ZioConfigFile ConfigFile;
+        public static NetworkUser TempViewer;
+        public static HUD TempHud;
+        public static string Path;
 
 
         public void Awake()
@@ -59,15 +59,13 @@ namespace Aerolt
             Instance = this;
             Log = Logger;
 
-            path = Path.GetDirectoryName(Info.Location);
-            _assets = AssetBundle.LoadFromFile(Path.Combine(path!, "aeroltbundle"));
+            Path = System.IO.Path.GetDirectoryName(Info.Location);
+            Assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(Path!, "aeroltbundle"));
             Tools.Log(LogLevel.Information, "Loaded AssetBundle");
-            _co = _assets.LoadAsset<GameObject>("PlayerCanvas");
-            _assets.LoadAsset<GameObject>("AeroltUI");
+            Co = Assets.LoadAsset<GameObject>("PlayerCanvas");
+            Assets.LoadAsset<GameObject>("AeroltUI");
 
-            chatWindow = _assets.LoadAsset<GameObject>("ChatWindowV2");
-            ConnectionWarning = _assets.LoadAsset<GameObject>("ConnectionWarning");
-            DontDestroyOnLoad(chatWindow);
+            ConnectionWarning = Assets.LoadAsset<GameObject>("ConnectionWarning");
 
             NetworkManager.Initialize();
         }
@@ -97,7 +95,7 @@ namespace Aerolt
 
         private void GameLoad()
         {
-            configFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
+            ConfigFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             CreateKeyBindSettings();
             Colors.InitColors();
 
@@ -108,7 +106,7 @@ namespace Aerolt
         private void CreateKeyBindSettings()
         {
             KeyBinds.Add(ButtonNames.OpenMenu,
-                configFile.Bind("Keybinds", "OpenMenu", new KeyboardShortcut(KeyCode.F1)));
+                ConfigFile.Bind("Keybinds", "OpenMenu", new KeyboardShortcut(KeyCode.F1)));
             if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
                 MakeRiskOfOptions();
         }
@@ -124,16 +122,16 @@ namespace Aerolt
             if (!hud.cameraRigController) return;
             var viewer = hud.cameraRigController.viewer;
 
-            if (aeroltUIs.ContainsKey(viewer)) return;
-            if (settingsUI && settingsUI.activeSelf) settingsUI.SetActive(false);
+            if (AeroltUIs.ContainsKey(viewer)) return;
+            if (_settingsUI && _settingsUI.activeSelf) _settingsUI.SetActive(false);
 
-            tempViewer = viewer;
-            tempHud = hud;
-            var ui = Instantiate(_co);
+            TempViewer = viewer;
+            TempHud = hud;
+            var ui = Instantiate(Co);
             ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
-            tempViewer = null;
-            tempHud = null;
-            aeroltUIs.Add(viewer, ui);
+            TempViewer = null;
+            TempHud = null;
+            AeroltUIs.Add(viewer, ui);
             Tools.Log(LogLevel.Information, "Created UI");
         }
     }

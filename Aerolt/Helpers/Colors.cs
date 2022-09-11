@@ -31,10 +31,10 @@ namespace Aerolt.Helpers
 
         public static Color32 GetColor(string identifier)
         {
-            if (Load.configFile == null) return Color.magenta;
+            if (Load.ConfigFile == null) return Color.magenta;
             if (GlobalColors.TryGetValue(identifier, out var color)) return color.Value;
 
-            color = Load.configFile.Bind("EspColors", identifier, (Color) DefaultColors[identifier], "");
+            color = Load.ConfigFile.Bind("EspColors", identifier, (Color) DefaultColors[identifier], "");
             GlobalColors[identifier] = color;
             if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
                 MakeRiskOfOptions(color);

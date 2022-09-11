@@ -33,7 +33,7 @@ namespace Aerolt.Classes
 
         private void OnDestroy()
         {
-            Load.aeroltUIs.Remove(owner);
+            Load.AeroltUIs.Remove(owner);
             visible.SettingChanged -= VisibleOnSettingChanged;
         }
 
