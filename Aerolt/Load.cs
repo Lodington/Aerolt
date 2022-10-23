@@ -39,9 +39,6 @@ namespace Aerolt
         public static GameObject Co;
         public static AssetBundle Assets;
 
-        public static GameObject ConnectionWarning;
-        public static GameObject ChatWindow;
-
         public static Load Instance;
         
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
@@ -64,8 +61,6 @@ namespace Aerolt
             Tools.Log(LogLevel.Information, "Loaded AssetBundle");
             Co = Assets.LoadAsset<GameObject>("PlayerCanvas");
             Assets.LoadAsset<GameObject>("AeroltUI");
-
-            ConnectionWarning = Assets.LoadAsset<GameObject>("ConnectionWarning");
 
             NetworkManager.Initialize();
         }
@@ -128,7 +123,7 @@ namespace Aerolt
             TempViewer = viewer;
             TempHud = hud;
             var ui = Instantiate(Co);
-            ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
+            ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem; 
             TempViewer = null;
             TempHud = null;
             AeroltUIs.Add(viewer, ui);

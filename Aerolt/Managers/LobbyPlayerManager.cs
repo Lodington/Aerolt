@@ -46,7 +46,7 @@ namespace Aerolt.Managers
         void IModuleStartup.ModuleEnd()
         {
             NetworkUser.onPostNetworkUserStart -= UserAdded;
-            //NetworkUser.onNetworkUserDiscovered -= UserAdded;
+            NetworkUser.onNetworkUserDiscovered -= UserAdded;
             NetworkUser.onNetworkUserLost -= UserLost;
 
             foreach (var (_, binding) in users) binding.OnDestroy();
@@ -75,6 +75,7 @@ namespace Aerolt.Managers
             if (!user.master) return;
             if (NetworkServer.active) BodyStart(user.master.GetBody());
             user.master.onBodyStart += BodyStart;
+            
         }
 
         private void BodyStart(CharacterBody body)
