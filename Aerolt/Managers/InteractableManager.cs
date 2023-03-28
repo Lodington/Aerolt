@@ -38,10 +38,13 @@ namespace Aerolt.Managers
             .Select(x => x.spawnCard).Union(FindObjectOfType<SceneDirector>().GenerateInteractableCardSelection()
                 .choices.Where(x => x.value != null && x.value.spawnCard != null).Select(x => x.value.spawnCard))
             .ToArray();
-
+        
+        public static Dictionary<SpawnCard, int> startOfRoundScaledInteractableCosts = new Dictionary<SpawnCard, int>();
+        
         public void ModuleStart()
         {
             _info = GetComponentInParent<MenuInfo>();
+            startOfRoundScaledInteractableCosts.Clear();
             foreach (var card in cards.OrderBy(x =>
                 x.prefab.GetComponentInChildren<IDisplayNameProvider>() != null
                     ? x.prefab.GetComponentInChildren<IDisplayNameProvider>().GetDisplayName()
@@ -56,6 +59,13 @@ namespace Aerolt.Managers
                 buttonComponet.image.sprite = PingIndicator.GetInteractableIcon(card.prefab);
                 buttonComponet.button.onClick.AddListener(() => SpawnInteractable(card));
                 cardDefRef[card] = buttonComponet;
+                
+                var prefab = card.prefab;
+                PurchaseInteraction purchaseInteraction = prefab.GetComponent<PurchaseInteraction>();
+                if (purchaseInteraction && purchaseInteraction.costType == CostTypeIndex.Money)
+                {
+                    startOfRoundScaledInteractableCosts.Add(card, Run.instance.GetDifficultyScaledCost(purchaseInteraction.cost));
+                }
             }
 
             if (searchFilter)
