@@ -61,10 +61,11 @@ namespace Aerolt.Managers
                 cardDefRef[card] = buttonComponet;
                 
                 var prefab = card.prefab;
-                PurchaseInteraction purchaseInteraction = prefab.GetComponent<PurchaseInteraction>();
+                var purchaseInteraction = prefab.GetComponent<PurchaseInteraction>();
                 if (purchaseInteraction && purchaseInteraction.costType == CostTypeIndex.Money)
                 {
-                    startOfRoundScaledInteractableCosts.Add(card, Run.instance.GetDifficultyScaledCost(purchaseInteraction.cost));
+                    var scaledCost = Run.instance.GetDifficultyScaledCost(purchaseInteraction.cost);
+                    startOfRoundScaledInteractableCosts.Add(card, scaledCost);
                 }
             }
 
