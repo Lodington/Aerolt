@@ -24,6 +24,7 @@ namespace Aerolt.Managers
         public TMP_InputField searchFilter;
         private MenuInfo _info;
         private readonly Dictionary<SpawnCard, CustomButton> cardDefRef = new();
+        static bool isScalingInteractablePricesConstantly = false;
 
         static InteractableManager()
         {
@@ -38,10 +39,13 @@ namespace Aerolt.Managers
             .Select(x => x.spawnCard).Union(FindObjectOfType<SceneDirector>().GenerateInteractableCardSelection()
                 .choices.Where(x => x.value != null && x.value.spawnCard != null).Select(x => x.value.spawnCard))
             .ToArray();
-
+        
+        public static Dictionary<SpawnCard, int> startOfRoundScaledInteractableCosts = new Dictionary<SpawnCard, int>();
+        
         public void ModuleStart()
         {
             _info = GetComponentInParent<MenuInfo>();
+            startOfRoundScaledInteractableCosts.Clear();
             foreach (var card in cards.OrderBy(x =>
                 x.prefab.GetComponentInChildren<IDisplayNameProvider>() != null
                     ? x.prefab.GetComponentInChildren<IDisplayNameProvider>().GetDisplayName()
@@ -56,6 +60,14 @@ namespace Aerolt.Managers
                 buttonComponet.image.sprite = PingIndicator.GetInteractableIcon(card.prefab);
                 buttonComponet.button.onClick.AddListener(() => SpawnInteractable(card));
                 cardDefRef[card] = buttonComponet;
+                
+                var prefab = card.prefab;
+                var purchaseInteraction = prefab.GetComponent<PurchaseInteraction>();
+                if (purchaseInteraction && purchaseInteraction.costType == CostTypeIndex.Money)
+                {
+                    var scaledCost = Run.instance.GetDifficultyScaledCost(purchaseInteraction.cost);
+                    startOfRoundScaledInteractableCosts.Add(card, scaledCost);
+                }
             }
 
             if (searchFilter)
@@ -91,18 +103,25 @@ namespace Aerolt.Managers
         public static void Spawn(uint index, Vector3 position)
         {
             var spawnCard = cards[index];
-            spawnCard.DoSpawn(position, new Quaternion(), new DirectorSpawnRequest(
-                spawnCard,
-                new DirectorPlacementRule
-                {
-                    placementMode = DirectorPlacementRule.PlacementMode.NearestNode,
-                    maxDistance = 100f,
-                    minDistance = 20f,
-                    position = position,
-                    preventOverhead = true
-                },
-                RoR2Application.rng)
-            );
+            var placementRule = new DirectorPlacementRule
+            {
+                placementMode = DirectorPlacementRule.PlacementMode.NearestNode,
+                maxDistance = 30f,
+                minDistance = 10f,
+                position = position,
+                preventOverhead = true
+            };
+            var directorSpawnRequest = new DirectorSpawnRequest(spawnCard, placementRule, RoR2Application.rng);
+            var interactableObject = DirectorCore.instance.TrySpawnObject(directorSpawnRequest);
+            
+            if (!interactableObject) return;
+            var purchaseInteraction = interactableObject.GetComponent<PurchaseInteraction>();
+            if (purchaseInteraction && purchaseInteraction.costType == CostTypeIndex.Money)
+            {
+                purchaseInteraction.Networkcost = isScalingInteractablePricesConstantly
+                    ? Run.instance.GetDifficultyScaledCost(purchaseInteraction.cost)
+                    : startOfRoundScaledInteractableCosts[spawnCard];
+            }
         }
 
         private void FilterUpdated(string text)

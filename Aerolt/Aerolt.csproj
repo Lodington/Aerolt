@@ -5,6 +5,8 @@
         <ImplicitUsings>false</ImplicitUsings>
         <Nullable>disable</Nullable>
         <LangVersion>9</LangVersion>
+        <Configurations>Debug;Release;DebugOutDir</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,5 +27,8 @@
         <HintPath>..\websocket-sharp.dll</HintPath>
       </Reference>
     </ItemGroup>
-
+    
+    <PropertyGroup Condition=" '$(Configuration)' == 'DebugOutDir' ">
+        <OutDir>C:\Users\$(USERNAME)\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\dev\BepInEx\plugins\Lodington-Aerolt</OutDir>
+    </PropertyGroup>
 </Project>
