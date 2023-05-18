@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using Console = RoR2.Console;
 
 namespace Aerolt.Managers
 {
@@ -169,6 +170,7 @@ namespace Aerolt.Managers
 
         public void SetUser(NetworkUser user)
         {
+            
             if (currentUser != null && currentUser.master) currentUser.master.onBodyStart -= SetBody;
             currentUser = user;
             PlayerConfig = playerManager.users[currentUser];
@@ -181,7 +183,7 @@ namespace Aerolt.Managers
             
             if (!master) return;
             var inv = master.inventory;
-            inventoryDisplay.SetSubscribedInventory(inv);
+            //inventoryDisplay.SetSubscribedInventory(inv);
             equipmentIcon.targetInventory = inv;
 
             master.onBodyStart += SetBody;
