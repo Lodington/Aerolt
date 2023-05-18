@@ -17,6 +17,13 @@ namespace Aerolt.Helpers
             {"Barrels", new Color32(255, 128, 0, 255)},
             {"Scrappers", Color.blue},
             {"NewtAlter", Color.white},
+            {"Blood", Color.white},
+            {"Chance", Color.white},
+            {"Combat", Color.white},
+            {"Gold", Color.white},
+            {"Mountain", Color.white},
+            {"Order", Color.white},
+            {"Woods", Color.white},
             {"Shrine", Color.white},
             {"Drone", Color.white},
             {"Printer", Color.white}

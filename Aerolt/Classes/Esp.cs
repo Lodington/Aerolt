@@ -364,8 +364,20 @@ namespace Aerolt.Classes
 
         private static void ShowShrine(PurchaseInteraction purchaseInteraction)
         {
+            var friendlyName = purchaseInteraction.GetDisplayName();
+            string colorName = friendlyName switch
+            {
+                _ when friendlyName.Contains("Blood") => "Blood",
+                _ when friendlyName.Contains("Chance") => "Chance",
+                _ when friendlyName.Contains("Combat") => "Combat",
+                _ when friendlyName.Contains("Gold") => "Gold",
+                _ when friendlyName.Contains("Mountain") => "Mountain",
+                _ when friendlyName.Contains("Order") => "Order",
+                _ when friendlyName.Contains("Woods") => "Woods",
+                _ => "Shrine"
+            };
             var position = purchaseInteraction.transform.position;
-            EspHelper.DrawESPLabel(position, Colors.GetColor("Shrine"), Color.clear,
+            EspHelper.DrawESPLabel(position, Colors.GetColor(colorName), Color.clear,
                 purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
         }
 
