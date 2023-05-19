@@ -455,7 +455,7 @@ namespace Aerolt.Classes
             if (itemDef == null) return color;
 
             var itemTier = itemDef.tier;
-            var itemTierDef = ItemTierCatalog.FindTierDef(itemTier.ToString());
+            var itemTierDef = ItemTierCatalog.GetItemTierDef(itemTier);
 
             if (itemTierDef == null) return color;
 
