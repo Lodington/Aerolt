@@ -306,13 +306,51 @@ namespace Aerolt.Classes
             }
         }
 
+        private static void ShowNewtAlter(PurchaseInteraction purchaseInteraction)
+        {
+            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("NewtAlter"), Color.clear,
+                GetLabel(purchaseInteraction));
+        }
+
+        private static void ShowShrine(PurchaseInteraction purchaseInteraction)
+        {
+            string colorName = purchaseInteraction.displayNameToken switch
+            {
+                "SHRINE_BLOOD_NAME"         => "Shrine of Blood",
+                "SHRINE_CHANCE_NAME"        => "Shrine of Chance",
+                "SHRINE_CLEANSE_NAME"       => "Cleansing Pool",
+                "SHRINE_COMBAT_NAME"        => "Shrine of Combat",
+                "SHRINE_GOLDSHORES_NAME"    => "Altar of Gold",
+                "SHRINE_BOSS_NAME"          => "Shrine of the Mountain",
+                "SHRINE_RESTACK_NAME"       => "Shrine of Order",
+                "SHRINE_HEALING_NAME"       => "Shrine of the Woods",
+                _ => "Shrine"
+            };
+            var position = purchaseInteraction.transform.position;
+            EspHelper.DrawESPLabel(position, Colors.GetColor(colorName), Color.clear,
+                purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
+        }
+
+        private static void ShowDrone(PurchaseInteraction purchaseInteraction)
+        {
+            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Drone"), Color.clear,
+                GetLabel(purchaseInteraction));
+        }
+
+        private static void ShowDuplicator(string token, ShopTerminalBehavior shopTerminal)
+        {
+            var text =
+                $"{Language.GetString(token)}\n{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n{shopTerminal.itemTier.ToString()}\n{GetDistance(shopTerminal.transform.position)}m";
+            EspHelper.DrawESPLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear, text);
+        }
+
         private static void ShowChest(TimedChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var items = optionChestBehavior.remainingTime;
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    GetDistance(purchaseInteraction) + "\n-" + items + "s");
+                    GetLabel(purchaseInteraction) + "\n-" + items + "s");
             }
             else
             {
@@ -347,78 +385,13 @@ namespace Aerolt.Classes
                     }).ToArray()
                     : new string[0];
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    GetDistance(purchaseInteraction) + "\n-" + string.Join("\n-", items));
+                    GetLabel(purchaseInteraction) + "\n-" + string.Join("\n-", items));
             }
             else
             {
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
                     "+");
             }
-        }
-
-        private static void ShowNewtAlter(PurchaseInteraction purchaseInteraction)
-        {
-            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("NewtAlter"), Color.clear,
-                GetDistance(purchaseInteraction));
-        }
-
-        private static void ShowShrine(PurchaseInteraction purchaseInteraction)
-        {
-            string colorName = purchaseInteraction.displayNameToken switch
-            {
-                "SHRINE_BLOOD_NAME"         => "Shrine of Blood",
-                "SHRINE_CHANCE_NAME"        => "Shrine of Chance",
-                "SHRINE_CLEANSE_NAME"       => "Cleansing Pool",
-                "SHRINE_COMBAT_NAME"        => "Shrine of Combat",
-                "SHRINE_GOLDSHORES_NAME"    => "Altar of Gold",
-                "SHRINE_BOSS_NAME"          => "Shrine of the Mountain",
-                "SHRINE_RESTACK_NAME"       => "Shrine of Order",
-                "SHRINE_HEALING_NAME"       => "Shrine of the Woods",
-                _ => "Shrine"
-            };
-            var position = purchaseInteraction.transform.position;
-            EspHelper.DrawESPLabel(position, Colors.GetColor(colorName), Color.clear,
-                purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
-        }
-
-        private static void ShowDrone(PurchaseInteraction purchaseInteraction)
-        {
-            EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Drone"), Color.clear,
-                GetDistance(purchaseInteraction));
-        }
-
-        private static void ShowDuplicator(string token, ShopTerminalBehavior shopTerminal)
-        {
-            var text =
-                $"{Language.GetString(token)}\n{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n{shopTerminal.itemTier.ToString()}\n{GetDistance(shopTerminal.transform.position)}m";
-            EspHelper.DrawESPLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear, text);
-        }
-
-        public static float GetDistance(Vector3 position)
-        {
-            var distanceToObject = Vector3.Distance(Camera.main.transform.position, position);
-            var distance = (int) distanceToObject;
-            return distance;
-        }
-
-        private static Color GetDropColor(ItemIndex itemIndex)
-        {
-            if (itemIndex == ItemIndex.None) return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Equipment);
-
-            var color = ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier1Item);
-
-            var itemDef = ItemCatalog.GetItemDef(itemIndex);
-
-            if (itemDef == null) return color;
-
-            var itemTier = itemDef.tier;
-            var itemTierDef = ItemTierCatalog.FindTierDef(itemTier.ToString());
-
-            if (itemTierDef == null) return color;
-
-            color = ColorCatalog.GetColor(itemTierDef.colorIndex);
-
-            return color;
         }
 
         private static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
@@ -434,10 +407,10 @@ namespace Aerolt.Classes
                     : "";
                 if (def.itemIndex != ItemIndex.None) {
                     EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                        GetDistance(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken));
+                        GetLabel(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken));
                 } else {
                     EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                        GetDistance(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken));
+                        GetLabel(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken));
                 }
                 
             }
@@ -462,7 +435,7 @@ namespace Aerolt.Classes
                     }).ToArray()
                     : new string[0];
                 EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    GetDistance(purchaseInteraction) + "\n-" + string.Join("\n-", items));
+                    GetLabel(purchaseInteraction) + "\n-" + string.Join("\n-", items));
             }
             else
             {
@@ -471,17 +444,41 @@ namespace Aerolt.Classes
             }
         }
 
-        public static string GetDistance(PurchaseInteraction purchaseInteraction)
+        private static Color GetDropColor(ItemIndex itemIndex)
         {
-            var distanceToObject =
-                Vector3.Distance(Camera.main.transform.position, purchaseInteraction.transform.position);
-            var distance = (int) distanceToObject;
+            if (itemIndex == ItemIndex.None) return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Equipment);
+
+            var color = ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier1Item);
+
+            var itemDef = ItemCatalog.GetItemDef(itemIndex);
+
+            if (itemDef == null) return color;
+
+            var itemTier = itemDef.tier;
+            var itemTierDef = ItemTierCatalog.FindTierDef(itemTier.ToString());
+
+            if (itemTierDef == null) return color;
+
+            color = ColorCatalog.GetColor(itemTierDef.colorIndex);
+
+            return color;
+        }
+
+        public static string GetLabel(PurchaseInteraction purchaseInteraction)
+        {
+            var distance = GetDistance(purchaseInteraction.transform.position);
             var friendlyName = purchaseInteraction.GetDisplayName();
             var cost = purchaseInteraction.cost;
 
             return $"{friendlyName}\n${cost}\n{distance}m";
         }
 
+        public static float GetDistance(Vector3 position)
+        {
+            var distanceToObject = Vector3.Distance(Camera.main.transform.position, position);
+            var distance = (int) distanceToObject;
+            return distance;
+        }
 
         public static bool CheckCursorPosition(Vector3 worldPos)
         {
