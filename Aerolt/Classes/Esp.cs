@@ -412,8 +412,14 @@ namespace Aerolt.Classes
                         Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
                         : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken)
                     : "";
-                EspHelper.DrawESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    GetDistance(purchaseInteraction) + "\n" + item);
+                if (def.itemIndex != ItemIndex.None) {
+                    EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                        GetDistance(purchaseInteraction), chest.dropPickup.GetPickupColor(), Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken));
+                } else {
+                    EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                        GetDistance(purchaseInteraction), chest.dropPickup.GetPickupColor(), Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken));
+                }
+                
             }
             else
             {

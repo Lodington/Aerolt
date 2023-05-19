@@ -28,6 +28,47 @@ namespace Aerolt.Managers
             }
         }
 
+        public static void DrawRarityESPLabel(Vector3 worldpos, Color textcolor, Color outlinecolor, string text,
+            Color itemColor, string itemName = "",  string outlinetext = null)
+        {
+            var content = new GUIContent(text);
+            if (outlinetext == null) outlinetext = text;
+            var outlineContent = new GUIContent(outlinetext);
+            var style = GUI.skin.label;
+            style.alignment = TextAnchor.MiddleCenter;
+            var size = style.CalcSize(content);
+            var pos = Camera.main.WorldToScreenPoint(worldpos);
+            pos.y = Screen.height - pos.y;
+            if (pos.z >= 0)
+            {
+                GUI.color = Color.black;
+                GUI.Label(new Rect(pos.x - size.x / 2 + 1, pos.y + 1, size.x, size.y), outlineContent);
+                GUI.Label(new Rect(pos.x - size.x / 2 - 1, pos.y - 1, size.x, size.y), outlineContent);
+                GUI.Label(new Rect(pos.x - size.x / 2 + 1, pos.y - 1, size.x, size.y), outlineContent);
+                GUI.Label(new Rect(pos.x - size.x / 2 - 1, pos.y + 1, size.x, size.y), outlineContent);
+                GUI.color = textcolor;
+                GUI.Label(new Rect(pos.x - size.x / 2, pos.y, size.x, size.y), content);
+
+                if (!string.IsNullOrEmpty(itemName))
+                {
+                    var itemContent = new GUIContent(itemName);
+                    var outlineItemName = itemName;
+                    var outlineItemContent = new GUIContent(outlineItemName);
+                    var itemSize = style.CalcSize(itemContent);
+
+                    GUI.color = Color.black;
+                    GUI.Label(new Rect(pos.x - itemSize.x / 2 + 1, pos.y + 1 + size.y, itemSize.x, itemSize.y), outlineItemContent);
+                    GUI.Label(new Rect(pos.x - itemSize.x / 2 - 1, pos.y - 1 + size.y, itemSize.x, itemSize.y), outlineItemContent);
+                    GUI.Label(new Rect(pos.x - itemSize.x / 2 + 1, pos.y - 1 + size.y, itemSize.x, itemSize.y), outlineItemContent);
+                    GUI.Label(new Rect(pos.x - itemSize.x / 2 - 1, pos.y + 1 + size.y, itemSize.x, itemSize.y), outlineItemContent);
+                    GUI.color = itemColor;
+                    GUI.Label(new Rect(pos.x - itemSize.x / 2, pos.y + size.y, itemSize.x, itemSize.y), itemContent);
+                }
+
+                GUI.color = Color.black;
+            }
+        }
+
         public static Vector3 WorldToScreen(Vector3 worldpos)
         {
             var pos = Camera.main.WorldToScreenPoint(worldpos);
