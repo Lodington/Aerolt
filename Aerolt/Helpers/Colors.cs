@@ -28,7 +28,11 @@ namespace Aerolt.Helpers
             {"Shrine of the Woods", Color.white},
             {"Shrine", Color.white},
             {"Drone", Color.white},
-            {"Printer", Color.white}
+            {"Printer", Color.white},
+            {"Teleporter Idle", Color.magenta},
+            {"Teleporter Charging", Color.yellow},
+            {"Teleporter Charged", Color.green},
+            {"Teleporter Finished", Color.red},
         };
 
         public static readonly Dictionary<string, ZioConfigEntry<Color>> GlobalColors = new();

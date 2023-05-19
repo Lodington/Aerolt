@@ -190,17 +190,17 @@ namespace Aerolt.Classes
                 switch (TeleporterInteraction.instance.currentState)
                 {
                     case TeleporterInteraction.IdleState:
-                        teleporterColor = Color.magenta;
+                        teleporterColor = Colors.GetColor("Teleporter Idle");
                         break;
                     case TeleporterInteraction.ChargingState:
                     case TeleporterInteraction.IdleToChargingState:
-                        teleporterColor = Color.yellow;
+                        teleporterColor = Colors.GetColor("Teleporter Charging");
                         break;
                     case TeleporterInteraction.ChargedState:
-                        teleporterColor = Color.green;
+                        teleporterColor = Colors.GetColor("Teleporter Charged");
                         break;
                     default:
-                        teleporterColor = Color.red;
+                        teleporterColor = Colors.GetColor("Teleporter Finished");;
                         break;
                 }
 
@@ -285,13 +285,20 @@ namespace Aerolt.Classes
 
                 var shopTerminal = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
                 if (shopTerminal)
+                {
                     if (Instance.showDuplicatorToggle.isOn)
                     {
-                        if (purchaseInteraction.displayNameToken == "DUPLICATOR_NAME")
-                            ShowDuplicator("DUPLICATOR_NAME", shopTerminal);
-                        if (purchaseInteraction.displayNameToken == "BAZAAR_CAULDRON_NAME")
-                            ShowDuplicator("BAZAAR_CAULDRON_NAME", shopTerminal);
+                        var possibleNames = new[] { "DUPLICATOR_NAME", "DUPLICATOR_MILITARY_NAME", "BAZAAR_CAULDRON_NAME" };
+                        foreach (var name in possibleNames)
+                        {
+                            if (purchaseInteraction.displayNameToken == name)
+                            {
+                                ShowDuplicator(name, shopTerminal);
+                                break;
+                            }
+                        }
                     }
+                }
 
                 var masterSummon = purchaseInteraction.GetComponent<SummonMasterBehavior>();
                 if (masterSummon && Instance.showDroneToggle.isOn) ShowDrone(purchaseInteraction);
@@ -339,9 +346,16 @@ namespace Aerolt.Classes
 
         private static void ShowDuplicator(string token, ShopTerminalBehavior shopTerminal)
         {
+            var def = PickupCatalog.GetPickupDef(shopTerminal.pickupIndex);
+            if (def.itemIndex != ItemIndex.None)
+            {
+                EspHelper.DrawRarityESPLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear,
+                    GetLabelDuplicator(Language.GetString(token), shopTerminal), GetDropColor(def.itemIndex), Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex).itemIndex).nameToken));
+            }
             var text =
-                $"{Language.GetString(token)}\n{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n{shopTerminal.itemTier.ToString()}\n{GetDistance(shopTerminal.transform.position)}m";
-            EspHelper.DrawESPLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear, text);
+                $"{Language.GetString(token)}\n" +
+                $"{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n" +
+                $"{GetDistance(shopTerminal.transform.position)}m";
         }
 
         private static void ShowChest(TimedChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
@@ -399,16 +413,13 @@ namespace Aerolt.Classes
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var def = PickupCatalog.GetPickupDef(chest.dropPickup);
-                var item = def != null
-                    ? def.itemIndex != ItemIndex.None
-                        ?
-                        Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
-                        : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken)
-                    : "";
-                if (def.itemIndex != ItemIndex.None) {
+                if (def.itemIndex != ItemIndex.None)
+                {
                     EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
                         GetLabel(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken));
-                } else {
+                }
+                else
+                {
                     EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Equipment"), Color.clear,
                         GetLabel(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken));
                 }
@@ -471,6 +482,12 @@ namespace Aerolt.Classes
             var cost = purchaseInteraction.cost;
 
             return $"{friendlyName}\n${cost}\n{distance}m";
+        }
+
+        public static string GetLabelDuplicator(string token, ShopTerminalBehavior shopTerminal)
+        {
+            var distance = GetDistance(shopTerminal.transform.position);
+            return $"{token}\n{distance}m";
         }
 
         public static float GetDistance(Vector3 position)
