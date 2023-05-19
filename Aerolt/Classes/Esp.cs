@@ -401,6 +401,26 @@ namespace Aerolt.Classes
             return distance;
         }
 
+        private static Color GetDropColor(ItemIndex itemIndex)
+        {
+            if (itemIndex == ItemIndex.None) return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Equipment);
+
+            var color = ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier1Item);
+
+            var itemDef = ItemCatalog.GetItemDef(itemIndex);
+
+            if (itemDef == null) return color;
+
+            var itemTier = itemDef.tier;
+            var itemTierDef = ItemTierCatalog.FindTierDef(itemTier.ToString());
+
+            if (itemTierDef == null) return color;
+
+            color = ColorCatalog.GetColor(itemTierDef.colorIndex);
+
+            return color;
+        }
+
         private static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
@@ -414,10 +434,10 @@ namespace Aerolt.Classes
                     : "";
                 if (def.itemIndex != ItemIndex.None) {
                     EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                        GetDistance(purchaseInteraction), chest.dropPickup.GetPickupColor(), Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken));
+                        GetDistance(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken));
                 } else {
                     EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                        GetDistance(purchaseInteraction), chest.dropPickup.GetPickupColor(), Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken));
+                        GetDistance(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken));
                 }
                 
             }
