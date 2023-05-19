@@ -364,16 +364,16 @@ namespace Aerolt.Classes
 
         private static void ShowShrine(PurchaseInteraction purchaseInteraction)
         {
-            var friendlyName = purchaseInteraction.GetDisplayName();
-            string colorName = friendlyName switch
+            string colorName = purchaseInteraction.displayNameToken switch
             {
-                _ when friendlyName.Contains("Blood") => "Blood",
-                _ when friendlyName.Contains("Chance") => "Chance",
-                _ when friendlyName.Contains("Combat") => "Combat",
-                _ when friendlyName.Contains("Gold") => "Gold",
-                _ when friendlyName.Contains("Mountain") => "Mountain",
-                _ when friendlyName.Contains("Order") => "Order",
-                _ when friendlyName.Contains("Woods") => "Woods",
+                "SHRINE_BLOOD_NAME"         => "Shrine of Blood",
+                "SHRINE_CHANCE_NAME"        => "Shrine of Chance",
+                "SHRINE_CLEANSE_NAME"       => "Cleansing Pool",
+                "SHRINE_COMBAT_NAME"        => "Shrine of Combat",
+                "SHRINE_GOLDSHORES_NAME"    => "Altar of Gold",
+                "SHRINE_BOSS_NAME"          => "Shrine of the Mountain",
+                "SHRINE_RESTACK_NAME"       => "Shrine of Order",
+                "SHRINE_HEALING_NAME"       => "Shrine of the Woods",
                 _ => "Shrine"
             };
             var position = purchaseInteraction.transform.position;
