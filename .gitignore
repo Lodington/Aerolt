@@ -1,6 +1,7 @@
 /Aerolt/obj/
 /Aerolt/bin/
 .idea
+.vs
 /Aerolt.manifest
 /aeroltbundle.manifest
 /copyAssetbundle.bat
