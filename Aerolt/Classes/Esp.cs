@@ -132,6 +132,10 @@ namespace Aerolt.Classes
                     str.AppendLine("Multi Shop Terminal"); // TODO use lang token
                 var costSet = false;
                 if (multiShopController.terminalGameObjects.src == null) continue; // TODO properly fix this
+
+                List<Color> itemColors = new List<Color>();
+                List<string> itemNames = new List<string>();
+
                 foreach (var o in multiShopController.terminalGameObjects)
                 {
                     var shop = o.GetComponent<ShopTerminalBehavior>();
@@ -153,16 +157,25 @@ namespace Aerolt.Classes
                     }
 
                     if (pickupDef.itemIndex != ItemIndex.None)
-                        str.AppendLine("- " +
-                                       Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken));
-                    if (pickupDef.equipmentIndex != EquipmentIndex.None)
-                        str.AppendLine("- " +
-                                       Language.GetString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex)
-                                           .nameToken));
+                    {
+                        itemNames.Add(Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken));
+                        itemColors.Add(GetDropColor(pickupDef.itemIndex));
+                        // str.AppendLine("- " +
+                        //                Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken));
+                        // EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
+                        //     GetLabel(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken));
+                    }
+                    else
+                    {
+                        itemNames.Add(Language.GetString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).nameToken));
+                        itemColors.Add(GetDropColor(pickupDef.itemIndex));
+                        // EspHelper.DrawRarityESPLabel(purchaseInteraction.transform.position, Colors.GetColor("Equipment"), Color.clear,
+                        //     GetLabel(purchaseInteraction), GetDropColor(def.itemIndex), Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken));
+                    }
                 }
 
                 if (!costSet) continue;
-                EspHelper.DrawESPLabel(position, Colors.GetColor("Shop"), Color.clear, str.ToString());
+                EspHelper.DrawMultiShopRarityESPLabel(position, Colors.GetColor("Shop"), Color.clear, str.ToString(), itemColors, itemNames);
             }
         }
 
@@ -352,10 +365,6 @@ namespace Aerolt.Classes
                 EspHelper.DrawRarityESPLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear,
                     GetLabelDuplicator(Language.GetString(token), shopTerminal), GetDropColor(def.itemIndex), Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex).itemIndex).nameToken));
             }
-            var text =
-                $"{Language.GetString(token)}\n" +
-                $"{Language.GetString(ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex)?.itemIndex ?? ItemIndex.None).nameToken)}\n" +
-                $"{GetDistance(shopTerminal.transform.position)}m";
         }
 
         private static void ShowChest(TimedChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
