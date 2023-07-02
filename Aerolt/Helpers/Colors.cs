@@ -11,15 +11,28 @@ namespace Aerolt.Helpers
     {
         public static readonly Dictionary<string, Color32> DefaultColors = new()
         {
-            {"Chest", Color.red},
-            {"Shop", Color.red},
+            {"Chest", Color.blue},
+            {"Equipment", Color.yellow},
+            {"Shop", Color.blue},
             {"Secret_Plates", Color.cyan},
             {"Barrels", new Color32(255, 128, 0, 255)},
             {"Scrappers", Color.blue},
             {"NewtAlter", Color.white},
+            {"Shrine of Blood", Color.white},
+            {"Shrine of Chance", Color.white},
+            {"Cleansing Pool", Color.white},
+            {"Shrine of Combat", Color.white},
+            {"Altar of Gold", Color.white},
+            {"Shrine of the Mountain", Color.white},
+            {"Shrine of Order", Color.white},
+            {"Shrine of the Woods", Color.white},
             {"Shrine", Color.white},
             {"Drone", Color.white},
-            {"Printer", Color.white}
+            {"Printer", Color.white},
+            {"Teleporter Idle", Color.magenta},
+            {"Teleporter Charging", Color.yellow},
+            {"Teleporter Charged", Color.green},
+            {"Teleporter Finished", Color.red},
         };
 
         public static readonly Dictionary<string, ZioConfigEntry<Color>> GlobalColors = new();
