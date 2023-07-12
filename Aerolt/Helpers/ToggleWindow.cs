@@ -53,15 +53,12 @@ namespace Aerolt.Classes
             visible = menuInfo.ConfigFile.Bind("General", "Show Icon", true,
                 "You should probably leave this on if you're using a gamepad.");
             visible.SettingChanged += VisibleOnSettingChanged;
-            VisibleOnSettingChanged()
+            VisibleOnSettingChanged(null, null, false);
             if (!roo.Contains(visible.Definition) && Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions"))
                 MakeRiskOfOptions(visible);
         }
 
-        private void VisibleOnSettingChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
-        {
-            GetComponent<Image>().enabled = visible.Value;
-        }
+        private void VisibleOnSettingChanged(ZioConfigEntryBase arg1, object arg2, bool arg3) => GetComponent<Image>().enabled = visible.Value;
 
         private void MakeRiskOfOptions(ZioConfigEntry<bool> visible)
         {
