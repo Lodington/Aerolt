@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Mime;
 using System.Security;
 using System.Security.Permissions;
 using Aerolt.Classes;
@@ -60,8 +61,11 @@ namespace Aerolt
             Assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(Path!, "aeroltbundle"));
             Tools.Log(LogLevel.Information, "Loaded AssetBundle");
             Co = Assets.LoadAsset<GameObject>("PlayerCanvas");
+            
             Assets.LoadAsset<GameObject>("AeroltUI");
 
+            
+            
             NetworkManager.Initialize();
         }
 
@@ -109,6 +113,7 @@ namespace Aerolt
         private void MakeRiskOfOptions()
         {
             foreach (var value in KeyBinds.Values) ModSettingsManager.AddOption(new ZioKeyBindOption(value));
+            ModSettingsManager.SetModIcon(Assets.LoadAsset<Sprite>("NewLogo"));
         }
 
 

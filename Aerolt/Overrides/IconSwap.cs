@@ -15,9 +15,6 @@ namespace Aerolt.Overrides
             if (ran < 20) SwapThisImage();
         }
 
-        public void SwapThisImage()
-        {
-            discord.sprite = imageToSwapTo;
-        }
+        public void SwapThisImage() => discord.sprite = imageToSwapTo;
     }
 }

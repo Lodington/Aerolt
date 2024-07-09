@@ -14,10 +14,7 @@ namespace Aerolt.Helpers
         private LocalUser localuser;
         private OpenState openSettings;
 
-        public void Awake()
-        {
-            localuser = GetComponentInParent<MenuInfo>().Owner.localUser;
-        }
+        public void Awake() => localuser = GetComponentInParent<MenuInfo>().Owner.localUser;
 
         private void Update()
         {

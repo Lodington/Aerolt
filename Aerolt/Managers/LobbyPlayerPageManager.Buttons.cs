@@ -17,15 +17,9 @@ namespace Aerolt.Managers
         public static PickupDropTable Chest1DropTable =>
             _chest1DropTable ??= LegacyResourcesAPI.Load<PickupDropTable>("DropTables/dtSmallChest");
 
-        public void Kick()
-        {
-            new KickBanMessage(currentUser, true).SendToServer();
-        }
+        public void Kick() => new KickBanMessage(currentUser, true).SendToServer();
 
-        public void Ban()
-        {
-            new KickBanMessage(currentUser, ban: true).SendToServer();
-        }
+        public void Ban() => new KickBanMessage(currentUser, ban: true).SendToServer();
 
         public void Goto()
         {
@@ -79,25 +73,9 @@ namespace Aerolt.Managers
             var items = ContentManager.itemDefs.ToDictionary(x => x, _ => 0);
             new SetItemCountMessage(master.inventory, items).SendToServer();
         }
-
-        public void OpenInventory()
-        {
-            SwapViewState(ViewState.Inventory);
-        }
-
-        public void OpenBuffs()
-        {
-            SwapViewState(ViewState.Buff);
-        }
-
-        public void OpenEquipment()
-        {
-            SwapViewState(ViewState.Equipment);
-        }
-
-        public void OpenSpawnAs()
-        {
-            SwapViewState(ViewState.Body);
-        }
+        public void OpenInventory() => SwapViewState(ViewState.Inventory);
+        public void OpenBuffs() => SwapViewState(ViewState.Buff);
+        public void OpenEquipment() => SwapViewState(ViewState.Equipment);
+        public void OpenSpawnAs() => SwapViewState(ViewState.Body);
     }
 }

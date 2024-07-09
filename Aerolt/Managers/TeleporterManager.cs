@@ -42,10 +42,7 @@ namespace Aerolt.Managers
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
-        public void SetScene(SceneDef scene)
-        {
-            new SceneChangeMessage(scene.sceneDefIndex).SendToServer();
-        }
+        public void SetScene(SceneDef scene) => new SceneChangeMessage(scene.sceneDefIndex).SendToServer();
 
         public void InstaTeleporter()
         {
@@ -65,10 +62,7 @@ namespace Aerolt.Managers
             Chat.AddMessage("<color=yellow>Added Mountain stack</color>");
         }
 
-        public void SpawnPortals(string portal)
-        {
-            new PortalSpawnMessage(portal).SendToServer();
-        }
+        public void SpawnPortals(string portal) => new PortalSpawnMessage(portal).SendToServer();
 
         private void FilterUpdated(string text)
         {

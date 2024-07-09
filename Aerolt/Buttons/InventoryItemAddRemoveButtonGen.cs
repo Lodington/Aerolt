@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using RoR2;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace Aerolt.Buttons
 {
@@ -33,23 +35,32 @@ namespace Aerolt.Buttons
             customButton = button.GetComponent<CustomButton>();
             //customButton.onRightClick.AddListener(isDecrease ? Increase : Decrease); There is a bug with this, when decreasing on the left side it can destroy the left side button
             button.GetComponent<Button>().onClick.AddListener(!isDecrease ? Increase : Decrease);
-
-            switch (defIn) // Generics are fucked
+            try
             {
-                case ItemDef itemDef:
-                    customButton.buttonText.text = Language.GetString(itemDef.nameToken);
-                    customButton.image.sprite = itemDef.pickupIconSprite;
-                    break;
-                case EquipmentDef eqDef:
-                    customButton.buttonText.text = Language.GetString(eqDef.nameToken);
-                    customButton.image.sprite = eqDef.pickupIconSprite;
-                    break;
-                case BuffDef buffDef:
-                    customButton.buttonText.text = buffDef.name;
-                    var image = customButton.image;
-                    image.sprite = buffDef.iconSprite;
-                    image.color = buffDef.buffColor;
-                    break;
+                switch (defIn) // Generics are fucked
+                {
+                    case ItemDef itemDef:
+                        customButton.buttonText.text = Language.GetString(itemDef.nameToken);
+                        customButton.image.sprite = itemDef.pickupIconSprite;
+                        break;
+                    case EquipmentDef eqDef:
+                        customButton.buttonText.text = Language.GetString(eqDef.nameToken);
+                        customButton.image.sprite = eqDef.pickupIconSprite;
+                        break;
+                    case BuffDef buffDef:
+                        customButton.buttonText.text = buffDef.name;
+                        var image = customButton.image;
+                        image.sprite = buffDef.iconSprite;
+                        image.color = buffDef.buffColor;
+                        break;
+                    default:
+                        customButton.buttonText.text = "This Mod Sucks Balls";
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("A mod isn't set up correctly." + ex);
             }
         }
 

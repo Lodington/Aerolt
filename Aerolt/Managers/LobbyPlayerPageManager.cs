@@ -109,6 +109,8 @@ namespace Aerolt.Managers
             playerManager = GetComponent<LobbyPlayerManager>();
             bodyStats.Setup();
 
+            
+            
             GlobalEventManager.onTeamLevelUp += OnTeamLevelUp;
 
             teamDropdown.options.Clear(); // ensure it was empty to begin with.
@@ -183,7 +185,7 @@ namespace Aerolt.Managers
             
             if (!master) return;
             var inv = master.inventory;
-            //inventoryDisplay.SetSubscribedInventory(inv);
+            inventoryDisplay.SetSubscribedInventory(inv);
             equipmentIcon.targetInventory = inv;
 
             master.onBodyStart += SetBody;

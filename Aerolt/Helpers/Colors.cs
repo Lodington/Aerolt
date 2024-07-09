@@ -37,10 +37,7 @@ namespace Aerolt.Helpers
 
         public static readonly Dictionary<string, ZioConfigEntry<Color>> GlobalColors = new();
 
-        public static string GenerateColoredString(string text, Color color)
-        {
-            return "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + text + "</color>";
-        }
+        public static string GenerateColoredString(string text, Color color) => "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + text + "</color>";
 
         public static Color32 GetColor(string identifier)
         {
@@ -54,15 +51,9 @@ namespace Aerolt.Helpers
             return color.Value;
         }
 
-        private static void MakeRiskOfOptions(ZioConfigEntry<Color> value)
-        {
-            ModSettingsManager.AddOption(new ZioColorOption(value));
-        }
+        private static void MakeRiskOfOptions(ZioConfigEntry<Color> value) => ModSettingsManager.AddOption(new ZioColorOption(value));
 
-        public static void SetColor(string id, Color32 c)
-        {
-            GlobalColors[id].Value = c;
-        }
+        public static void SetColor(string id, Color32 c) => GlobalColors[id].Value = c;
 
         public static string ColorToHex(Color32 color)
         {

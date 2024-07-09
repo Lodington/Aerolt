@@ -66,9 +66,9 @@ namespace Aerolt.Classes
 
         public void FuckingUnitySorting()
         {
-            StartCoroutine(Example());
+            StartCoroutine(ChangeSortingOrder());
 
-            IEnumerator Example()
+            IEnumerator ChangeSortingOrder()
             {
                 yield return new WaitForSecondsRealtime(0.01f);
                 parentCanvas.sortingOrder = 1000; // something keeps fucking setting this back to 0

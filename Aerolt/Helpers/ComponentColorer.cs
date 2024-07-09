@@ -36,10 +36,7 @@ namespace Aerolt.Helpers
         private bool initialized;
         private MenuInfo menuInfo;
 
-        private void Awake()
-        {
-            ModuleStart();
-        }
+        private void Awake() => ModuleStart();
 
         public void ModuleStart()
         {
@@ -145,10 +142,7 @@ namespace Aerolt.Helpers
 
     public class ColorableText : ColorableComponent
     {
-        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
-        {
-            GetComponent<TextMeshProUGUI>().color = (Color) configEntry.BoxedValue;
-        }
+        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _) => GetComponent<TextMeshProUGUI>().color = (Color) configEntry.BoxedValue;
     }
 
     public class ColorableImage : ColorableComponent
@@ -165,9 +159,6 @@ namespace Aerolt.Helpers
 
     public class ColorableRawImage : ColorableComponent
     {
-        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
-        {
-            GetComponent<RawImage>().color = (Color) configEntry.BoxedValue;
-        }
+        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _) => GetComponent<RawImage>().color = (Color) configEntry.BoxedValue;
     }
 }
