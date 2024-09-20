@@ -26,8 +26,9 @@ namespace Aerolt.Managers
         {
             base.Handle();
             var host = NetworkUser.localPlayers.First();
-            if (kick) Console.instance.RunCmd(host, "kick_steam", new List<string> {who.Network_id.steamId.ToString()});
-            if (ban) Console.instance.RunCmd(host, "ban_steam", new List<string> {who.Network_id.steamId.ToString()});
+            if (kick)
+                Console.instance.RunCmd(host, "kick_steam", new List<string> { who.Network_id.steamId.ToString() });
+            if (ban) Console.instance.RunCmd(host, "ban_steam", new List<string> { who.Network_id.steamId.ToString() });
         }
 
         public override void Deserialize(NetworkReader reader)

@@ -43,7 +43,7 @@ namespace Aerolt.Buttons
         {
             var body = user.master.GetBody();
             if (!body) return;
-            new SetBuffCountMessage(body, buffDef.ToDictionary(x => x.Key.buffIndex, x => (uint) x.Value))
+            new SetBuffCountMessage(body, buffDef.ToDictionary(x => x.Key.buffIndex, x => (uint)x.Value))
                 .SendToServer();
             GetComponentInParent<LobbyPlayerPageManager>().SwapViewState();
         }

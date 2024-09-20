@@ -38,8 +38,11 @@ namespace Aerolt.Managers
             GodMode.settingChanged += OnGodModeChanged;
             Noclip = ValueWrapper.Get("PlayerMenu", "Noclip", false, "", user);
             Noclip.settingChanged += OnNoclipChanged;
-            var who = user && user.localUser != null ? Load.Name + " " + user.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
-            NoclipInteractForDown = ValueWrapper.Get("PlayerMenu", "NoclipInteractForDown", true, "", user, firstSetup: config => ModSettingsManager.AddOption(new ZioCheckBoxOption(config), who, who));
+            var who = user && user.localUser != null
+                ? Load.Name + " " + user.GetNetworkPlayerName().GetResolvedName()
+                : Load.Guid;
+            NoclipInteractForDown = ValueWrapper.Get("PlayerMenu", "NoclipInteractForDown", true, "", user,
+                firstSetup: config => ModSettingsManager.AddOption(new ZioCheckBoxOption(config), who, who));
             NoclipInteractForDown.settingChanged += OnNoclipForInteractDownChanged;
         }
 
@@ -53,7 +56,7 @@ namespace Aerolt.Managers
             Noclip.settingChanged -= OnNoclipChanged;
             NoclipInteractForDown.settingChanged -= OnNoclipForInteractDownChanged;
         }
-        
+
         private void OnNoclipForInteractDownChanged()
         {
             if (!user.master) return;

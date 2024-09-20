@@ -17,13 +17,13 @@ namespace Aerolt.Helpers
     {
         private static readonly Dictionary<ColorLayer, Color> defaultColors = new()
         {
-            {ColorLayer.Foreground, new Color(0.322f, 0.322f, 0.322f)},
+            { ColorLayer.Foreground, new Color(0.322f, 0.322f, 0.322f) },
             {
                 ColorLayer.Background, new Color(0.149f, 0.149f, 0.149f, 0.8509804f)
             }, //new Color(0, 0, 0, 0.1960784f)},
-            {ColorLayer.Text, Color.white},
-            {ColorLayer.TextGrey, new Color(0.6705883f, 0.6666667f, 0.6941177f)},
-            {ColorLayer.Accent, new Color(0.322f, 0.322f, 0.322f)}
+            { ColorLayer.Text, Color.white },
+            { ColorLayer.TextGrey, new Color(0.6705883f, 0.6666667f, 0.6941177f) },
+            { ColorLayer.Accent, new Color(0.322f, 0.322f, 0.322f) }
         };
 
         public string configName;
@@ -36,7 +36,10 @@ namespace Aerolt.Helpers
         private bool initialized;
         private MenuInfo menuInfo;
 
-        private void Awake() => ModuleStart();
+        private void Awake()
+        {
+            ModuleStart();
+        }
 
         public void ModuleStart()
         {
@@ -52,12 +55,12 @@ namespace Aerolt.Helpers
 
                 if (!configFile.TryGetValue(definition, out var entry))
                 {
-                    entry = configFile.Bind(definition, defaultColors[(ColorLayer) i],
+                    entry = configFile.Bind(definition, defaultColors[(ColorLayer)i],
                         new ConfigDescription($"{colorName} color of the window."));
                     if (Chainloader.PluginInfos.ContainsKey("bubbet.zioriskofoptions")) MakeRiskOfOptions(entry);
                 }
 
-                colorEntries[(ColorLayer) i] = entry;
+                colorEntries[(ColorLayer)i] = entry;
                 i++;
             }
 
@@ -77,19 +80,19 @@ namespace Aerolt.Helpers
         private void MakeRiskOfOptions(ZioConfigEntryBase value)
         {
             var who = menuInfo ? Load.Name + " " + menuInfo.Owner.GetNetworkPlayerName().GetResolvedName() : Load.Guid;
-            ModSettingsManager.AddOption(new ZioColorOption((ZioConfigEntry<Color>) value), who, who);
+            ModSettingsManager.AddOption(new ZioColorOption((ZioConfigEntry<Color>)value), who, who);
         }
 
         private void ColorChangedOn(ZioConfigEntryBase arg1, object arg2, bool arg3)
         {
             if (!toggleOnImage) return;
-            toggleOnImage.color = (Color) arg1.BoxedValue;
+            toggleOnImage.color = (Color)arg1.BoxedValue;
         }
 
         private void ColorChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
         {
             if (!toggleImage) return;
-            toggleImage.color = (Color) arg1.BoxedValue;
+            toggleImage.color = (Color)arg1.BoxedValue;
         }
     }
 
@@ -142,7 +145,10 @@ namespace Aerolt.Helpers
 
     public class ColorableText : ColorableComponent
     {
-        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _) => GetComponent<TextMeshProUGUI>().color = (Color) configEntry.BoxedValue;
+        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        {
+            GetComponent<TextMeshProUGUI>().color = (Color)configEntry.BoxedValue;
+        }
     }
 
     public class ColorableImage : ColorableComponent
@@ -151,7 +157,7 @@ namespace Aerolt.Helpers
 
         public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
         {
-            var color = (Color) configEntry.BoxedValue;
+            var color = (Color)configEntry.BoxedValue;
             color.a *= alphaMult;
             GetComponent<Image>().color = color;
         }
@@ -159,6 +165,9 @@ namespace Aerolt.Helpers
 
     public class ColorableRawImage : ColorableComponent
     {
-        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _) => GetComponent<RawImage>().color = (Color) configEntry.BoxedValue;
+        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        {
+            GetComponent<RawImage>().color = (Color)configEntry.BoxedValue;
+        }
     }
 }

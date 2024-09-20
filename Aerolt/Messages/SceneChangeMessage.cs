@@ -38,14 +38,14 @@ namespace Aerolt.Messages
         {
             base.Deserialize(reader);
             isSet = reader.ReadBoolean();
-            target = (SceneIndex) reader.ReadInt32();
+            target = (SceneIndex)reader.ReadInt32();
         }
 
         public override void Serialize(NetworkWriter writer)
         {
             base.Serialize(writer);
             writer.Write(isSet);
-            writer.Write((int) target);
+            writer.Write((int)target);
         }
     }
 }

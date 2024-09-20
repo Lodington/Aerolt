@@ -24,11 +24,11 @@ namespace Aerolt.Messages
         {
             base.Serialize(writer);
             writer.Write(inventory.netId);
-            writer.WritePackedUInt32((uint) equipmentCounts.Count);
+            writer.WritePackedUInt32((uint)equipmentCounts.Count);
             foreach (var (key, value) in equipmentCounts)
             {
-                writer.WritePackedUInt32((uint) (int) key.equipmentIndex);
-                writer.WritePackedUInt32((uint) value);
+                writer.WritePackedUInt32((uint)(int)key.equipmentIndex);
+                writer.WritePackedUInt32((uint)value);
             }
         }
 
@@ -40,8 +40,8 @@ namespace Aerolt.Messages
             var length = reader.ReadPackedUInt32();
             for (var i = 0; i < length; i++)
             {
-                var def = EquipmentCatalog.GetEquipmentDef((EquipmentIndex) (int) reader.ReadPackedUInt32());
-                equipmentCounts.Add(def, (int) reader.ReadPackedUInt32());
+                var def = EquipmentCatalog.GetEquipmentDef((EquipmentIndex)(int)reader.ReadPackedUInt32());
+                equipmentCounts.Add(def, (int)reader.ReadPackedUInt32());
             }
         }
 

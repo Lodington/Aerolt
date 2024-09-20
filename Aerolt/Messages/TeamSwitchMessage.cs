@@ -34,14 +34,14 @@ namespace Aerolt.Messages
             var obj = Util.FindNetworkObject(reader.ReadNetworkId());
             if (obj)
                 target = obj.GetComponent<CharacterMaster>();
-            newTeam = (TeamIndex) reader.ReadInt32();
+            newTeam = (TeamIndex)reader.ReadInt32();
         }
 
         public override void Serialize(NetworkWriter writer)
         {
             base.Serialize(writer);
             writer.Write(target.netId);
-            writer.Write((int) newTeam);
+            writer.Write((int)newTeam);
         }
     }
 }

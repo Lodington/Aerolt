@@ -43,7 +43,7 @@ namespace Aerolt.Messages
             master.teamIndex = teamIndex;
 
             foreach (var (key, value) in itemCounts)
-                master.inventory.GiveItem(key, (int) value);
+                master.inventory.GiveItem(key, (int)value);
             if (eliteIndex != EquipmentIndex.None)
                 master.inventory.SetEquipmentIndex(eliteIndex);
             if (brainDead)

@@ -65,9 +65,11 @@ namespace Aerolt.Managers
         private bool ownerIsSelected;
         private LobbyPlayerManager playerManager;
         private static List<ItemDef> _giveAllFilteredItems;
+
         public static List<ItemDef> GiveAllFilteredItems => _giveAllFilteredItems ??= new List<ItemDef>
         {
-            DLC1Content.Items.DroneWeaponsBoost, // some bullshit nre raised by this item in bazaar and i dont want to deal with it
+            DLC1Content.Items
+                .DroneWeaponsBoost, // some bullshit nre raised by this item in bazaar and i dont want to deal with it
             RoR2Content.Items.HealthDecay,
             RoR2Content.Items.LunarPrimaryReplacement,
             RoR2Content.Items.LunarSecondaryReplacement,
@@ -91,9 +93,9 @@ namespace Aerolt.Managers
         public void Update()
         {
             if (!currentUser || !master) return;
-            ((TextMeshProUGUI) moneyInputField.placeholder).text = master.money.ToString();
-            ((TextMeshProUGUI) voidMarkersInputField.placeholder).text = master.voidCoins.ToString();
-            ((TextMeshProUGUI) lunarCoinsInputField.placeholder).text = currentUser.lunarCoins.ToString();
+            ((TextMeshProUGUI)moneyInputField.placeholder).text = master.money.ToString();
+            ((TextMeshProUGUI)voidMarkersInputField.placeholder).text = master.voidCoins.ToString();
+            ((TextMeshProUGUI)lunarCoinsInputField.placeholder).text = currentUser.lunarCoins.ToString();
 
             //xpSlider.value = TeamManager.instance.GetTeamExperience((TeamIndex) teamDropdown.value);
         }
@@ -109,8 +111,7 @@ namespace Aerolt.Managers
             playerManager = GetComponent<LobbyPlayerManager>();
             bodyStats.Setup();
 
-            
-            
+
             GlobalEventManager.onTeamLevelUp += OnTeamLevelUp;
 
             teamDropdown.options.Clear(); // ensure it was empty to begin with.
@@ -172,7 +173,6 @@ namespace Aerolt.Managers
 
         public void SetUser(NetworkUser user)
         {
-            
             if (currentUser != null && currentUser.master) currentUser.master.onBodyStart -= SetBody;
             currentUser = user;
             PlayerConfig = playerManager.users[currentUser];
@@ -182,10 +182,10 @@ namespace Aerolt.Managers
             master = currentUser.master;
 
             UpdateLevelValues();
-            
+
             if (!master) return;
             var inv = master.inventory;
-            inventoryDisplay.SetSubscribedInventory(inv);
+            //inventoryDisplay.SetSubscribedInventory(inv);
             equipmentIcon.targetInventory = inv;
 
             master.onBodyStart += SetBody;
@@ -199,7 +199,7 @@ namespace Aerolt.Managers
             if (!ownerIsSelected) bodyStats.ProfileSelected(0, false);
             buffDisplay.source = body;
             bodyStats.TargetBody = body;
-            teamDropdown.SetValueWithoutNotify((int) body.teamComponent.teamIndex);
+            teamDropdown.SetValueWithoutNotify((int)body.teamComponent.teamIndex);
         }
 
         private void MobSpawnsChanged()
@@ -212,7 +212,7 @@ namespace Aerolt.Managers
 
         private void TeamJoined(TeamComponent who, TeamIndex team)
         {
-            if (who.body == body) teamDropdown.SetValueWithoutNotify((int) team);
+            if (who.body == body) teamDropdown.SetValueWithoutNotify((int)team);
         }
 
         public void SetCurrency(CurrencyType currencyType, string strAmount)
@@ -231,22 +231,22 @@ namespace Aerolt.Managers
 
         private void OnTeamLevelUp(TeamIndex obj)
         {
-            xpSlider.value = TeamManager.instance.GetTeamCurrentLevelExperience((TeamIndex) teamDropdown.value);
-            LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
+            xpSlider.value = TeamManager.instance.GetTeamCurrentLevelExperience((TeamIndex)teamDropdown.value);
+            LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex)teamDropdown.value)}";
         }
 
         private void UpdateLevelValues()
         {
-            LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex) teamDropdown.value)}";
-            xpSlider.minValue = TeamManager.instance.GetTeamCurrentLevelExperience((TeamIndex) teamDropdown.value);
-            xpSlider.maxValue = TeamManager.instance.GetTeamNextLevelExperience((TeamIndex) teamDropdown.value);
-            xpSlider.value = TeamManager.instance.GetTeamExperience((TeamIndex) teamDropdown.value);
+            LevelLabel.text = $"Lv : {TeamManager.instance.GetTeamLevel((TeamIndex)teamDropdown.value)}";
+            xpSlider.minValue = TeamManager.instance.GetTeamCurrentLevelExperience((TeamIndex)teamDropdown.value);
+            xpSlider.maxValue = TeamManager.instance.GetTeamNextLevelExperience((TeamIndex)teamDropdown.value);
+            xpSlider.value = TeamManager.instance.GetTeamExperience((TeamIndex)teamDropdown.value);
         }
 
         public void TeamChanged(int team)
         {
             if (!master) return;
-            var index = (TeamIndex) team;
+            var index = (TeamIndex)team;
             new TeamSwitchMessage(master, index).SendToServer();
             UpdateLevelValues();
         }

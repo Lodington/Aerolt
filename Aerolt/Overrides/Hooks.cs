@@ -8,8 +8,5 @@ namespace Aerolt.Overrides
     [HarmonyPatch]
     public class Hooks
     {
-        
-        
-
     }
 }

@@ -17,7 +17,7 @@ namespace Aerolt.Helpers
 
         private void Awake()
         {
-            Target = (RectTransform) transform.parent;
+            Target = (RectTransform)transform.parent;
         }
 
 
@@ -30,7 +30,7 @@ namespace Aerolt.Helpers
 
         private void OnDrag(BaseEventData data)
         {
-            var ped = (PointerEventData) data;
+            var ped = (PointerEventData)data;
             //Target.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Target.rect.width + ped.delta.x);
             //Target.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Target.rect.height + ped.delta.y);
             RectTransform.Edge? horizontalEdge = null;
@@ -73,11 +73,11 @@ namespace Aerolt.Helpers
             if (horizontalEdge != null)
             {
                 if (horizontalEdge == RectTransform.Edge.Right)
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge) horizontalEdge,
+                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)horizontalEdge,
                         Screen.width - Target.position.x - Target.pivot.x * Target.rect.width,
                         Mathf.Clamp(Target.rect.width - ped.delta.x, MinimumDimmensions.x, MaximumDimmensions.x));
                 else
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge) horizontalEdge,
+                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)horizontalEdge,
                         Target.position.x - Target.pivot.x * Target.rect.width,
                         Mathf.Clamp(Target.rect.width + ped.delta.x, MinimumDimmensions.x, MaximumDimmensions.x));
             }
@@ -85,11 +85,11 @@ namespace Aerolt.Helpers
             if (verticalEdge != null)
             {
                 if (verticalEdge == RectTransform.Edge.Top)
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge) verticalEdge,
+                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)verticalEdge,
                         Screen.height - Target.position.y - Target.pivot.y * Target.rect.height,
                         Mathf.Clamp(Target.rect.height - ped.delta.y, MinimumDimmensions.y, MaximumDimmensions.y));
                 else
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge) verticalEdge,
+                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)verticalEdge,
                         Target.position.y - Target.pivot.y * Target.rect.height,
                         Mathf.Clamp(Target.rect.height + ped.delta.y, MinimumDimmensions.y, MaximumDimmensions.y));
             }

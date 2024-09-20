@@ -31,7 +31,7 @@ namespace Aerolt.Managers
                     ? Language.GetString(scene.nameToken)
                     : scene.cachedName;
                 if (scene.previewTexture)
-                    buttonComponet.image.sprite = Sprite.Create((Texture2D) scene.previewTexture,
+                    buttonComponet.image.sprite = Sprite.Create((Texture2D)scene.previewTexture,
                         new Rect(0, 0, scene.previewTexture.width, scene.previewTexture.height),
                         new Vector2(0.5f, 0.5f));
                 buttonComponet.button.onClick.AddListener(() => SetScene(scene));
@@ -42,7 +42,10 @@ namespace Aerolt.Managers
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
-        public void SetScene(SceneDef scene) => new SceneChangeMessage(scene.sceneDefIndex).SendToServer();
+        public void SetScene(SceneDef scene)
+        {
+            new SceneChangeMessage(scene.sceneDefIndex).SendToServer();
+        }
 
         public void InstaTeleporter()
         {
@@ -62,7 +65,10 @@ namespace Aerolt.Managers
             Chat.AddMessage("<color=yellow>Added Mountain stack</color>");
         }
 
-        public void SpawnPortals(string portal) => new PortalSpawnMessage(portal).SendToServer();
+        public void SpawnPortals(string portal)
+        {
+            new PortalSpawnMessage(portal).SendToServer();
+        }
 
         private void FilterUpdated(string text)
         {

@@ -23,12 +23,12 @@ namespace Aerolt.Managers
         private void Awake()
         {
             foreach (var body in BodyCatalog.allBodyPrefabBodyBodyComponents.OrderBy(x =>
-                Language.GetString(x.baseNameToken)))
+                         Language.GetString(x.baseNameToken)))
             {
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var customButton = newButton.GetComponent<CustomButton>();
                 customButton.buttonText.text = Language.GetString(body.baseNameToken);
-                customButton.image.sprite = Sprite.Create((Texture2D) body.portraitIcon,
+                customButton.image.sprite = Sprite.Create((Texture2D)body.portraitIcon,
                     new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 customButton.button.onClick.AddListener(() => SetBodyDef(body));
                 bodyDefRef[body] = customButton;

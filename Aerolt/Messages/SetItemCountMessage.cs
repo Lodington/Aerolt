@@ -19,7 +19,7 @@ namespace Aerolt.Messages
         public SetItemCountMessage(Inventory inventory, Dictionary<ItemDef, int> itemCounts)
         {
             this.inventory = inventory;
-            this.itemCounts = itemCounts.ToDictionary(x => x.Key, x => (uint) x.Value);
+            this.itemCounts = itemCounts.ToDictionary(x => x.Key, x => (uint)x.Value);
         }
 
         public override void Serialize(NetworkWriter writer)
@@ -40,7 +40,7 @@ namespace Aerolt.Messages
         {
             base.Handle();
             foreach (var itemCount in itemCounts)
-                inventory.GiveItem(itemCount.Key, (int) itemCount.Value - inventory.GetItemCount(itemCount.Key));
+                inventory.GiveItem(itemCount.Key, (int)itemCount.Value - inventory.GetItemCount(itemCount.Key));
         }
     }
 }

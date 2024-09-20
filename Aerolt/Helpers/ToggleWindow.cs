@@ -58,7 +58,10 @@ namespace Aerolt.Classes
                 MakeRiskOfOptions(visible);
         }
 
-        private void VisibleOnSettingChanged(ZioConfigEntryBase arg1, object arg2, bool arg3) => GetComponent<Image>().enabled = visible.Value;
+        private void VisibleOnSettingChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        {
+            GetComponent<Image>().enabled = visible.Value;
+        }
 
         private void MakeRiskOfOptions(ZioConfigEntry<bool> visible)
         {

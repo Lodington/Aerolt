@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using Aerolt.Managers;
@@ -46,11 +47,12 @@ namespace Aerolt.Classes
         {
             if (Instances.TryGetValue(GetId(who) + category + name, out var entry))
             {
-                var centry = (ValueWrapper<T>) entry;
+                var centry = (ValueWrapper<T>)entry;
                 return centry;
             }
 
-            var val = new ValueWrapper<T>(category, name, defaultValue, description, who, forceLocalOrRemote, firstSetup);
+            var val = new ValueWrapper<T>(category, name, defaultValue, description, who, forceLocalOrRemote,
+                firstSetup);
             return val;
         }
 
@@ -73,11 +75,13 @@ namespace Aerolt.Classes
         public NetworkUser user;
 
         public ValueWrapper(string category, string name, T defaultValue, string description, NetworkUser who = null,
-            bool? forceLocalOrRemote = null, Action<ZioConfigEntry<T>> firstSetup = null) // force = true, it will be a local : force = false, it will be remote 
+            bool? forceLocalOrRemote = null,
+            Action<ZioConfigEntry<T>> firstSetup =
+                null) // force = true, it will be a local : force = false, it will be remote 
         {
             user = who;
-            if (forceLocalOrRemote.HasValue && forceLocalOrRemote.Value || !who && !forceLocalOrRemote.HasValue ||
-                !forceLocalOrRemote.HasValue && who.localUser != null)
+            if ((forceLocalOrRemote.HasValue && forceLocalOrRemote.Value) || (!who && !forceLocalOrRemote.HasValue) ||
+                (!forceLocalOrRemote.HasValue && who.localUser != null))
             {
                 isLocalBinding = true;
                 var file = who ? MenuInfo.Files[who.localUser!] : Load.ConfigFile;
@@ -112,7 +116,10 @@ namespace Aerolt.Classes
                     duckConfigChange = false;
                 }
                 else
+                {
                     fallbackValue = value;
+                }
+
                 if (!duckChange) Sync();
                 settingChanged?.Invoke();
             }
@@ -133,7 +140,7 @@ namespace Aerolt.Classes
         protected override void SetValue(object value)
         {
             duckChange = true;
-            Value = (T) value;
+            Value = (T)value;
             duckChange = false;
         }
     }

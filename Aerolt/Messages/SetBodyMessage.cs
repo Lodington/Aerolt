@@ -32,7 +32,8 @@ namespace Aerolt.Messages
             if (gameover)
             {
                 foreach (var gameEndReportPanelController in gameover.reportPanels)
-                    Object.Destroy(gameEndReportPanelController.Value.gameObject); // TODO this is bad and will fuck gameover forever, not a one time revert
+                    Object.Destroy(gameEndReportPanelController.Value
+                        .gameObject); // TODO this is bad and will fuck gameover forever, not a one time revert
                 Object.Destroy(gameover.gameObject);
             }
 

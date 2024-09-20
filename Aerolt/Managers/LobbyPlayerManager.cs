@@ -27,15 +27,11 @@ namespace Aerolt.Managers
 
         public void ModuleStart()
         {
-            // var wasActive = gameObject.activeSelf;
-            // gameObject.SetActive(true);
-            NetworkUser.onPostNetworkUserStart += UserAdded;
-            //NetworkUser.onNetworkUserDiscovered += UserAdded;
-            NetworkUser.onNetworkUserLost += UserLost;
 
+            NetworkUser.onPostNetworkUserStart += UserAdded;
+            NetworkUser.onNetworkUserLost += UserLost;
             info = GetComponentInParent<MenuInfo>();
             toggleGroup = GetComponent<ToggleGroup>();
-
             // I give up
             _pageManager = GetComponent<LobbyPlayerPageManager>();
 
@@ -75,7 +71,6 @@ namespace Aerolt.Managers
             if (!user.master) return;
             if (NetworkServer.active) BodyStart(user.master.GetBody());
             user.master.onBodyStart += BodyStart;
-            
         }
 
         private void BodyStart(CharacterBody body)

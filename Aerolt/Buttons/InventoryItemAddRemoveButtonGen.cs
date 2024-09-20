@@ -68,7 +68,7 @@ namespace Aerolt.Buttons
         private void Increase()
         {
             if (customButton.EventSystem.player.GetButton(9)
-            ) // action 9 is shift by default //(Input.GetKey(KeyCode.LeftShift))
+               ) // action 9 is shift by default //(Input.GetKey(KeyCode.LeftShift))
             {
                 Change(5);
                 return;
@@ -105,7 +105,8 @@ namespace Aerolt.Buttons
 
             if (itemCounts[def] > 0) return;
             Object.Destroy(isDecrease ? button : countRemoveButton.button);
-            if (!isDecrease) countRemoveButton = null; else countRemoveButton.countRemoveButton = null;
+            if (!isDecrease) countRemoveButton = null;
+            else countRemoveButton.countRemoveButton = null;
         }
 
         public void UpdateText()

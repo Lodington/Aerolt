@@ -19,9 +19,15 @@ namespace Aerolt.Managers
                 typeof(AeroltMessageBase).IsAssignableFrom(x) && x != typeof(AeroltMessageBase)).ToArray();
         }
 
-        private static void RegisterMessages() => NetworkServer.RegisterHandler(2004, HandleMessage);
+        private static void RegisterMessages()
+        {
+            NetworkServer.RegisterHandler(2004, HandleMessage);
+        }
 
-        public static void RegisterMessages(NetworkClient client) => client.RegisterHandler(2004, HandleMessage);
+        public static void RegisterMessages(NetworkClient client)
+        {
+            client.RegisterHandler(2004, HandleMessage);
+        }
 
         private static void HandleMessage(NetworkMessage netmsg)
         {
@@ -69,9 +75,20 @@ namespace Aerolt.Managers
                 Handle();
         }
 
-        public void SendToAuthority(NetworkUser user) => SendToAuthority(user.netIdentity);
-        public void SendToAuthority(CharacterMaster master) => SendToAuthority(master.networkIdentity);
-        public void SendToAuthority(CharacterBody body) => SendToAuthority(body.networkIdentity);
+        public void SendToAuthority(NetworkUser user)
+        {
+            SendToAuthority(user.netIdentity);
+        }
+
+        public void SendToAuthority(CharacterMaster master)
+        {
+            SendToAuthority(master.networkIdentity);
+        }
+
+        public void SendToAuthority(CharacterBody body)
+        {
+            SendToAuthority(body.networkIdentity);
+        }
     }
 
     public class BroadcastMessage : AeroltMessageBase
@@ -83,7 +100,10 @@ namespace Aerolt.Managers
         {
         }
 
-        public BroadcastMessage(AeroltMessageBase aeroltMessageBase) => message = aeroltMessageBase;
+        public BroadcastMessage(AeroltMessageBase aeroltMessageBase)
+        {
+            message = aeroltMessageBase;
+        }
 
         public override void Handle()
         {
@@ -161,7 +181,7 @@ namespace Aerolt.Managers
         public AeroltMessage(AeroltMessageBase aeroltMessageBase)
         {
             message = aeroltMessageBase;
-            Type = (uint) Array.IndexOf(NetworkManager.RegisteredMessages, message.GetType());
+            Type = (uint)Array.IndexOf(NetworkManager.RegisteredMessages, message.GetType());
         }
 
         public override void Serialize(NetworkWriter writer)
@@ -175,7 +195,7 @@ namespace Aerolt.Managers
         {
             base.Deserialize(reader);
             Type = reader.ReadPackedUInt32();
-            var tmsg = (AeroltMessageBase) Activator.CreateInstance(NetworkManager.RegisteredMessages[Type]);
+            var tmsg = (AeroltMessageBase)Activator.CreateInstance(NetworkManager.RegisteredMessages[Type]);
             tmsg.Deserialize(reader);
             message = tmsg;
         }

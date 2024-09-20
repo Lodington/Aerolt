@@ -8,13 +8,7 @@ namespace Aerolt.Overrides
         public Image discord;
         public Sprite imageToSwapTo;
 
-        public void Awake()
-        {
-            var ran = Random.Range(0, 99);
-
-            if (ran < 20) SwapThisImage();
-        }
-
+        public void Awake() => SwapThisImage();
         public void SwapThisImage() => discord.sprite = imageToSwapTo;
     }
 }

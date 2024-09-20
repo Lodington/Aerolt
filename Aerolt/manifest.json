@@ -1,10 +1,9 @@
 {
   "name": "Aerolt",
   "authorName":"Lodington",
-  "website_url":"https://discord.gg/X4GHM9fePg",
+  "website_url":"https://links.lodington.dev/discord",
   "displayName":"Aerolt",
-
-  "version_number": "2.0.1",
+  "version_number": "4.1.0",
   "description": "RoRCheats ReWrite Aerolt! New UI, New Features! Best Debug Kit with UI!",
   "dependencies": [
     "bbepis-BepInExPack-5.4.1905",

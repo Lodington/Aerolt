@@ -32,11 +32,11 @@ namespace Aerolt.Messages
                     break;
                 case CurrencyType.Lunar:
                     var user = master.playerCharacterMasterController.networkUser;
-                    var val = (int) amount - user.NetworknetLunarCoins;
+                    var val = (int)amount - user.NetworknetLunarCoins;
                     if (val < 0)
-                        user.DeductLunarCoins((uint) Math.Abs(val));
+                        user.DeductLunarCoins((uint)Math.Abs(val));
                     else
-                        user.AwardLunarCoins((uint) val);
+                        user.AwardLunarCoins((uint)val);
                     break;
                 case CurrencyType.Void:
                     master.GiveVoidCoins(amount - master.voidCoins);
@@ -58,7 +58,7 @@ namespace Aerolt.Messages
             var obj = Util.FindNetworkObject(reader.ReadNetworkId());
             if (obj)
                 master = obj.GetComponent<CharacterMaster>();
-            _type = (CurrencyType) reader.ReadPackedUInt32();
+            _type = (CurrencyType)reader.ReadPackedUInt32();
             amount = reader.ReadPackedUInt32();
         }
 
@@ -66,7 +66,7 @@ namespace Aerolt.Messages
         {
             base.Serialize(writer);
             writer.Write(master.netId);
-            writer.WritePackedUInt32((uint) _type);
+            writer.WritePackedUInt32((uint)_type);
             writer.WritePackedUInt32(amount);
         }
     }

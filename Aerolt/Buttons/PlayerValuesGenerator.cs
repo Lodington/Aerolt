@@ -106,7 +106,7 @@ namespace Aerolt.Buttons
         private void UpdateText()
         {
             foreach (var (field, inputField) in _entries)
-                ((TextMeshProUGUI) inputField.placeholder).text =
+                ((TextMeshProUGUI)inputField.placeholder).text =
                     field.GetValue(TargetBody)
                         .ToString(); // this might but probably wont fuck up the profiles, if you die and come back to life
         }
@@ -123,7 +123,7 @@ namespace Aerolt.Buttons
                 if (selectedProfile.Value > 0) profiles[selectedProfile.Value - 1].entries[field].Value = value;
                 new BodyStatMessage(TargetBody, field.Name, value).SendToEveryone();
                 input.text = string.Empty;
-                ((TextMeshProUGUI) input.placeholder).text = value.ToString(CultureInfo.InvariantCulture);
+                ((TextMeshProUGUI)input.placeholder).text = value.ToString(CultureInfo.InvariantCulture);
             });
             _entries[field] = input;
         }

@@ -33,9 +33,9 @@ namespace Aerolt.Buttons
             if (!eventSystemLocator) return;
             if (!EventSystem) return;
             if (!EventSystem.currentInputModule) return;
-            if ((EventSystem.currentInputModule.input.GetMouseButtonDown((int) MouseButton.RightMouse) ||
-                 EventSystem.currentInputSource == MPEventSystem.InputSource.Gamepad &&
-                 EventSystem.player.GetButtonDown(5)) &&
+            if ((EventSystem.currentInputModule.input.GetMouseButtonDown(1) ||
+                 (EventSystem.currentInputSource == MPEventSystem.InputSource.Gamepad &&
+                  EventSystem.player.GetButtonDown(5))) &&
                 EventSystem.currentSelectedGameObject == gameObject) InvokeRightClick();
         }
 
