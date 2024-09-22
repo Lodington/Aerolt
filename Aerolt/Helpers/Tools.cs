@@ -10,20 +10,26 @@ namespace Aerolt.Helpers
     public static class Tools
     {
         public static string SendCount()
-        {  
-            const string uri = "https://links.lodington.dev/aerolt";
-            var client = new WebClient();
-            
-            client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+        {
+            string s;
+            try
+            {
+                const string uri = "https://links.lodington.dev/aerolt";
+                var client = new WebClient();
 
-            var data = client.OpenRead(uri);
-            var reader = new StreamReader(data!);
-            var s = reader.ReadToEnd();
-            data!.Close();
-            reader.Close();
+                client.Headers.Add("user-agent",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
 
+                var data = client.OpenRead(uri);
+                var reader = new StreamReader(data!);
+                s = reader.ReadToEnd();
+                data!.Close();
+                reader.Close();
+            } catch {
+                return "Error";
+            }
             return s;
-    }
+        }
         
         public static T[] FindMatches<T>(T[] toMatch, Func<T, string> toString, string filter)
         {

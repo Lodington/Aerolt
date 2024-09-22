@@ -86,6 +86,8 @@ Support Bubbet
 A shout out to Voidsenight✨#0060 for helping make the icons!
 
 # Changelog
+- 4.1.1
+  - fixed a issue where aerolt wouldnt load due to long load times.
 - 4.1.0
   - Attempted Fix for not spawning at the start of the stage (Bubbet)
   - Fixed interactable not spawning.
