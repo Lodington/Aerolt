@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <RootNamespace>Aerolt_External</RootNamespace>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <LangVersion>10</LangVersion>
+
+        <RoR2Folder>G:\SteamLibrary\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\</RoR2Folder>
+        <DestinationFolder>C:\Users\Bubbet\AppData\Roaming\com.kesomannen.gale\riskofrain2\profiles\aerolt\BepInEx\plugins\</DestinationFolder>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.Core" Version="5.4.19" />
+        <PackageReference Include="UnityEngine.Modules" Version="2021.3.33" />
+    </ItemGroup>
+
+    <ItemGroup Condition="!Exists($(RoR2Folder))">
+        <PackageReference Include="RiskOfRain2.GameLibs" Version="1.3.6-r.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="Exists($(RoR2Folder))">
+        <Reference Include="RoR2" Publicize="true">
+            <HintPath>$(RoR2Folder)RoR2.dll</HintPath>
+        </Reference>
+        <Reference Include="com.unity.multiplayer-hlapi.Runtime" Publicize="true">
+            <HintPath>$(RoR2Folder)com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <_BundleItems Include="$(ProjectDir)Bundle\**\*.*" />
+    </ItemGroup>
+
+    <Target Name="CopyDLLs" AfterTargets="Build" Condition="Exists($(DestinationFolder))">
+        <Message Text="Executing CopyDLLs task" Importance="High" />
+
+        <Copy SourceFiles="$(TargetDir)$(ProjectName).dll;$(TargetDir)$(ProjectName).pdb" DestinationFolder="$(DestinationFolder)$(ProjectName)" />
+        <Copy SourceFiles="@(_BundleItems)" DestinationFolder="$(DestinationFolder)$(ProjectName)\%(RecursiveDir)" />
+
+        <Message Text="Copied build files" Importance="High" />
+    </Target>
+</Project>
