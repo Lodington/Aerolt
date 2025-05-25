@@ -29,7 +29,7 @@ public class AeroltPlugin : BaseUnityPlugin
     [System.Serializable]
     public class ImageHeader
     {
-        public string type; // "image"
+        public string type => "ImageHeader";
         public string filename; // e.g. "sword.png"
         public int length; // byte length of the following frame
         public string itemName; // extra game data
@@ -72,7 +72,7 @@ public class AeroltPlugin : BaseUnityPlugin
         
         IEnumerator SenditemCatalogWhenReady()
         {
-            yield return new WaitUntil(() => Equals(ItemCatalog.availability, ItemCatalog.availability.available));
+            yield return new WaitUntil(() => ItemCatalog.availability.available);
             
             var simple = ItemCatalog.allItemDefs
                 .Select(d => new
@@ -87,7 +87,7 @@ public class AeroltPlugin : BaseUnityPlugin
 
             var envelope = new
             {
-                type = "itemCatalog",
+                type = "Catalog",
                 count = simple.Count,
                 items = simple
             };
