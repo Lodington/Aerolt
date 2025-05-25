@@ -21,13 +21,6 @@ public class AeroltPlugin : BaseUnityPlugin
     private WebSocketServer _server;
     private static readonly System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
 
-    [System.Serializable]
-    public struct ImageEntry
-    {
-        public string relativePath; // under StreamingAssets
-        public string itemName;
-        public int itemId;
-    }
 
     [System.Serializable]
     public class ImageHeader
@@ -35,9 +28,7 @@ public class AeroltPlugin : BaseUnityPlugin
         public string type => "ImageHeader";
         public string fileName; // e.g. "sword.png"
         public int length; // byte length of the following frame
-        public string itemName; // extra game data
-        public int itemId; // extra game data
-    }
+   }
 
     private void Start()
     {
@@ -68,7 +59,7 @@ public class AeroltPlugin : BaseUnityPlugin
 
     public class CatalogService : WebSocketBehavior
     {
-        private static Dictionary<ItemIndex, byte[]> icons = new Dictionary<ItemIndex, byte[]>();
+        private static Dictionary<ItemIndex, byte[]> itemIcons = new Dictionary<ItemIndex, byte[]>();
 
         protected override void OnOpen()
         {
@@ -84,7 +75,7 @@ public class AeroltPlugin : BaseUnityPlugin
                 .Select(d =>
                 {
                     if (d.pickupIconSprite)
-                        icons[d.itemIndex] = d.pickupIconSprite.texture.ToReadable().EncodeToPNG();
+                        itemIcons[d.itemIndex] = d.pickupIconSprite.texture.ToReadable().EncodeToPNG();
                     return new
                     {
                         itemId = (int)d.itemIndex,
@@ -94,7 +85,7 @@ public class AeroltPlugin : BaseUnityPlugin
                         description = Language.GetString(d.descriptionToken),
                         pickupModel = d.pickupModelPrefab?.name,
                         iconHash = d.pickupIconSprite
-                            ? md5.ComputeHash(icons[d.itemIndex])
+                            ? md5.ComputeHash(itemIcons[d.itemIndex])
                             : null
                     };
                 })
@@ -104,7 +95,8 @@ public class AeroltPlugin : BaseUnityPlugin
             {
                 type = "Catalog",
                 count = simple.Count,
-                items = simple
+                items = simple,
+                equipments = Array.Empty<object>()
             };
             string json = JsonConvert.SerializeObject(envelope);
             Send(json);
@@ -117,31 +109,62 @@ public class AeroltPlugin : BaseUnityPlugin
             {
                 case nameof(IconRequest):
                     var message = new IconRequest(e.Data);
-                    foreach (var index in message.icons)
+                    switch (message.iconType)
                     {
-                        var itemIndex = (ItemIndex)index;
-                        var item = ItemCatalog.GetItemDef(itemIndex);
-                        var png = icons[itemIndex];
-                        var header = new ImageHeader()
-                        {
-                            fileName = item.name + "_" + item.nameToken,
-                            itemId = index,
-                            itemName = Language.GetString(item.nameToken),
-                            length = png.Length
-                        };
-                        Context.WebSocket.Send(JsonConvert.SerializeObject(header));
-                        Context.WebSocket.Send(png);
+                        case IconRequest.IconType.Item:
+                            foreach (var index in message.icons)
+                            {
+                                var itemIndex = (ItemIndex)index;
+                                var item = ItemCatalog.GetItemDef(itemIndex);
+                                var png = itemIcons[itemIndex];
+                                var header = new ImageHeader()
+                                {
+                                    fileName = item.name + "_" + item.nameToken,
+                                    length = png.Length
+                                };
+                                Context.WebSocket.Send(JsonConvert.SerializeObject(header));
+                                Context.WebSocket.Send(png);
+                            }
+                            break;
+                        case IconRequest.IconType.Equipment:
+                            break;
+                        case IconRequest.IconType.Buff:
+                            break;
+                        case IconRequest.IconType.Monster:
+                            break;
+                        case IconRequest.IconType.Map:
+                            break;
+                        case IconRequest.IconType.Interactable:
+                            break;
+                        case IconRequest.IconType.Skill:
+                            break;
+                        case IconRequest.IconType.Misc:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
-
                     break;
             }
 
             base.OnMessage(e);
         }
     }
-
+    
     class IconRequest
     {
+        [Serializable]
+        public enum IconType
+        {
+            Item,
+            Equipment,
+            Buff,
+            Monster,
+            Map,
+            Interactable,
+            Skill,
+            Misc
+        }
+        public IconType iconType;
         public int[] icons;
 
         public IconRequest(string serializedData)
