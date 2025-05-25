@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using BepInEx;
+using BepInEx.Logging;
 using Newtonsoft.Json;
 using RoR2;
 using UnityEngine;
-using WebSocketSharp;
 using WebSocketSharp.Server;
-using Console = System.Console;
-using Debug = System.Diagnostics.Debug;
+using Debug = UnityEngine.Debug;
+using LogLevel = WebSocketSharp.LogLevel;
 
 namespace Aerolt_External;
 
 [BepInPlugin("com.Lodington.Aerolt", "Aerolt", "5.0.0")]
 public class AeroltPlugin : BaseUnityPlugin
 {
+    public static ManualLogSource Log;
+    public static AeroltPlugin Instance;
+    private WebSocketServer _server;
+    
     [System.Serializable]
     public struct ImageEntry
     {
@@ -32,55 +36,64 @@ public class AeroltPlugin : BaseUnityPlugin
         public int itemId; // extra game data
     }
 
-    private void Awake()
+    private void Start()
     {
-        var socket = new WebSocketServer("ws://127.0.0.1:8181");
-        socket.Log.Level = LogLevel.Info;
-        socket.AddWebSocketService<WebSocketBehaviour>("/ws");
-        socket.Start();
-        
-        
-        
+        Log = Logger;
 
+        Instance = this;
+        
+        _server = new WebSocketServer("ws://127.0.0.1:8181");
+        _server.Log.Level = LogLevel.Info;
+        _server.AddWebSocketService<CatalogService>("/ws");
+        _server.Start();
+        
+        
+        Debug.Log("Started Websocket Server");
+        
         var startInfo = new ProcessStartInfo("\"C:\\Users\\Lodington\\AppData\\Roaming\\com.kesomannen.gale\\riskofrain2\\profiles\\Default\\BepInEx\\plugins\\Lodington-Aerolt\\aerolt.exe\"");
         
         startInfo.UseShellExecute = true;
         Process.Start(startInfo);
+        Debug.Log("Started Client");
+    }
+
+    void OnDestroy()
+    {
+        _server.Stop();
     }
 
     public class CatalogService : WebSocketBehavior
     {
         protected override void OnOpen()
         {
-            new Thread(() =>
+            Instance.StartCoroutine(SenditemCatalogWhenReady());
+            Debug.Log("ItemCatalog Ready");
+        }
+        
+        IEnumerator SenditemCatalogWhenReady()
+        {
+            yield return new WaitUntil(() => Equals(ItemCatalog.availability, ItemCatalog.availability.available));
+            
+            var simple = ItemCatalog.allItemDefs
+                .Select(d => new
                 {
-                    while (!ItemCatalog.availability.available)
-                    {
-                        Thread.Sleep(100);
-                        
-                    }
-                    
-                    var simple = ItemCatalog.allItemDefs
-                        .Select(d => new
-                        {
-                            itemId = (int)d.itemIndex,
-                            itemName = Language.GetString(d.nameToken),
-                            tier = d.tier.ToString(),
-                            description = Language.GetString(d.descriptionToken),
-                            pickupModel = d.pickupModelPrefab?.name
-                        })
-                        .ToList();
-
-                    var envelope = new
-                    {
-                        type = "itemCatalog",
-                        count = simple.Count,
-                        items = simple
-                    };
-                    string json = JsonConvert.SerializeObject(envelope);
-                    Send(json);
+                    itemId = (int)d.itemIndex,
+                    itemName = Language.GetString(d.nameToken),
+                    tier = d.tier.ToString(),
+                    description = Language.GetString(d.descriptionToken),
+                    pickupModel = d.pickupModelPrefab?.name
                 })
-                { IsBackground = true }.Start();
+                .ToList();
+
+            var envelope = new
+            {
+                type = "itemCatalog",
+                count = simple.Count,
+                items = simple
+            };
+            string json = JsonConvert.SerializeObject(envelope);
+            Send(json);
+            
         }
     }
 }
