@@ -29,7 +29,7 @@ public class AeroltPlugin : BaseUnityPlugin
     [System.Serializable]
     public class ImageHeader
     {
-        public string type => "ImageHeader";
+        public string type => "imageHeader";
         public string filename; // e.g. "sword.png"
         public int length; // byte length of the following frame
         public string itemName; // extra game data
@@ -87,7 +87,7 @@ public class AeroltPlugin : BaseUnityPlugin
 
             var envelope = new
             {
-                type = "Catalog",
+                type = "catalog",
                 count = simple.Count,
                 items = simple
             };
