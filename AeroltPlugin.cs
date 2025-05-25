@@ -35,8 +35,8 @@ public class AeroltPlugin : BaseUnityPlugin
         Log = Logger;
 
         Instance = this;
-        
-        _server = new WebSocketServer("ws://127.0.0.1:8181");
+
+        _server = new WebSocketServer("ws://127.0.0.1:8180");
         _server.Log.Level = LogLevel.Info;
         _server.AddWebSocketService<CatalogService>("/ws");
         _server.Start();
