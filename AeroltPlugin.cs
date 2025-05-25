@@ -53,7 +53,7 @@ public class AeroltPlugin : BaseUnityPlugin
         var startInfo = new ProcessStartInfo("\"C:\\Users\\Lodington\\AppData\\Roaming\\com.kesomannen.gale\\riskofrain2\\profiles\\Default\\BepInEx\\plugins\\Lodington-Aerolt\\aerolt.exe\"");
         
         startInfo.UseShellExecute = true;
-        Process.Start(startInfo);
+        //Process.Start(startInfo);
         Debug.Log("Started Client");
     }
 
