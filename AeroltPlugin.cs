@@ -50,7 +50,7 @@ public class AeroltPlugin : BaseUnityPlugin
         
         Debug.Log("Started Websocket Server");
         
-        var startInfo = new ProcessStartInfo("\"C:\\Users\\Lodington\\AppData\\Roaming\\com.kesomannen.gale\\riskofrain2\\profiles\\Default\\BepInEx\\plugins\\Lodington-Aerolt\\aerolt.exe\"");
+        var startInfo = new ProcessStartInfo(System.IO.Path.Join(System.IO.Path.GetDirectoryName(Info.Location),"aerolt.exe"));
         
         startInfo.UseShellExecute = true;
         //Process.Start(startInfo);
