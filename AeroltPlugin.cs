@@ -8,6 +8,8 @@ using UnityEngine;
 using WebSocketSharp.Server;
 using Debug = UnityEngine.Debug;
 using LogLevel = WebSocketSharp.LogLevel;
+using System.Security.Cryptography;
+using WebSocketSharp;
 
 namespace Aerolt_External;
 
@@ -17,7 +19,8 @@ public class AeroltPlugin : BaseUnityPlugin
     public static ManualLogSource Log;
     public static AeroltPlugin Instance;
     private WebSocketServer _server;
-    
+    private static readonly System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
+
     [System.Serializable]
     public struct ImageEntry
     {
@@ -29,8 +32,8 @@ public class AeroltPlugin : BaseUnityPlugin
     [System.Serializable]
     public class ImageHeader
     {
-        public string type => "imageHeader";
-        public string filename; // e.g. "sword.png"
+        public string type => "ImageHeader";
+        public string fileName; // e.g. "sword.png"
         public int length; // byte length of the following frame
         public string itemName; // extra game data
         public int itemId; // extra game data
@@ -46,12 +49,13 @@ public class AeroltPlugin : BaseUnityPlugin
         _server.Log.Level = LogLevel.Info;
         _server.AddWebSocketService<CatalogService>("/ws");
         _server.Start();
-        
-        
+
+
         Debug.Log("Started Websocket Server");
-        
-        var startInfo = new ProcessStartInfo(System.IO.Path.Join(System.IO.Path.GetDirectoryName(Info.Location),"aerolt.exe"));
-        
+
+        var startInfo =
+            new ProcessStartInfo(System.IO.Path.Join(System.IO.Path.GetDirectoryName(Info.Location), "aerolt.exe"));
+
         startInfo.UseShellExecute = true;
         //Process.Start(startInfo);
         Debug.Log("Started Client");
@@ -64,36 +68,89 @@ public class AeroltPlugin : BaseUnityPlugin
 
     public class CatalogService : WebSocketBehavior
     {
+        private static Dictionary<ItemIndex, byte[]> icons = new Dictionary<ItemIndex, byte[]>();
+
         protected override void OnOpen()
         {
             Instance.StartCoroutine(SenditemCatalogWhenReady());
             Debug.Log("ItemCatalog Ready");
         }
-        
+
         IEnumerator SenditemCatalogWhenReady()
         {
             yield return new WaitUntil(() => ItemCatalog.availability.available);
-            
+
             var simple = ItemCatalog.allItemDefs
-                .Select(d => new
+                .Select(d =>
                 {
-                    itemId = (int)d.itemIndex,
-                    itemName = Language.GetString(d.nameToken),
-                    tier = d.tier.ToString(),
-                    description = Language.GetString(d.descriptionToken),
-                    pickupModel = d.pickupModelPrefab?.name
+                    if (d.pickupIconSprite)
+                        icons[d.itemIndex] = d.pickupIconSprite.texture.ToReadable().EncodeToPNG();
+                    return new
+                    {
+                        itemId = (int)d.itemIndex,
+                        fileName = d.name + "_" + d.nameToken,
+                        itemName = Language.GetString(d.nameToken),
+                        tier = d.tier.ToString(),
+                        description = Language.GetString(d.descriptionToken),
+                        pickupModel = d.pickupModelPrefab?.name,
+                        iconHash = d.pickupIconSprite
+                            ? md5.ComputeHash(icons[d.itemIndex])
+                            : null
+                    };
                 })
                 .ToList();
 
             var envelope = new
             {
-                type = "catalog",
+                type = "Catalog",
                 count = simple.Count,
                 items = simple
             };
             string json = JsonConvert.SerializeObject(envelope);
             Send(json);
-            
+        }
+
+        protected override void OnMessage(MessageEventArgs e)
+        {
+            var rawPayload = new WebsocketMessage(e.Data);
+            switch (rawPayload.type)
+            {
+                case nameof(IconRequest):
+                    var message = new IconRequest(e.Data);
+                    foreach (var index in message.icons)
+                    {
+                        var itemIndex = (ItemIndex)index;
+                        var item = ItemCatalog.GetItemDef(itemIndex);
+                        var png = icons[itemIndex];
+                        var header = new ImageHeader()
+                        {
+                            fileName = item.name + "_" + item.nameToken,
+                            itemId = index,
+                            itemName = Language.GetString(item.nameToken),
+                            length = png.Length
+                        };
+                        Context.WebSocket.Send(JsonConvert.SerializeObject(header));
+                        Context.WebSocket.Send(png);
+                    }
+
+                    break;
+            }
+
+            base.OnMessage(e);
+        }
+    }
+
+    class IconRequest
+    {
+        public int[] icons;
+
+        public IconRequest(string serializedData)
+        {
+            JsonConvert.PopulateObject(serializedData, this);
+        }
+
+        public IconRequest()
+        {
         }
     }
 }
