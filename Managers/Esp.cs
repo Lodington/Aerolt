@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Aerolt_External.Commands;
 using Aerolt_External.Helpers;
 using Newtonsoft.Json;
 using RoR2;
@@ -34,29 +35,15 @@ using UnityEngine.UI;
         public bool showDroneToggle;
         public bool showShrineToggle;
 
-        public class EspToggleMessage
+
+        public static void ToggleEspOptions(EspToggle payload)
         {
-            public bool showNewtAlterToggle {get; set;}
-            public bool showAdvancedToggle {get; set;}
-            public bool showTeleporterToggle{get; set;}
-            public bool showChestToggle{get; set;}
-            public bool showMultiShopToggle{get; set;}
-            public bool showBarrelToggle{get; set;}
-            public bool showScrapperToggle{get; set;}
-            public bool ShowSecretToggle{get; set;}
-            public bool showDuplicatorToggle{get; set;}
-            public bool showDroneToggle {get; set;}
-            public bool showShrineToggle {get; set;}
-        }  
-        public static void ToggleEspOptions(string payload)
-        {
-            var toggleMessage = JsonConvert.DeserializeObject<EspToggleMessage>(payload);
-            var messageProps = typeof(EspToggleMessage).GetProperties();
+            var messageProps = typeof(EspToggle).GetFields();
             var espInstance = Instance;
 
             foreach (var prop in messageProps)
             {
-                var value = (bool)prop.GetValue(toggleMessage);
+                var value = (bool)prop.GetValue(payload);
                 
                 var field = typeof(Esp).GetField(prop.Name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                 if (field != null && field.FieldType == typeof(bool))

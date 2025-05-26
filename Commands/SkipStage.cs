@@ -3,10 +3,9 @@ using WebSocketSharp.Net.WebSockets;
 
 namespace Aerolt_External.Commands;
 
-public class SkipStageCommand : IWebsocketCommand
+public class SkipStage : IWebsocketCommand
 {
-    public string CommandName => "skipStage";
-    public void Execute(string payload, WebSocketContext context)
+    public void Execute(WebSocketContext context)
     {
         new SceneChangeMessage().SendToServer();
         //todo send message to chat?

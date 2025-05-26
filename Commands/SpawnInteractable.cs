@@ -10,10 +10,9 @@ using WebSocketSharp.Net.WebSockets;
 
 namespace Aerolt_External.Commands;
 
-public class SpawnInteractableCommand : IWebsocketCommand
+public class SpawnInteractable : IWebsocketCommand
 {
     // user, intactable, position
-    public string CommandName => "spawnInteractable";
     
     public static SpawnCard[]? _spawnCards; // mmm yummy linq
     private static bool isScalingInteractablePricesConstantly = false;
@@ -41,31 +40,28 @@ public class SpawnInteractableCommand : IWebsocketCommand
      *      card: "cardname",
      *      player: "playerid",
      */
-    public void Execute(string payload, WebSocketContext context)
+    public void Execute(WebSocketContext context)
     {
         startOfRoundScaledInteractableCosts.Clear();
-        
-        var data = JsonConvert.DeserializeObject<InteractablePayLoad>(payload);
-
+     
         var user = NetworkUser.instancesList.FirstOrDefault(user =>
             user.userName != null &&
-            user.userName.Equals(data.playerID, StringComparison.OrdinalIgnoreCase));
+            user.userName.Equals(playerID, StringComparison.OrdinalIgnoreCase));
 
         var position = user.master.GetBody().corePosition;
         var aimRay = user.master.GetBody().inputBank.GetAimRay().direction * 1.6f;
         
         if (NetworkServer.active)
-            Spawn((uint)Array.IndexOf(cards, data?.card), position + aimRay);
+            Spawn((uint)Array.IndexOf(cards, card), position + aimRay);
         else
-            ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage((uint)Array.IndexOf(cards, data?.card),
+            ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage((uint)Array.IndexOf(cards, card),
                 position + aimRay));
     }
 
-    public class InteractablePayLoad
-    {
-        public string card { get; set; }
-        public string playerID { get; set; }
-    }
+
+    public string card;
+    public string playerID;
+    
     
     public static void Spawn(uint index, Vector3 position)
     {

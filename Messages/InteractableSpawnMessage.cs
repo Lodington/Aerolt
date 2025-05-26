@@ -36,6 +36,6 @@ public class InteractableSpawnMessage : AeroltMessageBase
     public override void Handle()
     {
         base.Handle();
-        SpawnInteractableCommand.Spawn(index, position);
+        SpawnInteractable.Spawn(index, position);
     }
 }

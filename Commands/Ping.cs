@@ -3,10 +3,9 @@ using WebSocketSharp.Net.WebSockets;
 
 namespace Aerolt_External.Commands;
 
-public class PingCommand : IWebsocketCommand
+public class Ping : IWebsocketCommand
 {
-    public string CommandName => "ping";
-    public void Execute(string payload, WebSocketContext context)
+    public void Execute(WebSocketContext context)
     {
         var response = new { type = "Pong" };
         var json = JsonConvert.SerializeObject(response);
