@@ -9,6 +9,7 @@ using WebSocketSharp.Server;
 using Debug = UnityEngine.Debug;
 using LogLevel = WebSocketSharp.LogLevel;
 using System.Security.Cryptography;
+using Aerolt_External.Commands;
 using WebSocketSharp;
 
 namespace Aerolt_External;
@@ -21,6 +22,8 @@ public class AeroltPlugin : BaseUnityPlugin
     private WebSocketServer _server;
     private static readonly System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
 
+
+    private List<CharacterBody> _bodies = new();
 
     [System.Serializable]
     public class ImageHeader
@@ -41,6 +44,7 @@ public class AeroltPlugin : BaseUnityPlugin
         _server.AddWebSocketService<CatalogService>("/ws");
         _server.Start();
 
+        CommandManager.Register(new PingCommand());
 
         Debug.Log("Started Websocket Server");
 
@@ -59,7 +63,7 @@ public class AeroltPlugin : BaseUnityPlugin
 
     public class CatalogService : WebSocketBehavior
     {
-        private static Dictionary<ItemIndex, byte[]> itemIcons = new Dictionary<ItemIndex, byte[]>();
+        private static Dictionary<ItemIndex, byte[]> itemIcons = new();
 
         protected override void OnOpen()
         {
@@ -105,6 +109,9 @@ public class AeroltPlugin : BaseUnityPlugin
         protected override void OnMessage(MessageEventArgs e)
         {
             var rawPayload = new WebsocketMessage(e.Data);
+            
+            CommandManager.Execute(rawPayload.type, e.Data, Context);
+            
             switch (rawPayload.type)
             {
                 case nameof(IconRequest):
