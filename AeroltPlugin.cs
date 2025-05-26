@@ -38,14 +38,12 @@ public class AeroltPlugin : BaseUnityPlugin
         Log = Logger;
 
         Instance = this;
-
+        CommandManager.RegisterAllCommands();
+        
         _server = new WebSocketServer("ws://127.0.0.1:8180");
         _server.Log.Level = LogLevel.Info;
         _server.AddWebSocketService<CatalogService>("/ws");
         _server.Start();
-
-        CommandManager.Register(new PingCommand());
-
         Debug.Log("Started Websocket Server");
 
         var startInfo =
