@@ -26,6 +26,9 @@
         <Reference Include="RoR2" Publicize="true">
             <HintPath>$(RoR2Folder)RoR2.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(RoR2Folder)UnityEngine.UI.dll</HintPath>
+        </Reference>
         <Reference Include="HGCSharpUtils" Publicize="true">
             <HintPath>$(RoR2Folder)HGCSharpUtils.dll</HintPath>
         </Reference>
