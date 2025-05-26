@@ -21,10 +21,7 @@ public class AeroltPlugin : BaseUnityPlugin
     public static ManualLogSource Log;
     public static AeroltPlugin Instance;
     private WebSocketServer _server;
-    private static readonly System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
-
-
-    private List<CharacterBody> _bodies = new();
+    private static readonly MD5 md5 = MD5.Create();
 
     [System.Serializable]
     public class ImageHeader
@@ -33,6 +30,13 @@ public class AeroltPlugin : BaseUnityPlugin
         public string fileName; // e.g. "sword.png"
         public int length; // byte length of the following frame
    }
+
+    private void Awake()
+    {
+        var espObject = new GameObject("Esp");
+        espObject.AddComponent<Esp>();
+        DontDestroyOnLoad(espObject);
+    }
 
     private void Start()
     {
@@ -54,10 +58,7 @@ public class AeroltPlugin : BaseUnityPlugin
         //Process.Start(startInfo);
         Debug.Log("Started Client");
     }
-    public void OnGUI()
-    {
-        Esp.Draw();
-    }
+
     void OnDestroy()
     {
         _server.Stop();

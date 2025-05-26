@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Aerolt_External;
 using Aerolt_External.Helpers;
 using Newtonsoft.Json;
 using RoR2;
@@ -48,8 +47,7 @@ using UnityEngine.UI;
             public bool showDuplicatorToggle{get; set;}
             public bool showDroneToggle {get; set;}
             public bool showShrineToggle {get; set;}
-        }
-
+        }  
         public static void ToggleEspOptions(string payload)
         {
             var toggleMessage = JsonConvert.DeserializeObject<EspToggleMessage>(payload);
@@ -67,21 +65,42 @@ using UnityEngine.UI;
                 }
             }
         }
-
-        private void Awake()
+        
+        private void OnEnable()
         {
-            if (Instance) return;
-            Instance = this;
-            
-            AeroltPlugin.Log.LogInfo("instance" + Instance);
-
-            GatherObjects();
+            Stage.onServerStageBegin += OnStageStart;
         }
 
+        private void OnDisable()
+        {
+            Stage.onServerStageBegin -= OnStageStart;
+        }
+
+        private void OnStageStart(Stage stage)
+        {
+            if (HUD.instancesList.Count > 0)
+            {
+                var hud = HUD.instancesList[0];
+                bool display = true;
+                GatherObjects(hud, ref display);
+            }
+        }
+        
+        private void OnGUI()
+        {
+            if (!Application.isFocused) return;
+
+            Draw(); // calls all ESP draw logic
+        }
+        
+        private void Awake()
+        {
+            Instance = this;
+        }
         public static void Draw()
         {
+           if (Instance.showTeleporterToggle)
                 ShowTeleporter();
-                AeroltPlugin.Log.LogInfo("Show");
             if (Instance.showChestToggle || Instance.showDuplicatorToggle || Instance.showDroneToggle ||
                 Instance.showShrineToggle || Instance.showNewtAlterToggle)
                 DrawPurchaseInteractables();
@@ -159,7 +178,7 @@ using UnityEngine.UI;
             }
         }
 
-        public static void GatherObjects()
+        public static void GatherObjects(HUD hud, ref bool shoulddisplay)
         {
             BarrelInteractions = FindObjectsOfType<BarrelInteraction>().ToList();
             PurchaseInteractions = FindObjectsOfType<PurchaseInteraction>().ToList();
@@ -194,6 +213,7 @@ using UnityEngine.UI;
                         break;
                     default:
                         teleporterColor = Colors.GetColor("Teleporter Finished");
+                        ;
                         break;
                 }
 
