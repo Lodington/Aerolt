@@ -10,6 +10,7 @@ using Debug = UnityEngine.Debug;
 using LogLevel = WebSocketSharp.LogLevel;
 using System.Security.Cryptography;
 using Aerolt_External.Commands;
+using RoR2.UI;
 using WebSocketSharp;
 
 namespace Aerolt_External;
@@ -53,7 +54,10 @@ public class AeroltPlugin : BaseUnityPlugin
         //Process.Start(startInfo);
         Debug.Log("Started Client");
     }
-
+    public void OnGUI()
+    {
+        Esp.Draw();
+    }
     void OnDestroy()
     {
         _server.Stop();
