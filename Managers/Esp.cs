@@ -34,39 +34,23 @@ using UnityEngine.UI;
         public bool showDuplicatorToggle;
         public bool showDroneToggle;
         public bool showShrineToggle;
-
-
-        public static void ToggleEspOptions(EspToggle payload)
-        {
-            var messageProps = typeof(EspToggle).GetFields();
-            var espInstance = Instance;
-
-            foreach (var prop in messageProps)
-            {
-                var value = (bool)prop.GetValue(payload);
-                
-                var field = typeof(Esp).GetField(prop.Name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                if (field != null && field.FieldType == typeof(bool))
-                {
-                    field.SetValue(espInstance, value);
-                }
-            }
-        }
         
         private void OnEnable()
         {
-            Stage.onServerStageBegin += OnStageStart;
+            Stage.onStageStartGlobal += OnStageStart;
         }
 
         private void OnDisable()
         {
-            Stage.onServerStageBegin -= OnStageStart;
+            Stage.onStageStartGlobal -= OnStageStart;
         }
 
         private void OnStageStart(Stage stage)
         {
+            
             if (HUD.instancesList.Count > 0)
             {
+                ;
                 var hud = HUD.instancesList[0];
                 bool display = true;
                 GatherObjects(hud, ref display);
