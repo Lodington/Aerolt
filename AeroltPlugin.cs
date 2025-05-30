@@ -67,11 +67,47 @@ public class AeroltPlugin : BaseUnityPlugin
     public class CatalogService : WebSocketBehavior
     {
         private static Dictionary<ItemIndex, byte[]> itemIcons = new();
+        private static Dictionary<BodyIndex, byte[]> bodyIcons = new();
 
         protected override void OnOpen()
         {
             Instance.StartCoroutine(SenditemCatalogWhenReady());
-            Debug.Log("ItemCatalog Ready");
+            AeroltPlugin.Log.LogInfo("Item Catalog Ready"); 
+            Instance.StartCoroutine(SendMonsterCatalogWhenReady());
+            AeroltPlugin.Log.LogInfo("Body Catalog Ready");
+            
+        }
+
+        IEnumerator SendMonsterCatalogWhenReady()
+        {
+            yield return new WaitUntil(() => BodyCatalog.availability.available);
+            
+            var simple = BodyCatalog.allBodyPrefabs
+                .Select(d =>
+                {
+                    var characterBody = d.GetComponent<CharacterBody>();
+                    if (characterBody.portraitIcon) 
+                        bodyIcons[characterBody.bodyIndex] = characterBody.portraitIcon.ToReadable().EncodeToPNG();
+                    return new
+                    {
+                        bodyId = (int)characterBody.bodyIndex, 
+                        fileName = d.name + "_" + characterBody.baseNameToken,
+                        bodyName = Language.GetString(characterBody.baseNameToken),
+                        pickupModel = characterBody.portraitIcon?.name,
+                        iconHash = characterBody.portraitIcon
+                            ? md5.ComputeHash(bodyIcons[characterBody.bodyIndex])
+                            : null
+                    };
+                })
+                .ToList();
+            var envelope = new
+            {
+                type = "Catalog",
+                count = simple.Count,
+                body = simple,
+            };
+            string json = JsonConvert.SerializeObject(envelope);
+            Send(json);
         }
 
         IEnumerator SenditemCatalogWhenReady()
