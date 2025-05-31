@@ -161,6 +161,19 @@ public class AeroltPlugin : BaseUnityPlugin
                         case IconRequest.IconType.Buff:
                             break;
                         case IconRequest.IconType.Monster:
+                            foreach (var index in message.icons)
+                            {
+                                var itemIndex = (BodyIndex)index;
+                                var item = BodyCatalog.GetBodyPrefabBodyComponent(itemIndex);
+                                var png = bodyIcons[itemIndex];
+                                var header = new ImageHeader()
+                                {
+                                    fileName = item.name + "_" + item.baseNameToken,
+                                    length = png.Length
+                                };
+                                Context.WebSocket.Send(JsonConvert.SerializeObject(header));
+                                Context.WebSocket.Send(png);
+                            }
                             break;
                         case IconRequest.IconType.Map:
                             break;
