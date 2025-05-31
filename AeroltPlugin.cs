@@ -72,17 +72,35 @@ public class AeroltPlugin : BaseUnityPlugin
         protected override void OnOpen()
         {
             Instance.StartCoroutine(SenditemCatalogWhenReady());
-            AeroltPlugin.Log.LogInfo("Item Catalog Ready"); 
-            Instance.StartCoroutine(SendMonsterCatalogWhenReady());
-            AeroltPlugin.Log.LogInfo("Body Catalog Ready");
-            
-        }
+            AeroltPlugin.Log.LogInfo("Item Catalog Ready");
 
-        IEnumerator SendMonsterCatalogWhenReady()
+        }
+        
+        IEnumerator SenditemCatalogWhenReady()
         {
-            yield return new WaitUntil(() => BodyCatalog.availability.available);
-            
-            var simple = BodyCatalog.allBodyPrefabs
+            yield return new WaitUntil(() => ItemCatalog.availability.available && BodyCatalog.availability.available);
+
+            var items = ItemCatalog.allItemDefs
+                .Select(d =>
+                {
+                    if (d.pickupIconSprite)
+                        itemIcons[d.itemIndex] = d.pickupIconSprite.texture.ToReadable().EncodeToPNG();
+                    return new
+                    {
+                        itemId = (int)d.itemIndex,
+                        fileName = d.name + "_" + d.nameToken,
+                        itemName = Language.GetString(d.nameToken),
+                        tier = d.tier.ToString(),
+                        description = Language.GetString(d.descriptionToken),
+                        pickupModel = d.pickupModelPrefab?.name,
+                        iconHash = d.pickupIconSprite
+                            ? md5.ComputeHash(itemIcons[d.itemIndex])
+                            : null
+                    };
+                })
+                .ToList();
+
+            var body = BodyCatalog.allBodyPrefabs
                 .Select(d =>
                 {
                     var characterBody = d.GetComponent<CharacterBody>();
@@ -103,42 +121,8 @@ public class AeroltPlugin : BaseUnityPlugin
             var envelope = new
             {
                 type = "Catalog",
-                count = simple.Count,
-                body = simple,
-            };
-            string json = JsonConvert.SerializeObject(envelope);
-            Send(json);
-        }
-
-        IEnumerator SenditemCatalogWhenReady()
-        {
-            yield return new WaitUntil(() => ItemCatalog.availability.available);
-
-            var simple = ItemCatalog.allItemDefs
-                .Select(d =>
-                {
-                    if (d.pickupIconSprite)
-                        itemIcons[d.itemIndex] = d.pickupIconSprite.texture.ToReadable().EncodeToPNG();
-                    return new
-                    {
-                        itemId = (int)d.itemIndex,
-                        fileName = d.name + "_" + d.nameToken,
-                        itemName = Language.GetString(d.nameToken),
-                        tier = d.tier.ToString(),
-                        description = Language.GetString(d.descriptionToken),
-                        pickupModel = d.pickupModelPrefab?.name,
-                        iconHash = d.pickupIconSprite
-                            ? md5.ComputeHash(itemIcons[d.itemIndex])
-                            : null
-                    };
-                })
-                .ToList();
-
-            var envelope = new
-            {
-                type = "Catalog",
-                count = simple.Count,
-                items = simple,
+                items = items,
+                bodys = body,
                 equipments = Array.Empty<object>()
             };
             string json = JsonConvert.SerializeObject(envelope);
