@@ -126,7 +126,8 @@ namespace Aerolt
             var loader = hud.gameObject.AddComponent<AeroltHudLoader>();
             loader.hud = hud;
             
-            loader.Invoke(nameof(AeroltHudLoader.SpawnHud), 3);
+            // Delay spawn to reduce initial hitch - wait 5 seconds instead of 3
+            loader.Invoke(nameof(AeroltHudLoader.SpawnHud), 5);
         }
         public class AeroltHudLoader : MonoBehaviour
         {

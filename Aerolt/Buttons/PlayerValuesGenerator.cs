@@ -56,7 +56,7 @@ namespace Aerolt.Buttons
 
         public void Setup()
         {
-            foreach (var field in Fields) CreateNewStatPrefab(field);
+            StartCoroutine(InitializeFields());
 
             info = GetComponentInParent<MenuInfo>();
             var i = 0;
@@ -109,6 +109,24 @@ namespace Aerolt.Buttons
                 ((TextMeshProUGUI)inputField.placeholder).text =
                     field.GetValue(TargetBody)
                         .ToString(); // this might but probably wont fuck up the profiles, if you die and come back to life
+        }
+
+        private System.Collections.IEnumerator InitializeFields()
+        {
+            int count = 0;
+            const int batchSize = 10; // Create 10 fields per frame
+
+            foreach (var field in Fields)
+            {
+                CreateNewStatPrefab(field);
+
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; // Wait one frame
+                }
+            }
         }
 
         private void CreateNewStatPrefab(FieldInfo field)

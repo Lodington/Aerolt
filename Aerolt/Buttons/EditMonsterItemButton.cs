@@ -21,6 +21,7 @@ namespace Aerolt.Buttons
         public GameObject itemListParent;
         protected Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
         private ZioConfigEntry<int> sortModeEntry;
+        private bool initialized = false;
 
         public virtual Dictionary<ItemDef, int> itemDef => MonsterButtonGenerator.ItemDef;
 
@@ -41,9 +42,34 @@ namespace Aerolt.Buttons
 
             if (searchFilter)
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
+        }
+
+        private void OnEnable()
+        {
+            if (!initialized)
+            {
+                StartCoroutine(InitializeButtons());
+            }
+        }
+
+        private System.Collections.IEnumerator InitializeButtons()
+        {
+            initialized = true;
+            int count = 0;
+            const int batchSize = 15; // Create 15 buttons per frame
+
             foreach (var def in ContentManager._itemDefs)
+            {
                 itemDefRef[def] =
                     new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
+
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; // Wait one frame
+                }
+            }
         }
 
         public void Sort(int _)

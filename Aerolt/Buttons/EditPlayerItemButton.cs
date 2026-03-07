@@ -26,6 +26,7 @@ namespace Aerolt.Buttons
         private readonly Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
         private ZioConfigEntry<int> sortModeEntry;
         private NetworkUser user;
+        private bool initialized = false;
 
         public void Awake()
         {
@@ -43,9 +44,34 @@ namespace Aerolt.Buttons
 
             if (searchFilter)
                 searchFilter.m_OnEndEdit.AddListener(FilterUpdated);
+        }
+
+        private void OnEnable()
+        {
+            if (!initialized)
+            {
+                StartCoroutine(InitializeButtons());
+            }
+        }
+
+        private System.Collections.IEnumerator InitializeButtons()
+        {
+            initialized = true;
+            int count = 0;
+            const int batchSize = 15; // Create 15 buttons per frame
+
             foreach (var def in ContentManager._itemDefs)
+            {
                 itemDefRef[def] =
                     new AddRemoveButtonGen<ItemDef>(def, buttonPrefab, itemDef, buttonParent, itemListParent, false);
+
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; // Wait one frame
+                }
+            }
         }
 
         private void FilterUpdated(string text)

@@ -26,9 +26,39 @@ namespace Aerolt.Buttons
         private Dictionary<string, EquipmentIndex> eliteMap;
         private readonly Dictionary<CharacterMaster, CustomButton> masterDefRef = new();
         private readonly List<string> options = new();
+        private bool initialized = false;
 
         private void Awake()
         {
+            // Initialize dropdowns immediately (lightweight)
+            foreach (var team in Enum.GetNames(typeof(TeamIndex))) options.Add(team);
+            teamIndexDropDown.AddOptions(options);
+
+            eliteMap = new Dictionary<string, EquipmentIndex> { { "None", EquipmentIndex.None } };
+            foreach (var eliteDef in EliteCatalog.eliteDefs)
+                if (eliteDef.eliteEquipmentDef)
+                    eliteMap[Language.GetStringFormatted(eliteDef.modifierToken, "Monster")] =
+                        eliteDef.eliteEquipmentDef.equipmentIndex;
+            if (eliteIndexDropDown)
+                eliteIndexDropDown.AddOptions(eliteMap.Keys.ToList());
+            if (searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
+        }
+
+        private void OnEnable()
+        {
+            if (!initialized)
+            {
+                StartCoroutine(InitializeButtons());
+            }
+        }
+
+        private System.Collections.IEnumerator InitializeButtons()
+        {
+            initialized = true;
+            int count = 0;
+            const int batchSize = 10; // Create 10 buttons per frame
+
             foreach (var master in MasterCatalog.allAiMasters.OrderBy(x =>
                          x.bodyPrefab
                              ? Language.GetString(x.bodyPrefab.GetComponent<CharacterBody>().baseNameToken)
@@ -45,20 +75,14 @@ namespace Aerolt.Buttons
                     new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 buttonComponet.button.onClick.AddListener(() => SpawnMonster(master));
                 masterDefRef[master] = buttonComponet;
+
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; // Wait one frame
+                }
             }
-
-            foreach (var team in Enum.GetNames(typeof(TeamIndex))) options.Add(team);
-            teamIndexDropDown.AddOptions(options);
-
-            eliteMap = new Dictionary<string, EquipmentIndex> { { "None", EquipmentIndex.None } };
-            foreach (var eliteDef in EliteCatalog.eliteDefs)
-                if (eliteDef.eliteEquipmentDef)
-                    eliteMap[Language.GetStringFormatted(eliteDef.modifierToken, "Monster")] =
-                        eliteDef.eliteEquipmentDef.equipmentIndex;
-            if (eliteIndexDropDown)
-                eliteIndexDropDown.AddOptions(eliteMap.Keys.ToList());
-            if (searchFilter)
-                searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
         public void SpawnMonster(CharacterMaster monsterMaster)

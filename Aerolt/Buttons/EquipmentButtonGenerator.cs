@@ -17,11 +17,30 @@ namespace Aerolt.Buttons
         public GameObject buttonParent;
         public TMP_InputField searchFilter;
         private readonly Dictionary<EquipmentDef, CustomButton> equipmentDefRef = new();
+        private bool initialized = false;
 
         private NetworkUser target;
 
         private void Awake()
         {
+            if (searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
+        }
+
+        private void OnEnable()
+        {
+            if (!initialized)
+            {
+                StartCoroutine(InitializeButtons());
+            }
+        }
+
+        private System.Collections.IEnumerator InitializeButtons()
+        {
+            initialized = true;
+            int count = 0;
+            const int batchSize = 15; // Create 15 buttons per frame
+
             foreach (var def in ContentManager._equipmentDefs.OrderBy(x => Language.GetString(x.nameToken)))
             {
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
@@ -30,10 +49,14 @@ namespace Aerolt.Buttons
                 customButton.image.sprite = def.pickupIconSprite;
                 customButton.button.onClick.AddListener(() => SetEquipmentDef(def));
                 equipmentDefRef[def] = customButton;
-            }
 
-            if (searchFilter)
-                searchFilter.onValueChanged.AddListener(FilterUpdated);
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; // Wait one frame
+                }
+            }
         }
 
         public void SetEquipmentDef(EquipmentDef def)

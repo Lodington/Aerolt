@@ -22,14 +22,40 @@ namespace Aerolt.Buttons
         private readonly Dictionary<BuffDef, int> buffDef = new();
         private readonly Dictionary<BuffDef, AddRemoveButtonGen<BuffDef>> buffDefRef = new();
         private NetworkUser user;
+        private bool initialized = false;
 
         public void Awake()
         {
-            foreach (var def in ContentManager.buffDefs.OrderBy(x => x.name))
-                buffDefRef[def] =
-                    new AddRemoveButtonGen<BuffDef>(def, buttonPrefab, buffDef, buttonParent, itemListParent, false);
             if (searchFilter)
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
+        }
+
+        private void OnEnable()
+        {
+            if (!initialized)
+            {
+                StartCoroutine(InitializeButtons());
+            }
+        }
+
+        private System.Collections.IEnumerator InitializeButtons()
+        {
+            initialized = true;
+            int count = 0;
+            const int batchSize = 20; // Create 20 buttons per frame
+
+            foreach (var def in ContentManager.buffDefs.OrderBy(x => x.name))
+            {
+                buffDefRef[def] =
+                    new AddRemoveButtonGen<BuffDef>(def, buttonPrefab, buffDef, buttonParent, itemListParent, false);
+
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; // Wait one frame
+                }
+            }
         }
 
         public void Initialize(NetworkUser userIn)
