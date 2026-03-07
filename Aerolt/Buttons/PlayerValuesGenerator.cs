@@ -19,15 +19,15 @@ namespace Aerolt.Buttons
             _fields ??= typeof(CharacterBody).GetFields().Where(x => x.FieldType == typeof(float)).ToArray();
 
         [CanBeNull] private static readonly FieldInfo[] _fields;
-        public GameObject parent;
-        public GameObject playerValuePrefab;
-        public ToggleGroup profileGroup;
-        public List<Toggle> toggles;
+        public GameObject parent = null!;
+        public GameObject playerValuePrefab = null!;
+        public ToggleGroup profileGroup = null!;
+        public List<Toggle> toggles = null!;
         private readonly Dictionary<FieldInfo, TMP_InputField> _entries = new();
-        private CharacterBody _target;
-        private MenuInfo info;
+        private CharacterBody _target = null!;
+        private MenuInfo info = null!;
         private readonly List<StatProfile> profiles = new();
-        private ZioConfigEntry<int> selectedProfile;
+        private ZioConfigEntry<int> selectedProfile = null!;
         private bool setup;
 
         public CharacterBody TargetBody

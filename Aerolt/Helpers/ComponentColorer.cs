@@ -26,15 +26,15 @@ namespace Aerolt.Helpers
             { ColorLayer.Accent, new Color(0.322f, 0.322f, 0.322f) }
         };
 
-        public string configName;
+        public string configName = null!;
 
         public Image
-            toggleImage; // Might want to put these under their own config entry/color, especially this one considering its paired to the grey text color which is ew.
+            toggleImage = null!; // Might want to put these under their own config entry/color, especially this one considering its paired to the grey text color which is ew.
 
-        public Image toggleOnImage;
+        public Image toggleOnImage = null!;
         public Dictionary<ColorLayer, ZioConfigEntryBase> colorEntries = new();
         private bool initialized;
-        private MenuInfo menuInfo;
+        private MenuInfo menuInfo = null!;
 
         private void Awake()
         {
@@ -83,13 +83,13 @@ namespace Aerolt.Helpers
             ModSettingsManager.AddOption(new ZioColorOption((ZioConfigEntry<Color>)value), who, who);
         }
 
-        private void ColorChangedOn(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        private void ColorChangedOn(ZioConfigEntryBase arg1, object? arg2, bool arg3)
         {
             if (!toggleOnImage) return;
             toggleOnImage.color = (Color)arg1.BoxedValue;
         }
 
-        private void ColorChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        private void ColorChanged(ZioConfigEntryBase arg1, object? arg2, bool arg3)
         {
             if (!toggleImage) return;
             toggleImage.color = (Color)arg1.BoxedValue;
@@ -104,7 +104,7 @@ namespace Aerolt.Helpers
 
         protected Color Color;
         private bool failedToSetUp;
-        private ZioConfigEntryBase parent;
+        private ZioConfigEntryBase? parent;
 
         private void Awake()
         {
@@ -140,12 +140,12 @@ namespace Aerolt.Helpers
                 parent.SettingChanged -= Colorize;
         }
 
-        public abstract void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _);
+        public abstract void Colorize(ZioConfigEntryBase configEntry, object? oldValue, bool _);
     }
 
     public class ColorableText : ColorableComponent
     {
-        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        public override void Colorize(ZioConfigEntryBase configEntry, object? oldValue, bool _)
         {
             GetComponent<TextMeshProUGUI>().color = (Color)configEntry.BoxedValue;
         }
@@ -155,7 +155,7 @@ namespace Aerolt.Helpers
     {
         public float alphaMult = 1f;
 
-        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        public override void Colorize(ZioConfigEntryBase configEntry, object? oldValue, bool _)
         {
             var color = (Color)configEntry.BoxedValue;
             color.a *= alphaMult;
@@ -165,7 +165,7 @@ namespace Aerolt.Helpers
 
     public class ColorableRawImage : ColorableComponent
     {
-        public override void Colorize(ZioConfigEntryBase configEntry, object oldValue, bool _)
+        public override void Colorize(ZioConfigEntryBase configEntry, object? oldValue, bool _)
         {
             GetComponent<RawImage>().color = (Color)configEntry.BoxedValue;
         }

@@ -15,17 +15,17 @@ namespace Aerolt.Buttons
 {
     public class EditPlayerItemButton : MonoBehaviour
     {
-        public TMP_Dropdown sortMode;
-        public TMP_InputField searchFilter;
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
+        public TMP_Dropdown sortMode = null!;
+        public TMP_InputField searchFilter = null!;
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
 
-        public GameObject itemListParent;
+        public GameObject itemListParent = null!;
 
         private readonly Dictionary<ItemDef, int> itemDef = new();
         private readonly Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
-        private ZioConfigEntry<int> sortModeEntry;
-        private NetworkUser user;
+        private ZioConfigEntry<int>? sortModeEntry;
+        private NetworkUser user = null!;
         private bool initialized = false;
 
         public void Awake()

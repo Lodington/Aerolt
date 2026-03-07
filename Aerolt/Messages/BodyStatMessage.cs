@@ -7,8 +7,8 @@ namespace Aerolt.Messages
 {
     public class BodyStatMessage : AeroltMessageBase
     {
-        private string fieldName;
-        private CharacterBody TargetBody;
+        private string fieldName = null!;
+        private CharacterBody TargetBody = null!;
         private float value;
 
         public BodyStatMessage()

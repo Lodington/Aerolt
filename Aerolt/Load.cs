@@ -36,20 +36,20 @@ namespace Aerolt
         public const string Name = "Aerolt";
         public const string Guid = "com.Lodington." + Name;
         public const string Version = "4.1.0";
-        public static ManualLogSource Log;
-        public static GameObject Co;
-        public static AssetBundle Assets;
+        public static ManualLogSource Log = null!;
+        public static GameObject Co = null!;
+        public static AssetBundle Assets = null!;
 
         public static Load Instance = null!;
 
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
         public static Dictionary<NetworkUser, GameObject> AeroltUIs = new();
-        private static GameObject _settingsUI;
-        public static ZioConfigFile.ZioConfigFile ConfigFile;
-        public static NetworkUser TempViewer;
-        public static HUD TempHud;
-        public static string Path;
+        private static GameObject? _settingsUI;
+        public static ZioConfigFile.ZioConfigFile ConfigFile = null!;
+        public static NetworkUser? TempViewer;
+        public static HUD? TempHud;
+        public static string Path = null!;
 
 
         public void Awake()
@@ -131,7 +131,7 @@ namespace Aerolt
         }
         public class AeroltHudLoader : MonoBehaviour
         {
-            public HUD hud;
+            public HUD hud = null!;
 
             public void SpawnHud()
             {
@@ -145,8 +145,8 @@ namespace Aerolt
                 TempHud = hud;
                 var ui = Instantiate(Co);
                 ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
-                TempViewer = null;
-                TempHud = null;
+                TempViewer = null!;
+                TempHud = null!;
                 AeroltUIs.Add(viewer, ui);
                 Tools.Log(LogLevel.Information, "Created UI");
             }

@@ -7,7 +7,7 @@ namespace Aerolt.Messages
     public class TeamSwitchMessage : AeroltMessageBase
     {
         private TeamIndex newTeam;
-        private CharacterMaster target;
+        private CharacterMaster target = null!;
 
         public TeamSwitchMessage()
         {

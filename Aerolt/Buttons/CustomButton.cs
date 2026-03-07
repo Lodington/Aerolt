@@ -13,13 +13,13 @@ namespace Aerolt.Buttons
 {
     public class CustomButton : MonoBehaviour, IPointerClickHandler
     {
-        public TMP_Text buttonText;
-        public Image image;
-        public RawImage rawImage;
-        public Button.ButtonClickedEvent onRightClick;
-        [CanBeNull] private Button _button;
+        public TMP_Text buttonText = null!;
+        public Image image = null!;
+        public RawImage rawImage = null!;
+        public Button.ButtonClickedEvent onRightClick = new();
+        [CanBeNull] private Button? _button;
 
-        private MPEventSystemLocator eventSystemLocator;
+        private MPEventSystemLocator eventSystemLocator = null!;
         public Button button => _button ??= GetComponent<Button>();
         public MPEventSystem EventSystem => eventSystemLocator.eventSystem;
 

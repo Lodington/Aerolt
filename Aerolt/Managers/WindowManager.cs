@@ -8,8 +8,8 @@ namespace Aerolt.Managers
 {
     public class WindowManager : MonoBehaviour
     {
-        public List<Toggle> buttons;
-        public List<GameObject> panels;
+        public List<Toggle> buttons = null!;
+        public List<GameObject> panels = null!;
         private readonly List<ZioConfigEntry<bool>> windowOpen = new();
 
         public void Start()

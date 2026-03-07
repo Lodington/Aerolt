@@ -11,13 +11,13 @@ namespace Aerolt.Classes
     public class MenuInfo : MonoBehaviour
     {
         public static readonly Dictionary<LocalUser, ZioConfigFile.ZioConfigFile> Files = new();
-        [NonSerialized] public ZioConfigFile.ZioConfigFile ConfigFile;
-        [NonSerialized] public HUD Hud;
-        [NonSerialized] public NetworkUser Owner;
-        private Canvas parentCanvas;
-        [CanBeNull] public LocalUser LocalUser => Owner.localUser;
-        [CanBeNull] public CharacterBody Body => LocalUser?.cachedBody;
-        [CanBeNull] public CharacterMaster Master => Owner.master;
+        [NonSerialized] public ZioConfigFile.ZioConfigFile ConfigFile = null!;
+        [NonSerialized] public HUD Hud = null!;
+        [NonSerialized] public NetworkUser Owner = null!;
+        private Canvas parentCanvas = null!;
+        [CanBeNull] public LocalUser? LocalUser => Owner.localUser;
+        [CanBeNull] public CharacterBody? Body => LocalUser?.cachedBody;
+        [CanBeNull] public CharacterMaster? Master => Owner.master;
 
         private void Awake()
         {

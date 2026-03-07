@@ -13,14 +13,14 @@ namespace Aerolt.Buttons
 {
     public class EditMonsterItemButton : MonoBehaviour
     {
-        public TMP_Dropdown sortMode;
-        public TMP_InputField searchFilter;
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
+        public TMP_Dropdown sortMode = null!;
+        public TMP_InputField searchFilter = null!;
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
 
-        public GameObject itemListParent;
+        public GameObject itemListParent = null!;
         protected Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
-        private ZioConfigEntry<int> sortModeEntry;
+        private ZioConfigEntry<int>? sortModeEntry;
         private bool initialized = false;
 
         public virtual Dictionary<ItemDef, int> itemDef => MonsterButtonGenerator.ItemDef;

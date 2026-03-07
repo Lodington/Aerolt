@@ -9,7 +9,7 @@ namespace Aerolt.Managers
     {
         private bool ban;
         private bool kick;
-        private NetworkUser who;
+        private NetworkUser who = null!;
 
         public KickBanMessage()
         {

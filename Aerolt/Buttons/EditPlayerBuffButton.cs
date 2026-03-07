@@ -13,15 +13,15 @@ namespace Aerolt.Buttons
 {
     public class EditPlayerBuffButton : MonoBehaviour
     {
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
 
-        public GameObject itemListParent;
-        public TMP_InputField searchFilter;
+        public GameObject itemListParent = null!;
+        public TMP_InputField searchFilter = null!;
 
         private readonly Dictionary<BuffDef, int> buffDef = new();
         private readonly Dictionary<BuffDef, AddRemoveButtonGen<BuffDef>> buffDefRef = new();
-        private NetworkUser user;
+        private NetworkUser user = null!;
         private bool initialized = false;
 
         public void Awake()

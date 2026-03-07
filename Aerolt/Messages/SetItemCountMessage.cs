@@ -9,8 +9,8 @@ namespace Aerolt.Messages
 {
     public class SetItemCountMessage : AeroltMessageBase
     {
-        private Inventory inventory;
-        private Dictionary<ItemDef, uint> itemCounts;
+        private Inventory inventory = null!;
+        private Dictionary<ItemDef, uint> itemCounts = null!;
 
         public SetItemCountMessage()
         {
@@ -32,7 +32,7 @@ namespace Aerolt.Messages
         public override void Deserialize(NetworkReader reader)
         {
             base.Deserialize(reader);
-            inventory = Util.FindNetworkObject(reader.ReadNetworkId())?.GetComponent<Inventory>();
+            inventory = Util.FindNetworkObject(reader.ReadNetworkId())?.GetComponent<Inventory>()!;
             itemCounts = reader.ReadItemAmounts();
         }
 

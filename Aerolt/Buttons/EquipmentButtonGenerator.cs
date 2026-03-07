@@ -13,13 +13,13 @@ namespace Aerolt.Buttons
 {
     public class EquipmentButtonGenerator : MonoBehaviour
     {
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
-        public TMP_InputField searchFilter;
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
+        public TMP_InputField searchFilter = null!;
         private readonly Dictionary<EquipmentDef, CustomButton> equipmentDefRef = new();
         private bool initialized = false;
 
-        private NetworkUser target;
+        private NetworkUser target = null!;
 
         private void Awake()
         {

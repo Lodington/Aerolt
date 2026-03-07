@@ -8,7 +8,7 @@ namespace Aerolt.Messages
     public class TeleportMessage : AeroltMessageBase
     {
         private Vector3 targetPosition;
-        private CharacterBody teleportedBody;
+        private CharacterBody teleportedBody = null!;
 
         public TeleportMessage()
         {

@@ -14,16 +14,16 @@ namespace Aerolt.Buttons
     public class MonsterButtonGenerator : MonoBehaviour
     {
         public static Dictionary<ItemDef, int> ItemDef = new();
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
 
-        public GameObject editItemsPrefab;
+        public GameObject editItemsPrefab = null!;
 
-        public TMP_Dropdown teamIndexDropDown;
-        public TMP_Dropdown eliteIndexDropDown;
-        public TMP_InputField searchFilter;
-        public Toggle brainDead;
-        private Dictionary<string, EquipmentIndex> eliteMap;
+        public TMP_Dropdown teamIndexDropDown = null!;
+        public TMP_Dropdown eliteIndexDropDown = null!;
+        public TMP_InputField searchFilter = null!;
+        public Toggle brainDead = null!;
+        private Dictionary<string, EquipmentIndex> eliteMap = null!;
         private readonly Dictionary<CharacterMaster, CustomButton> masterDefRef = new();
         private readonly List<string> options = new();
         private bool initialized = false;

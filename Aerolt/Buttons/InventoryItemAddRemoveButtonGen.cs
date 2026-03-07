@@ -11,18 +11,18 @@ namespace Aerolt.Buttons
     {
         public readonly T def;
 
-        public GameObject button;
-        public AddRemoveButtonGen<T> countRemoveButton;
-        public CustomButton customButton;
+        public GameObject button = null!;
+        public AddRemoveButtonGen<T>? countRemoveButton;
+        public CustomButton customButton = null!;
         private readonly bool isDecrease;
         private readonly Dictionary<T, int> itemCounts;
 
         private GameObject parent;
         private readonly GameObject prefab;
-        private readonly GameObject removeParent;
+        private readonly GameObject? removeParent;
 
         public AddRemoveButtonGen(T defIn, GameObject prefabIn, Dictionary<T, int> itemDefDictionary,
-            GameObject parentIn, GameObject removeParentIn = null, bool doDestroy = true)
+            GameObject parentIn, GameObject? removeParentIn = null, bool doDestroy = true)
         {
             def = defIn;
             prefab = prefabIn;
@@ -94,7 +94,7 @@ namespace Aerolt.Buttons
             {
                 if (relativeAmount < 0) return;
 
-                countRemoveButton = new AddRemoveButtonGen<T>(def, prefab, itemCounts, removeParent);
+                countRemoveButton = new AddRemoveButtonGen<T>(def, prefab, itemCounts, removeParent!);
                 countRemoveButton.countRemoveButton = this;
                 if (!itemCounts.ContainsKey(def))
                     itemCounts.Add(def, 0);
@@ -104,14 +104,14 @@ namespace Aerolt.Buttons
             UpdateText();
 
             if (itemCounts[def] > 0) return;
-            Object.Destroy(isDecrease ? button : countRemoveButton.button);
+            Object.Destroy(isDecrease ? button : countRemoveButton!.button);
             if (!isDecrease) countRemoveButton = null;
-            else countRemoveButton.countRemoveButton = null;
+            else countRemoveButton!.countRemoveButton = null;
         }
 
         public void UpdateText()
         {
-            var targetButton = isDecrease ? customButton : countRemoveButton.customButton;
+            var targetButton = isDecrease ? customButton : countRemoveButton!.customButton;
             targetButton.buttonText.text = def switch // Generics are fucked
             {
                 ItemDef itemDef => $"{Language.GetString(itemDef.nameToken)} x{itemCounts[def]}",

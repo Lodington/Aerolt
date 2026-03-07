@@ -16,11 +16,11 @@ namespace Aerolt.Classes
     {
         private static readonly List<ConfigDefinition> roo = new();
 
-        public GameObject panel;
+        public GameObject panel = null!;
         private bool _menuIsOpen = true;
-        private MenuInfo menuInfo;
-        [NonSerialized] public NetworkUser owner;
-        private ZioConfigEntry<bool> visible;
+        private MenuInfo menuInfo = null!;
+        [NonSerialized] public NetworkUser owner = null!;
+        private ZioConfigEntry<bool> visible = null!;
 
         public void Update()
         {
@@ -58,7 +58,7 @@ namespace Aerolt.Classes
                 MakeRiskOfOptions(visible);
         }
 
-        private void VisibleOnSettingChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
+        private void VisibleOnSettingChanged(ZioConfigEntryBase? arg1, object? arg2, bool arg3)
         {
             GetComponent<Image>().enabled = visible.Value;
         }

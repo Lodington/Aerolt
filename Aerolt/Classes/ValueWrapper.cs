@@ -43,7 +43,7 @@ namespace Aerolt.Classes
         /// <typeparam name="T">Any <see cref="ZioConfigEntry{T}" /> serializable type.</typeparam>
         /// <returns></returns>
         public static ValueWrapper<T> Get<T>(string category, string name, T defaultValue, string description,
-            NetworkUser who = null, bool? forceLocalOrRemote = null, Action<ZioConfigEntry<T>> firstSetup = null)
+            NetworkUser? who = null, bool? forceLocalOrRemote = null, Action<ZioConfigEntry<T>>? firstSetup = null)
         {
             if (Instances.TryGetValue(GetId(who) + category + name, out var entry))
             {
@@ -56,7 +56,7 @@ namespace Aerolt.Classes
             return val;
         }
 
-        public static string GetId(NetworkUser user)
+        public static string GetId(NetworkUser? user)
         {
             if (!user) return string.Empty;
             var id = user.id;
@@ -66,17 +66,17 @@ namespace Aerolt.Classes
 
     public class ValueWrapper<T> : ValueWrapper
     {
-        private readonly ZioConfigEntry<T> configEntry;
+        private readonly ZioConfigEntry<T>? configEntry;
         private bool duckChange;
         private bool duckConfigChange;
-        private T fallbackValue;
-        protected string identifier;
+        private T fallbackValue = default!;
+        protected string identifier = null!;
         private readonly bool isLocalBinding;
-        public NetworkUser user;
+        public NetworkUser? user;
 
-        public ValueWrapper(string category, string name, T defaultValue, string description, NetworkUser who = null,
+        public ValueWrapper(string category, string name, T defaultValue, string description, NetworkUser? who = null,
             bool? forceLocalOrRemote = null,
-            Action<ZioConfigEntry<T>> firstSetup =
+            Action<ZioConfigEntry<T>>? firstSetup =
                 null) // force = true, it will be a local : force = false, it will be remote 
         {
             user = who;
@@ -105,14 +105,14 @@ namespace Aerolt.Classes
 
         public T Value
         {
-            get => isLocalBinding ? configEntry.Value : fallbackValue;
+            get => isLocalBinding ? configEntry!.Value : fallbackValue;
             set
             {
                 //if (value.Equals(Value)) return;
                 if (isLocalBinding)
                 {
                     duckConfigChange = true;
-                    configEntry.Value = value;
+                    configEntry!.Value = value;
                     duckConfigChange = false;
                 }
                 else
@@ -125,7 +125,7 @@ namespace Aerolt.Classes
             }
         }
 
-        public event Action settingChanged;
+        public event Action? settingChanged;
 
         public override string ToString()
         {
@@ -134,7 +134,7 @@ namespace Aerolt.Classes
 
         public void Sync()
         {
-            new ValueWrapperSyncMessage(identifier, Value).SendToEveryone();
+            new ValueWrapperSyncMessage(identifier, Value!).SendToEveryone();
         }
 
         protected override void SetValue(object value)
@@ -147,9 +147,9 @@ namespace Aerolt.Classes
 
     public class ValueWrapperSyncMessage : AeroltMessageBase
     {
-        private string key;
+        private string key = null!;
         private int type;
-        private string value;
+        private string value = null!;
 
         public ValueWrapperSyncMessage()
         {
