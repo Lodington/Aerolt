@@ -122,8 +122,34 @@ namespace Aerolt.Buttons
         public void Initialize(NetworkUser currentUser)
         {
             user = currentUser;
+            
+            // Wait for buttons to be initialized before trying to set amounts
+            if (!initialized)
+            {
+                StartCoroutine(InitializeAndSetAmounts(currentUser));
+                return;
+            }
+            
             foreach (var def in ContentManager._itemDefs)
-                itemDefRef[def].SetAmount(user.master.inventory.GetItemCount(def));
+            {
+                if (itemDefRef.ContainsKey(def))
+                    itemDefRef[def].SetAmount(user.master.inventory.GetItemCount(def));
+            }
+
+            Sort();
+        }
+
+        private System.Collections.IEnumerator InitializeAndSetAmounts(NetworkUser currentUser)
+        {
+            // Wait for initialization to complete
+            yield return StartCoroutine(InitializeButtons());
+            
+            // Now set the amounts
+            foreach (var def in ContentManager._itemDefs)
+            {
+                if (itemDefRef.ContainsKey(def))
+                    itemDefRef[def].SetAmount(currentUser.master.inventory.GetItemCount(def));
+            }
 
             Sort();
         }

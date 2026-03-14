@@ -253,6 +253,7 @@ namespace Aerolt.Managers
 
         public void SwapViewState(ViewState newState)
         {
+            // Deactivate current state
             switch (_state)
             {
                 case ViewState.Main:
@@ -274,6 +275,9 @@ namespace Aerolt.Managers
                     throw new ArgumentOutOfRangeException();
             }
 
+            _state = newState;
+
+            // Activate new state
             switch (newState)
             {
                 case ViewState.Main:
@@ -298,8 +302,6 @@ namespace Aerolt.Managers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
             }
-
-            _state = newState;
         }
 
         public void KillAllMobs()

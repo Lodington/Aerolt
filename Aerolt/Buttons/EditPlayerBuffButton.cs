@@ -61,8 +61,34 @@ namespace Aerolt.Buttons
         public void Initialize(NetworkUser userIn)
         {
             user = userIn;
+            
+            // Wait for buttons to be initialized before trying to set amounts
+            if (!initialized)
+            {
+                StartCoroutine(InitializeAndSetAmounts(userIn));
+                return;
+            }
+            
             var body = user.master.GetBody();
-            foreach (var def in ContentManager.buffDefs) buffDefRef[def].SetAmount(body ? body.GetBuffCount(def) : 0);
+            foreach (var def in ContentManager.buffDefs)
+            {
+                if (buffDefRef.ContainsKey(def))
+                    buffDefRef[def].SetAmount(body ? body.GetBuffCount(def) : 0);
+            }
+        }
+
+        private System.Collections.IEnumerator InitializeAndSetAmounts(NetworkUser userIn)
+        {
+            // Wait for initialization to complete
+            yield return StartCoroutine(InitializeButtons());
+            
+            // Now set the amounts
+            var body = userIn.master.GetBody();
+            foreach (var def in ContentManager.buffDefs)
+            {
+                if (buffDefRef.ContainsKey(def))
+                    buffDefRef[def].SetAmount(body ? body.GetBuffCount(def) : 0);
+            }
         }
 
         public void GiveBuffs()
