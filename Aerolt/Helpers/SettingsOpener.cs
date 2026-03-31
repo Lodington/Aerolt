@@ -10,8 +10,8 @@ namespace Aerolt.Helpers
 {
     public class SettingsOpener : MonoBehaviour
     {
-        private Transform headerTransform;
-        private LocalUser localuser;
+        private Transform headerTransform = null!;
+        private LocalUser localuser = null!;
         private OpenState openSettings;
 
         public void Awake()

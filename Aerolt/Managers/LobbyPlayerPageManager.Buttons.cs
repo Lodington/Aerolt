@@ -12,7 +12,7 @@ namespace Aerolt.Managers
 {
     public partial class LobbyPlayerPageManager
     {
-        [CanBeNull] private static PickupDropTable _chest1DropTable;
+        [CanBeNull] private static PickupDropTable? _chest1DropTable;
 
         public static PickupDropTable Chest1DropTable =>
             _chest1DropTable ??= LegacyResourcesAPI.Load<PickupDropTable>("DropTables/dtSmallChest");
@@ -29,12 +29,12 @@ namespace Aerolt.Managers
 
         public void Goto()
         {
-            if (info.Body && body) new TeleportMessage(info.Body, body.transform.position).SendToAuthority(info.Body);
+            if (info.Body && body) new TeleportMessage(info.Body!, body.transform.position).SendToAuthority(info.Body!);
         }
 
         public void Bring()
         {
-            if (info.Body && body) new TeleportMessage(body, info.Body.transform.position).SendToAuthority(body);
+            if (info.Body && body) new TeleportMessage(body, info.Body!.transform.position).SendToAuthority(body);
         }
 
         public void Kill()

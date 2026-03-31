@@ -20,7 +20,9 @@ namespace Aerolt.Buttons
 
         public GameObject itemListParent = null!;
         protected Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
+#pragma warning disable CS0649
         private ZioConfigEntry<int>? sortModeEntry;
+#pragma warning restore CS0649
         private bool initialized = false;
 
         public virtual Dictionary<ItemDef, int> itemDef => MonsterButtonGenerator.ItemDef;
@@ -106,7 +108,7 @@ namespace Aerolt.Buttons
 
         private void SortModeChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
         {
-            sortMode.value = sortModeEntry.Value;
+            sortMode.value = sortModeEntry!.Value;
             Sort();
         }
     }

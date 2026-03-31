@@ -8,7 +8,7 @@ namespace Aerolt.Managers
 {
     public static class NetworkManager
     {
-        public static Type[] RegisteredMessages;
+        public static Type[] RegisteredMessages = null!;
 
         public static void Initialize()
         {
@@ -93,8 +93,8 @@ namespace Aerolt.Managers
 
     public class BroadcastMessage : AeroltMessageBase
     {
-        public NetworkConnection fromConnection;
-        private AeroltMessageBase message;
+        public NetworkConnection fromConnection = null!;
+        private AeroltMessageBase message = null!;
 
         public BroadcastMessage()
         {
@@ -133,8 +133,8 @@ namespace Aerolt.Managers
 
     public class NewAuthMessage : AeroltMessageBase
     {
-        private AeroltMessageBase message;
-        private NetworkIdentity target;
+        private AeroltMessageBase message = null!;
+        private NetworkIdentity target = null!;
 
         public NewAuthMessage()
         {
@@ -171,7 +171,7 @@ namespace Aerolt.Managers
 
     internal class AeroltMessage : MessageBase
     {
-        public AeroltMessageBase message;
+        public AeroltMessageBase message = null!;
         public uint Type;
 
         public AeroltMessage()

@@ -7,8 +7,8 @@ namespace Aerolt.Messages
 {
     public class SetBuffCountMessage : AeroltMessageBase
     {
-        public CharacterBody body;
-        public Dictionary<BuffIndex, uint> buffCounts;
+        public CharacterBody body = null!;
+        public Dictionary<BuffIndex, uint> buffCounts = null!;
 
         public SetBuffCountMessage()
         {

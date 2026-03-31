@@ -7,7 +7,7 @@ namespace Aerolt.Messages
     public class GodModeMessage : AeroltMessageBase
     {
         private bool enabled;
-        private CharacterMaster master;
+        private CharacterMaster master = null!;
 
         public GodModeMessage()
         {

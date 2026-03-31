@@ -13,40 +13,40 @@ namespace Aerolt.Classes
 {
     public class Esp : MonoBehaviour, IModuleStartup
     {
-        public static List<PurchaseInteraction> PurchaseInteractions;
-        public static List<BarrelInteraction> BarrelInteractions;
-        public static List<PressurePlateController> SecretButtons;
-        public static List<ScrapperController> Scrappers;
-        public static List<MultiShopController> MultiShops;
+        public static List<PurchaseInteraction> PurchaseInteractions = null!;
+        public static List<BarrelInteraction> BarrelInteractions = null!;
+        public static List<PressurePlateController> SecretButtons = null!;
+        public static List<ScrapperController> Scrappers = null!;
+        public static List<MultiShopController> MultiShops = null!;
 
 
-        public static Esp Instance;
+        public static Esp Instance = null!;
 
-        public Toggle showAdvancedToggle;
-        public Toggle showTeleporterToggle;
-        public Toggle showChestToggle;
-        public Toggle showMultiShopToggle;
-        public Toggle showBarrelToggle;
-        public Toggle showScrapperToggle;
-        public Toggle ShowSecretToggle;
-        public Toggle showDuplicatorToggle;
-        public Toggle showDroneToggle;
-        public Toggle showShrineToggle;
+        public Toggle showAdvancedToggle = null!;
+        public Toggle showTeleporterToggle = null!;
+        public Toggle showChestToggle = null!;
+        public Toggle showMultiShopToggle = null!;
+        public Toggle showBarrelToggle = null!;
+        public Toggle showScrapperToggle = null!;
+        public Toggle ShowSecretToggle = null!;
+        public Toggle showDuplicatorToggle = null!;
+        public Toggle showDroneToggle = null!;
+        public Toggle showShrineToggle = null!;
 
         [FormerlySerializedAs("showClensingPoolToggle")]
-        public Toggle showNewtAlterToggle;
+        public Toggle showNewtAlterToggle = null!;
 
-        private ZioConfigEntry<bool> advancedEntry;
-        private ZioConfigEntry<bool> barrelEntry;
-        private ZioConfigEntry<bool> chestEntry;
-        private ZioConfigEntry<bool> droneEntry;
-        private ZioConfigEntry<bool> duplicatorEntry;
-        private ZioConfigEntry<bool> scrapperEntry;
-        private ZioConfigEntry<bool> secretEntry;
-        private ZioConfigEntry<bool> shopEntry;
-        private ZioConfigEntry<bool> showNewtAlterEntry;
-        private ZioConfigEntry<bool> shrineEntry;
-        private ZioConfigEntry<bool> teleporterEntry;
+        private ZioConfigEntry<bool> advancedEntry = null!;
+        private ZioConfigEntry<bool> barrelEntry = null!;
+        private ZioConfigEntry<bool> chestEntry = null!;
+        private ZioConfigEntry<bool> droneEntry = null!;
+        private ZioConfigEntry<bool> duplicatorEntry = null!;
+        private ZioConfigEntry<bool> scrapperEntry = null!;
+        private ZioConfigEntry<bool> secretEntry = null!;
+        private ZioConfigEntry<bool> shopEntry = null!;
+        private ZioConfigEntry<bool> showNewtAlterEntry = null!;
+        private ZioConfigEntry<bool> shrineEntry = null!;
+        private ZioConfigEntry<bool> teleporterEntry = null!;
 
         public void ModuleStart()
         {

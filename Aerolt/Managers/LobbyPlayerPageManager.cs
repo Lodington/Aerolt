@@ -17,54 +17,55 @@ namespace Aerolt.Managers
 {
     public partial class LobbyPlayerPageManager : MonoBehaviour, IModuleStartup
     {
-        public PlayerValuesGenerator bodyStats;
+        public PlayerValuesGenerator bodyStats = null!;
 
 
-        [Header("Inventory Display")] public ItemInventoryDisplay inventoryDisplay;
+        [Header("Inventory Display")] public ItemInventoryDisplay inventoryDisplay = null!;
 
-        public EquipmentIcon equipmentIcon;
-        public BuffDisplay buffDisplay;
+        public EquipmentIcon equipmentIcon = null!;
+        private GameObject equipmentIconGo = null!;
+        public BuffDisplay buffDisplay = null!;
 
-        [Header("Toggles")] public Toggle aimbotToggle;
+        [Header("Toggles")] public Toggle aimbotToggle = null!;
 
-        public Toggle noclipToggle;
-        public Toggle godToggle;
-        public Toggle infiniteSkillsToggle;
-        public Toggle alwaysSprintToggle;
-        public Toggle disableMobSpawnToggle;
+        public Toggle noclipToggle = null!;
+        public Toggle godToggle = null!;
+        public Toggle infiniteSkillsToggle = null!;
+        public Toggle alwaysSprintToggle = null!;
+        public Toggle disableMobSpawnToggle = null!;
 
-        [Header("Sliders")] public Slider aimbotWeightSlider;
+        [Header("Sliders")] public Slider aimbotWeightSlider = null!;
 
-        public Slider xpSlider;
+        public Slider xpSlider = null!;
 
-        [Header("DropDowns")] public TMP_Dropdown teamDropdown;
+        [Header("DropDowns")] public TMP_Dropdown teamDropdown = null!;
 
-        [Header("InputFields")] public TMP_InputField moneyInputField;
+        [Header("InputFields")] public TMP_InputField moneyInputField = null!;
 
-        public TMP_InputField lunarCoinsInputField;
-        public TMP_InputField voidMarkersInputField;
-        public TMP_InputField xpToGiveInputField;
+        public TMP_InputField lunarCoinsInputField = null!;
+        public TMP_InputField voidMarkersInputField = null!;
+        public TMP_InputField xpToGiveInputField = null!;
 
-        [Header("Content Display")] public GameObject mainContent;
+        [Header("Content Display")] public GameObject mainContent = null!;
 
-        public EditPlayerItemButton itemContent;
-        public EquipmentButtonGenerator equipmentContent;
-        public BodyManager bodyContent;
-        public EditPlayerBuffButton buffContent;
-        public TMP_Text LevelLabel;
-        private PlayerConfigBinding _playerConfig;
+        public EditPlayerItemButton itemContent = null!;
+        public EquipmentButtonGenerator equipmentContent = null!;
+        public BodyManager bodyContent = null!;
+        public EditPlayerBuffButton buffContent = null!;
+        public TMP_Text LevelLabel = null!;
+        private PlayerConfigBinding _playerConfig = null!;
 
         private ViewState _state = ViewState.Main;
-        private CharacterBody body;
+        private CharacterBody body = null!;
 
-        [Header("Character Info")] private NetworkUser currentUser;
+        [Header("Character Info")] private NetworkUser currentUser = null!;
 
-        private ValueWrapper<bool> disableMobSpawns;
-        private MenuInfo info;
-        private CharacterMaster master;
+        private ValueWrapper<bool> disableMobSpawns = null!;
+        private MenuInfo info = null!;
+        private CharacterMaster master = null!;
         private bool ownerIsSelected;
-        private LobbyPlayerManager playerManager;
-        private static List<ItemDef> _giveAllFilteredItems;
+        private LobbyPlayerManager playerManager = null!;
+        private static List<ItemDef>? _giveAllFilteredItems;
 
         public static List<ItemDef> GiveAllFilteredItems => _giveAllFilteredItems ??= new List<ItemDef>
         {
@@ -109,6 +110,11 @@ namespace Aerolt.Managers
         {
             info = GetComponentInParent<MenuInfo>();
             playerManager = GetComponent<LobbyPlayerManager>();
+            // Destroy EquipmentIcon component to prevent NRE in its Awake() when the
+            // panel is activated before an inventory is available. We recreate it in SetUser.
+            equipmentIconGo = equipmentIcon.gameObject;
+            Destroy(equipmentIcon);
+            equipmentIcon = null!;
             bodyStats.Setup();
 
 
@@ -186,6 +192,7 @@ namespace Aerolt.Managers
             if (!master) return;
             var inv = master.inventory;
             //inventoryDisplay.SetSubscribedInventory(inv);
+            if (!equipmentIcon) equipmentIcon = equipmentIconGo.AddComponent<EquipmentIcon>();
             equipmentIcon.targetInventory = inv;
 
             master.onBodyStart += SetBody;

@@ -5,8 +5,8 @@ namespace Aerolt.Classes
 {
     public class AlwaysSprintBehavior : MonoBehaviour
     {
-        private PlayerCharacterMasterController controller;
-        private LocalUser localUser;
+        private PlayerCharacterMasterController controller = null!;
+        private LocalUser localUser = null!;
 
         public void Awake()
         {

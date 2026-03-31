@@ -26,7 +26,6 @@ namespace Aerolt.Buttons
         private Dictionary<string, EquipmentIndex> eliteMap = null!;
         private readonly Dictionary<CharacterMaster, CustomButton> masterDefRef = new();
         private readonly List<string> options = new();
-        private bool initialized = false;
 
         private void Awake()
         {
@@ -45,32 +44,51 @@ namespace Aerolt.Buttons
                 searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
+        private Coroutine? _initCoroutine;
+
         private void OnEnable()
         {
-            if (!initialized)
+            if (masterDefRef.Count == 0)
             {
-                StartCoroutine(InitializeButtons());
+                if (_initCoroutine != null) StopCoroutine(_initCoroutine);
+                _initCoroutine = StartCoroutine(InitializeButtons());
             }
+        }
+
+        private void ClearButtons()
+        {
+            if (_initCoroutine != null)
+            {
+                StopCoroutine(_initCoroutine);
+                _initCoroutine = null;
+            }
+            foreach (var entry in masterDefRef)
+                if (entry.Value) Destroy(entry.Value.gameObject);
+            masterDefRef.Clear();
+        }
+
+        public void Repopulate()
+        {
+            ClearButtons();
+            _initCoroutine = StartCoroutine(InitializeButtons());
         }
 
         private System.Collections.IEnumerator InitializeButtons()
         {
-            initialized = true;
             int count = 0;
             const int batchSize = 10; // Create 10 buttons per frame
 
-            foreach (var master in MasterCatalog.allAiMasters.OrderBy(x =>
-                         x.bodyPrefab
-                             ? Language.GetString(x.bodyPrefab.GetComponent<CharacterBody>().baseNameToken)
-                             : x.name))
+            foreach (var master in MasterCatalog.allMasters
+                         .Where(x => x.bodyPrefab && x.bodyPrefab.GetComponent<CharacterBody>()?.portraitIcon)
+                         .OrderBy(x => Language.GetString(x.bodyPrefab.GetComponent<CharacterBody>().baseNameToken)))
             {
+                if (masterDefRef.ContainsKey(master)) continue;
+
                 var body = master.bodyPrefab.GetComponent<CharacterBody>();
 
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var buttonComponet = newButton.GetComponent<CustomButton>();
-                buttonComponet.buttonText.text = master.bodyPrefab
-                    ? Language.GetString(master.bodyPrefab.GetComponent<CharacterBody>().baseNameToken)
-                    : master.name;
+                buttonComponet.buttonText.text = Language.GetString(body.baseNameToken);
                 buttonComponet.image.sprite = Sprite.Create((Texture2D)body.portraitIcon,
                     new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 buttonComponet.button.onClick.AddListener(() => SpawnMonster(master));
@@ -83,6 +101,8 @@ namespace Aerolt.Buttons
                     yield return null; // Wait one frame
                 }
             }
+
+            _initCoroutine = null;
         }
 
         public void SpawnMonster(CharacterMaster monsterMaster)

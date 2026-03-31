@@ -6,7 +6,7 @@ namespace Aerolt.Messages
 {
     public class KillMessage : AeroltMessageBase
     {
-        private CharacterMaster master;
+        private CharacterMaster master = null!;
 
         public KillMessage()
         {

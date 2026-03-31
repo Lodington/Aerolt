@@ -8,9 +8,9 @@ namespace Aerolt.Helpers
     [RequireComponent(typeof(EventTrigger))]
     public class MovePanel : MonoBehaviour
     {
-        private EventTrigger _eventTrigger;
-        private ZioConfigEntry<Vector2> configEntry;
-        private Transform Target;
+        private EventTrigger _eventTrigger = null!;
+        private ZioConfigEntry<Vector2> configEntry = null!;
+        private Transform Target = null!;
 
         private void Awake()
         {

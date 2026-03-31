@@ -25,11 +25,11 @@ namespace Aerolt.Classes
             PauseManager.onPauseStartGlobal += FuckingUnitySorting;
             FuckingUnitySorting();
 
-            Hud = Load.TempHud;
-            Owner = Load.TempViewer;
+            Hud = Load.TempHud!;
+            Owner = Load.TempViewer!;
 
-            if (Owner.localUser == null) return;
-            if (!Files.TryGetValue(Owner.localUser, out ConfigFile))
+            if (Owner?.localUser == null) return;
+            if (!Files.TryGetValue(Owner.localUser, out ConfigFile!))
             {
                 ConfigFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage,
                     $"/Aerolt/Profiles/{Owner.localUser.userProfile.fileName}.cfg", true);

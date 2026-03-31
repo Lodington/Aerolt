@@ -7,10 +7,9 @@ namespace Aerolt.Classes
     public class AimbotBehavior : MonoBehaviour
     {
         public float weight = 0.5f;
-        private CharacterBody body;
+        private CharacterBody body = null!;
         private Vector3? direction;
-        private InputBankTest inputBank;
-        private BullseyeSearch search;
+        private InputBankTest inputBank = null!;
         private TeamIndex team;
 
         private void Awake()

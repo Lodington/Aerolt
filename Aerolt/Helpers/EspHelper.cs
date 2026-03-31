@@ -74,7 +74,7 @@ namespace Aerolt.Managers
 
         public static void DrawMultiShopRarityESPLabel(Vector3 worldpos, Color textcolor, Color outlinecolor,
             string text,
-            List<Color> itemColors, List<string> itemNames, string outlinetext = null)
+            List<Color> itemColors, List<string> itemNames, string? outlinetext = null)
         {
             var content = new GUIContent(text);
             if (outlinetext == null) outlinetext = text;

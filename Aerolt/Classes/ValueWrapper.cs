@@ -59,7 +59,7 @@ namespace Aerolt.Classes
         public static string GetId(NetworkUser? user)
         {
             if (!user) return string.Empty;
-            var id = user.id;
+            var id = user!.id;
             return (id.value != 0UL ? id.value.ToString() : id.strValue) + id.subId;
         }
     }
@@ -81,10 +81,10 @@ namespace Aerolt.Classes
         {
             user = who;
             if ((forceLocalOrRemote.HasValue && forceLocalOrRemote.Value) || (!who && !forceLocalOrRemote.HasValue) ||
-                (!forceLocalOrRemote.HasValue && who.localUser != null))
+                (!forceLocalOrRemote.HasValue && who?.localUser != null))
             {
                 isLocalBinding = true;
-                var file = who ? MenuInfo.Files[who.localUser!] : Load.ConfigFile;
+                var file = who ? MenuInfo.Files[who!.localUser!] : Load.ConfigFile;
                 configEntry = file.Bind(category, name, defaultValue, description);
                 configEntry.SettingChanged += (_, _, _) =>
                 {

@@ -24,7 +24,9 @@ namespace Aerolt.Buttons
 
         private readonly Dictionary<ItemDef, int> itemDef = new();
         private readonly Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
+#pragma warning disable CS0649
         private ZioConfigEntry<int>? sortModeEntry;
+#pragma warning restore CS0649
         private NetworkUser user = null!;
         private bool initialized = false;
 
@@ -103,7 +105,7 @@ namespace Aerolt.Buttons
 
         private void SortModeChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
         {
-            sortMode.value = sortModeEntry.Value;
+            sortMode.value = sortModeEntry!.Value;
             Sort();
         }
 

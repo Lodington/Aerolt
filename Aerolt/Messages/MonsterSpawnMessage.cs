@@ -9,12 +9,12 @@ namespace Aerolt.Messages
 {
     public class MonsterSpawnMessage : AeroltMessageBase
     {
-        private string bodyName;
+        private string bodyName = null!;
         private bool brainDead;
         private EquipmentIndex eliteIndex;
-        private Dictionary<ItemDef, uint> itemCounts;
+        private Dictionary<ItemDef, uint> itemCounts = null!;
         private Vector3 location;
-        private string masterName;
+        private string masterName = null!;
         private TeamIndex teamIndex;
 
         public MonsterSpawnMessage()

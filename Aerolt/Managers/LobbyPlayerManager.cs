@@ -12,13 +12,13 @@ namespace Aerolt.Managers
     [RequireComponent(typeof(ToggleGroup))]
     public class LobbyPlayerManager : MonoBehaviour, IModuleStartup
     {
-        public GameObject playerEntryPrefab;
-        public Transform playerEntryParent;
+        public GameObject playerEntryPrefab = null!;
+        public Transform playerEntryParent = null!;
         public readonly Dictionary<NetworkUser, PlayerConfigBinding> users = new();
-        private LobbyPlayerPageManager _pageManager;
-        private MenuInfo info;
-        private NetworkUser selectedUser;
-        private ToggleGroup toggleGroup;
+        private LobbyPlayerPageManager _pageManager = null!;
+        private MenuInfo info = null!;
+        private NetworkUser selectedUser = null!;
+        private ToggleGroup toggleGroup = null!;
 
         private void OnEnable()
         {

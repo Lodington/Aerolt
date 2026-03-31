@@ -8,8 +8,8 @@ namespace Aerolt.Overrides
 {
     public class IconSwap : MonoBehaviour
     {
-        public Image discord;
-        public Sprite imageToSwapTo;
+        public Image discord = null!;
+        public Sprite imageToSwapTo = null!;
 
         public void Awake() => SwapThisImage();
         public void SwapThisImage()

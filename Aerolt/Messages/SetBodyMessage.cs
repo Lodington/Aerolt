@@ -7,8 +7,8 @@ namespace Aerolt.Messages
 {
     public class SetBodyMessage : AeroltMessageBase
     {
-        private string newBody;
-        private NetworkUser user;
+        private string newBody = null!;
+        private NetworkUser user = null!;
 
         public SetBodyMessage()
         {

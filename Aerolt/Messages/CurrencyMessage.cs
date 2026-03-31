@@ -9,7 +9,7 @@ namespace Aerolt.Messages
     {
         private CurrencyType _type;
         private uint amount;
-        private CharacterMaster master;
+        private CharacterMaster master = null!;
 
         public CurrencyMessage()
         {

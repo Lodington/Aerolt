@@ -40,12 +40,6 @@ namespace Aerolt.Buttons
             }
         }
 
-        public void Awake()
-        {
-            toggles[0].SetIsOnWithoutNotify(false);
-            toggles[selectedProfile.Value].SetIsOnWithoutNotify(true);
-        }
-
         public void Update()
         {
             if (setup) return;
@@ -54,11 +48,15 @@ namespace Aerolt.Buttons
             setup = true;
         }
 
+        private bool needsFieldInit;
+
         public void Setup()
         {
-            StartCoroutine(InitializeFields());
-
             info = GetComponentInParent<MenuInfo>();
+
+            selectedProfile = info.ConfigFile.Bind("Player", "Selected Profile", 0,
+                "Which profile is selected for the body stats.");
+
             var i = 0;
             foreach (var toggle in toggles)
             {
@@ -73,9 +71,25 @@ namespace Aerolt.Buttons
                 i++;
             }
 
-            selectedProfile = info.ConfigFile.Bind("Player", "Selected Profile", 0,
-                "Which profile is selected for the body stats.");
-            ProfileSelected(selectedProfile.Value);
+            toggles[0].SetIsOnWithoutNotify(false);
+            toggles[selectedProfile.Value].SetIsOnWithoutNotify(true);
+
+            needsFieldInit = true;
+            if (gameObject.activeInHierarchy)
+                StartCoroutine(InitializeFieldsThenApplyProfile());
+        }
+
+        private void OnEnable()
+        {
+            if (needsFieldInit && _entries.Count == 0)
+                StartCoroutine(InitializeFieldsThenApplyProfile());
+        }
+
+        private System.Collections.IEnumerator InitializeFieldsThenApplyProfile()
+        {
+            needsFieldInit = false;
+            yield return StartCoroutine(InitializeFields());
+            ProfileSelected(selectedProfile.Value, false);
         }
 
         public void SetTogglesActive(bool enable)

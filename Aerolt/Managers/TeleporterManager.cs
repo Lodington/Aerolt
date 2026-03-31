@@ -12,9 +12,9 @@ namespace Aerolt.Managers
 {
     public class TeleporterManager : MonoBehaviour
     {
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
-        public TMP_InputField searchFilter;
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
+        public TMP_InputField searchFilter = null!;
         private readonly Dictionary<SceneDef, CustomButton> sceneDefRef = new();
 
         public void Start()

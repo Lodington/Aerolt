@@ -18,11 +18,11 @@ namespace Aerolt.Managers
 {
     public class InteractableManager : MonoBehaviour, IModuleStartup
     {
-        [CanBeNull] public static SpawnCard[] _spawnCards; // mmm yummy linq
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
-        public TMP_InputField searchFilter;
-        private MenuInfo _info;
+        [CanBeNull] public static SpawnCard[]? _spawnCards; // mmm yummy linq
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
+        public TMP_InputField searchFilter = null!;
+        private MenuInfo _info = null!;
         private readonly Dictionary<SpawnCard, CustomButton> cardDefRef = new();
         private static bool isScalingInteractablePricesConstantly = false;
 
@@ -82,14 +82,14 @@ namespace Aerolt.Managers
                 return;
             }
 
-            var body = _info.Body;
+            var body = _info?.Body;
             if (!body) //wats a erorr catch?
             {
                 Tools.Log(LogLevel.Error, "Cant Spawn Interactable Localuser Body is null");
                 return;
             }
 
-            var position = body.transform.position;
+            var position = body!.transform.position;
             var aimRay = body.inputBank.GetAimRay().direction * 1.6f;
 
 

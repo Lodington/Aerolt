@@ -12,13 +12,13 @@ namespace Aerolt.Managers
 {
     public class BodyManager : MonoBehaviour
     {
-        public GameObject buttonPrefab;
-        public GameObject buttonParent;
-        public TMP_InputField searchFilter;
+        public GameObject buttonPrefab = null!;
+        public GameObject buttonParent = null!;
+        public TMP_InputField searchFilter = null!;
 
-        private GameObject _newBody;
+        private GameObject _newBody = null!;
         private readonly Dictionary<CharacterBody, CustomButton> bodyDefRef = new();
-        private NetworkUser target;
+        private NetworkUser target = null!;
 
         private void Awake()
         {

@@ -35,7 +35,7 @@ namespace Aerolt
     {
         public const string Name = "Aerolt";
         public const string Guid = "com.Lodington." + Name;
-        public const string Version = "4.1.0";
+        public const string Version = "4.1.3";
         public static ManualLogSource Log = null!;
         public static GameObject Co = null!;
         public static AssetBundle Assets = null!;
@@ -45,7 +45,9 @@ namespace Aerolt
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
         public static Dictionary<NetworkUser, GameObject> AeroltUIs = new();
+#pragma warning disable CS0649
         private static GameObject? _settingsUI;
+#pragma warning restore CS0649
         public static ZioConfigFile.ZioConfigFile ConfigFile = null!;
         public static NetworkUser? TempViewer;
         public static HUD? TempHud;
@@ -139,7 +141,7 @@ namespace Aerolt
                 var viewer = hud.cameraRigController.viewer;
 
                 if (AeroltUIs.ContainsKey(viewer)) return;
-                if (_settingsUI && _settingsUI.activeSelf) _settingsUI.SetActive(false);
+                if (_settingsUI != null && _settingsUI.activeSelf) _settingsUI.SetActive(false);
 
                 TempViewer = viewer;
                 TempHud = hud;

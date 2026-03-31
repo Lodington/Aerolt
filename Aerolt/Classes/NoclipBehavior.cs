@@ -6,12 +6,12 @@ namespace Aerolt.Classes
     public class NoclipBehavior : MonoBehaviour
     {
         public bool shouldUseInteractForDown = true;
-        private CharacterBody body;
+        private CharacterBody body = null!;
         private int collisionMask;
-        private InputBankTest inputBank;
+        private InputBankTest inputBank = null!;
         private bool isFlying;
-        private CharacterMotor motor;
-        private Rigidbody rigidbody;
+        private CharacterMotor motor = null!;
+        private Rigidbody rigidbody = null!;
 
         private bool useGravity;
 

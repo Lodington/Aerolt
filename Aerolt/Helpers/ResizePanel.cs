@@ -9,11 +9,11 @@ namespace Aerolt.Helpers
     public class ResizePanel : MonoBehaviour
     {
         public HandlerType Type;
-        public RectTransform Target;
+        public RectTransform Target = null!;
         public Vector2 MinimumDimmensions = new(50, 50);
         public Vector2 MaximumDimmensions = new(800, 800);
 
-        private EventTrigger _eventTrigger;
+        private EventTrigger _eventTrigger = null!;
 
         private void Awake()
         {
