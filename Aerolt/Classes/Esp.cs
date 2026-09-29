@@ -444,8 +444,8 @@ namespace Aerolt.Classes
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
-                var items = optionChestBehavior.generatedDrops != null
-                    ? optionChestBehavior.generatedDrops.Select(x =>
+                var items = optionChestBehavior.generatedPickups != null
+                    ? optionChestBehavior.generatedPickups.Select(x =>
                     {
                         var def = PickupCatalog.GetPickupDef(x);
                         return def.itemIndex != ItemIndex.None
