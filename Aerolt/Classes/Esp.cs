@@ -131,7 +131,7 @@ namespace Aerolt.Classes
                 if (advanced)
                     str.AppendLine("Multi Shop Terminal"); // TODO use lang token
                 var costSet = false;
-                if (multiShopController.terminalGameObjects.src == null) continue; // TODO properly fix this
+                if (multiShopController.terminalGameObjects == null) continue;
 
                 var itemColors = new List<Color>();
                 var itemNames = new List<string>();
@@ -139,7 +139,7 @@ namespace Aerolt.Classes
                 foreach (var o in multiShopController.terminalGameObjects)
                 {
                     var shop = o.GetComponent<ShopTerminalBehavior>();
-                    var pickupDef = PickupCatalog.GetPickupDef(shop.pickupIndex);
+                    var pickupDef = PickupCatalog.GetPickupDef(shop.pickup.pickupIndex);
                     if (pickupDef == null) continue;
                     if (!costSet)
                     {
@@ -359,12 +359,12 @@ namespace Aerolt.Classes
 
         private static void ShowDuplicator(string token, ShopTerminalBehavior shopTerminal)
         {
-            var def = PickupCatalog.GetPickupDef(shopTerminal.pickupIndex);
+            var def = PickupCatalog.GetPickupDef(shopTerminal.pickup.pickupIndex);
             if (def.itemIndex != ItemIndex.None)
                 EspHelper.DrawRarityEspLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear,
                     GetLabelDuplicator(Language.GetString(token), shopTerminal), GetDropColor(def.itemIndex),
                     Language.GetString(ItemCatalog
-                        .GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickupIndex).itemIndex).nameToken));
+                        .GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickup.pickupIndex).itemIndex).nameToken));
         }
 
         private static void ShowChest(TimedChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
@@ -390,13 +390,13 @@ namespace Aerolt.Classes
                 var items = optionChestBehavior.entries != null
                     ? optionChestBehavior.entries.OrderByDescending(x =>
                     {
-                        var def = PickupCatalog.GetPickupDef(x.pickupIndex);
+                        var def = PickupCatalog.GetPickupDef(x.pickup.pickupIndex);
                         return def != null && def.itemIndex != ItemIndex.None
                             ? ItemCatalog.GetItemDef(def.itemIndex).tier
                             : ItemTier.Tier1;
                     }).Take(3).OrderBy(x => x.endTime.timeUntil).Select(x =>
                     {
-                        var def = PickupCatalog.GetPickupDef(x.pickupIndex);
+                        var def = PickupCatalog.GetPickupDef(x.pickup.pickupIndex);
                         var tier = def != null && def.itemIndex != ItemIndex.None
                             ? ItemCatalog.GetItemDef(def.itemIndex).tier
                             : ItemTier.Tier1;
@@ -421,7 +421,7 @@ namespace Aerolt.Classes
         {
             if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
             {
-                var def = PickupCatalog.GetPickupDef(chest.dropPickup);
+                var def = PickupCatalog.GetPickupDef(chest.currentPickup.pickupIndex);
                 if (def.itemIndex != ItemIndex.None)
                     EspHelper.DrawRarityEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"),
                         Color.clear,
@@ -447,7 +447,7 @@ namespace Aerolt.Classes
                 var items = optionChestBehavior.generatedPickups != null
                     ? optionChestBehavior.generatedPickups.Select(x =>
                     {
-                        var def = PickupCatalog.GetPickupDef(x);
+                        var def = PickupCatalog.GetPickupDef(x.pickupIndex);
                         return def.itemIndex != ItemIndex.None
                             ? Language.GetString(ItemCatalog.GetItemDef(def.itemIndex).nameToken)
                             : Language.GetString(EquipmentCatalog.GetEquipmentDef(def.equipmentIndex).nameToken);
