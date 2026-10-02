@@ -35,7 +35,7 @@ namespace Aerolt
     {
         public const string Name = "Aerolt";
         public const string Guid = "com.Lodington." + Name;
-        public const string Version = "4.1.3";
+        public const string Version = "4.1.7";
         public static ManualLogSource Log = null!;
         public static GameObject Co = null!;
         public static AssetBundle Assets = null!;
@@ -66,7 +66,7 @@ namespace Aerolt
 
             Assets.LoadAsset<GameObject>("AeroltUI");
 
-            Tools.Log(LogLevel.Information, Tools.SendCount());
+            Tools.SendCount();
             NetworkManager.Initialize();
         }
 

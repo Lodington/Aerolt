@@ -43,9 +43,9 @@ namespace Aerolt.Messages
             master.teamIndex = teamIndex;
 
             foreach (var (key, value) in itemCounts)
-                master.inventory.GiveItem(key, (int)value);
+                master.inventory.GiveItemPermanent(key, (int)value);
             if (eliteIndex != EquipmentIndex.None)
-                master.inventory.SetEquipmentIndex(eliteIndex);
+                master.inventory.SetEquipmentIndex(eliteIndex, false);
             if (brainDead)
                 foreach (var masterAIComponent in master.aiComponents)
                     Object.Destroy(masterAIComponent);

@@ -40,7 +40,8 @@ namespace Aerolt.Messages
         {
             base.Handle();
             foreach (var itemCount in itemCounts)
-                inventory.GiveItem(itemCount.Key, (int)itemCount.Value - inventory.GetItemCount(itemCount.Key));
+                inventory.GiveItemPermanent(itemCount.Key,
+                    (int)itemCount.Value - inventory.GetItemCountEffective(itemCount.Key));
         }
     }
 }

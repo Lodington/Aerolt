@@ -42,36 +42,68 @@ namespace Aerolt.Managers
 
         public static Dictionary<SpawnCard, int> startOfRoundScaledInteractableCosts = new();
 
+        private bool initialized;
+
         public void ModuleStart()
         {
             _info = GetComponentInParent<MenuInfo>();
+
+            if (searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
+            if (gameObject.activeInHierarchy)
+                StartCoroutine(GenerateButtons());
+        }
+
+        private void OnEnable()
+        {
+            if (!initialized && _info != null)
+                StartCoroutine(GenerateButtons());
+        }
+
+        private System.Collections.IEnumerator GenerateButtons()
+        {
+            if (initialized) yield break;
+            initialized = true;
+
             startOfRoundScaledInteractableCosts.Clear();
-            foreach (var card in cards.OrderBy(x =>
-                         x.prefab.GetComponentInChildren<IDisplayNameProvider>() != null
-                             ? x.prefab.GetComponentInChildren<IDisplayNameProvider>().GetDisplayName()
-                             : x.name))
+            var ordered = cards
+                .Where(x => !x.Equals(null) && !x.Equals(default))
+                .Select(card =>
+                {
+                    var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
+                    var displayName = provider != null ? provider.GetDisplayName() : card.name;
+                    return (card, displayName);
+                })
+                .OrderBy(x => x.displayName)
+                .ToArray();
+
+            const int batchSize = 15; 
+            var count = 0;
+
+            foreach (var (card, displayName) in ordered)
             {
-                if (card.Equals(null) || card.Equals(default)) continue;
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
-                var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
 
                 var buttonComponet = newButton.GetComponent<CustomButton>();
-                buttonComponet.buttonText.text = provider != null ? provider.GetDisplayName() : card.name;
+                buttonComponet.buttonText.text = displayName;
                 buttonComponet.image.sprite = PingIndicator.GetInteractableIcon(card.prefab);
                 buttonComponet.button.onClick.AddListener(() => SpawnInteractable(card));
                 cardDefRef[card] = buttonComponet;
 
-                var prefab = card.prefab;
-                var purchaseInteraction = prefab.GetComponent<PurchaseInteraction>();
+                var purchaseInteraction = card.prefab.GetComponent<PurchaseInteraction>();
                 if (purchaseInteraction && purchaseInteraction.costType == CostTypeIndex.Money)
                 {
                     var scaledCost = Run.instance.GetDifficultyScaledCost(purchaseInteraction.cost);
                     startOfRoundScaledInteractableCosts.Add(card, scaledCost);
                 }
-            }
 
-            if (searchFilter)
-                searchFilter.onValueChanged.AddListener(FilterUpdated);
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; 
+                }
+            }
         }
 
         public void SpawnInteractable(SpawnCard card)

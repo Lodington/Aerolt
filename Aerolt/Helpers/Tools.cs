@@ -1,34 +1,42 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Aerolt.Enums;
 
 namespace Aerolt.Helpers
 {
     public static class Tools
     {
-        public static string SendCount()
+        private const string SendCountUri = "https://links.lodington.dev/aerolt";
+
+        private static readonly HttpClient HttpClient = CreateHttpClient();
+
+        private static HttpClient CreateHttpClient()
         {
-            string s;
+            var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+            client.DefaultRequestHeaders.TryAddWithoutValidation("user-agent",
+                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            return client;
+        }
+
+        public static void SendCount()
+        {
+            _ = SendCountAsync();
+        }
+
+        private static async Task SendCountAsync()
+        {
             try
             {
-                const string uri = "https://links.lodington.dev/aerolt";
-                var client = new WebClient();
-
-                client.Headers.Add("user-agent",
-                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
-                var data = client.OpenRead(uri);
-                var reader = new StreamReader(data!);
-                s = reader.ReadToEnd();
-                data!.Close();
-                reader.Close();
-            } catch {
-                return "Error";
+                var response = await HttpClient.GetStringAsync(SendCountUri).ConfigureAwait(false);
+                Log(LogLevel.Information, $"SendCount: {response}");
             }
-            return s;
+            catch (Exception e)
+            {
+                Log(LogLevel.Warning, $"SendCount failed: {e.Message}");
+            }
         }
         
         public static T[] FindMatches<T>(T[] toMatch, Func<T, string> toString, string filter)

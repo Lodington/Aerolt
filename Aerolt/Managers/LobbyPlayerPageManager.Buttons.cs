@@ -55,7 +55,7 @@ namespace Aerolt.Managers
         {
             if (!master) return;
             var items = ContentManager.itemDefs.Except(GiveAllFilteredItems)
-                .ToDictionary(x => x, def => master.inventory.GetItemCount(def) + 1);
+                .ToDictionary(x => x, def => master.inventory.GetItemCountEffective(def) + 1);
             new SetItemCountMessage(master.inventory, items).SendToServer();
         }
 
@@ -65,10 +65,10 @@ namespace Aerolt.Managers
             var items = new Dictionary<ItemDef, int>();
             for (var i = 0; i < Random.Range(0, 100); i++)
             {
-                var pickup = Chest1DropTable.GenerateDrop(RoR2Application.rng);
+                var pickup = Chest1DropTable.GeneratePickup(RoR2Application.rng).pickupIndex;
                 var item = ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(pickup)?.itemIndex ?? ItemIndex.None);
                 if (item == null) continue;
-                if (!items.ContainsKey(item)) items[item] = master.inventory.GetItemCount(item);
+                if (!items.ContainsKey(item)) items[item] = master.inventory.GetItemCountEffective(item);
                 items[item] += Random.Range(0, 100);
             }
 

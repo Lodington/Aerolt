@@ -24,9 +24,7 @@ namespace Aerolt.Buttons
 
         private readonly Dictionary<ItemDef, int> itemDef = new();
         private readonly Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
-#pragma warning disable CS0649
         private ZioConfigEntry<int>? sortModeEntry;
-#pragma warning restore CS0649
         private NetworkUser user = null!;
         private bool initialized = false;
 
@@ -60,7 +58,7 @@ namespace Aerolt.Buttons
         {
             initialized = true;
             int count = 0;
-            const int batchSize = 15; // Create 15 buttons per frame
+            const int batchSize = 15;
 
             foreach (var def in ContentManager._itemDefs)
             {
@@ -71,7 +69,7 @@ namespace Aerolt.Buttons
                 if (count >= batchSize)
                 {
                     count = 0;
-                    yield return null; // Wait one frame
+                    yield return null; 
                 }
             }
         }
@@ -125,7 +123,6 @@ namespace Aerolt.Buttons
         {
             user = currentUser;
             
-            // Wait for buttons to be initialized before trying to set amounts
             if (!initialized)
             {
                 StartCoroutine(InitializeAndSetAmounts(currentUser));
@@ -135,7 +132,7 @@ namespace Aerolt.Buttons
             foreach (var def in ContentManager._itemDefs)
             {
                 if (itemDefRef.ContainsKey(def))
-                    itemDefRef[def].SetAmount(user.master.inventory.GetItemCount(def));
+                    itemDefRef[def].SetAmount(user.master.inventory.GetItemCountEffective(def));
             }
 
             Sort();
@@ -150,7 +147,7 @@ namespace Aerolt.Buttons
             foreach (var def in ContentManager._itemDefs)
             {
                 if (itemDefRef.ContainsKey(def))
-                    itemDefRef[def].SetAmount(currentUser.master.inventory.GetItemCount(def));
+                    itemDefRef[def].SetAmount(currentUser.master.inventory.GetItemCountEffective(def));
             }
 
             Sort();
