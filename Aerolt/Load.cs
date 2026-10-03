@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Security;
 using System.Security.Permissions;
 using Aerolt.Classes;
@@ -12,7 +11,6 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using Rewired;
 using RiskOfOptions;
 using RoR2;
 using RoR2.UI;
@@ -45,9 +43,6 @@ namespace Aerolt
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
         public static Dictionary<NetworkUser, GameObject> AeroltUIs = new();
-#pragma warning disable CS0649
-        private static GameObject? _settingsUI;
-#pragma warning restore CS0649
         public static ZioConfigFile.ZioConfigFile ConfigFile = null!;
         public static NetworkUser? TempViewer;
         public static HUD? TempHud;
@@ -121,18 +116,18 @@ namespace Aerolt
         public static void CreateHud(HUD hud, ref bool shoulddisplay)
         {
             if (!hud.cameraRigController) return;
-            
+
             if (hud.gameObject.GetComponent<AeroltHudLoader>()) return;
-            
+
             var viewer = hud.cameraRigController.viewer;
             if (AeroltUIs.ContainsKey(viewer)) return;
-            
+
             var loader = hud.gameObject.AddComponent<AeroltHudLoader>();
             loader.hud = hud;
-            
-            // Delay spawn to reduce initial hitch - wait 5 seconds instead of 3
-            loader.Invoke(nameof(AeroltHudLoader.SpawnHud), 5);
+
+            loader.Invoke(nameof(AeroltHudLoader.SpawnHud), 1);
         }
+
         public class AeroltHudLoader : MonoBehaviour
         {
             public HUD hud = null!;
@@ -142,8 +137,8 @@ namespace Aerolt
                 if (!hud.cameraRigController) return;
                 var viewer = hud.cameraRigController.viewer;
 
+                if (!viewer) return;
                 if (AeroltUIs.ContainsKey(viewer)) return;
-                if (_settingsUI != null && _settingsUI.activeSelf) _settingsUI.SetActive(false);
 
                 TempViewer = viewer;
                 TempHud = hud;
@@ -151,7 +146,14 @@ namespace Aerolt
                 ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
                 TempViewer = null!;
                 TempHud = null!;
-                AeroltUIs.Add(viewer, ui);
+
+                if (!ui)
+                {
+                    AeroltUIs.Remove(viewer);
+                    return;
+                }
+
+                AeroltUIs[viewer] = ui;
                 Tools.Log(LogLevel.Information, "Created UI");
             }
         }
