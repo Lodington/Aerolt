@@ -164,6 +164,9 @@ namespace Aerolt.Managers
         void IModuleStartup.ModuleEnd()
         {
             disableMobSpawns.settingChanged -= MobSpawnsChanged;
+            GlobalEventManager.onTeamLevelUp -= OnTeamLevelUp;
+            TeamComponent.onJoinTeamGlobal -= TeamJoined;
+            if (currentUser != null && currentUser.master) currentUser.master.onBodyStart -= SetBody;
         }
 
         private void UpdateCheckboxValues()

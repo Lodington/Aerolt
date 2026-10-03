@@ -80,6 +80,8 @@ namespace Aerolt
         {
             if (!Esp.Instance)
                 return;
+            if (Event.current.type != EventType.Repaint)
+                return;
             Esp.Draw();
         }
 

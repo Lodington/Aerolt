@@ -7,7 +7,6 @@ using RoR2;
 using RoR2.ContentManagement;
 using TMPro;
 using UnityEngine;
-using ZioConfigFile;
 
 namespace Aerolt.Buttons
 {
@@ -20,9 +19,6 @@ namespace Aerolt.Buttons
 
         public GameObject itemListParent = null!;
         protected Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
-#pragma warning disable CS0649
-        private ZioConfigEntry<int>? sortModeEntry;
-#pragma warning restore CS0649
         private bool initialized = false;
 
         public virtual Dictionary<ItemDef, int> itemDef => MonsterButtonGenerator.ItemDef;
@@ -104,12 +100,6 @@ namespace Aerolt.Buttons
             };
 
             foreach (var buttonGen in sorted) buttonGen.button.transform.SetSiblingIndex(0);
-        }
-
-        private void SortModeChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
-        {
-            sortMode.value = sortModeEntry!.Value;
-            Sort();
         }
     }
 }

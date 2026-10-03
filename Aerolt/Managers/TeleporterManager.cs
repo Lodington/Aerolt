@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using Aerolt.Buttons;
 using Aerolt.Helpers;
@@ -16,9 +17,32 @@ namespace Aerolt.Managers
         public GameObject buttonParent = null!;
         public TMP_InputField searchFilter = null!;
         private readonly Dictionary<SceneDef, CustomButton> sceneDefRef = new();
+        private bool initialized;
 
         public void Start()
         {
+            if (searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
+
+        
+            if (gameObject.activeInHierarchy)
+                StartCoroutine(GenerateButtons());
+        }
+
+        private void OnEnable()
+        {
+            if (!initialized)
+                StartCoroutine(GenerateButtons());
+        }
+
+        private IEnumerator GenerateButtons()
+        {
+            if (initialized) yield break;
+            initialized = true;
+
+            const int batchSize = 15;
+            var count = 0;
+
             foreach (var scene in SceneCatalog.allSceneDefs.OrderByDescending(x => x.sceneType))
             {
                 if (!scene)
@@ -30,16 +54,25 @@ namespace Aerolt.Managers
                 buttonComponet.buttonText.text = !string.IsNullOrEmpty(scene.nameToken)
                     ? Language.GetString(scene.nameToken)
                     : scene.cachedName;
+                // previewTexture is deprecated in favor of the async AssetReferenceTexture
+                // previewTextureReference. Keep using the synchronous legacy field here to avoid
+                // reworking this into an async Addressables load; the field is still populated.
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (scene.previewTexture)
                     buttonComponet.image.sprite = Sprite.Create((Texture2D)scene.previewTexture,
                         new Rect(0, 0, scene.previewTexture.width, scene.previewTexture.height),
                         new Vector2(0.5f, 0.5f));
+#pragma warning restore CS0618 // Type or member is obsolete
                 buttonComponet.button.onClick.AddListener(() => SetScene(scene));
                 sceneDefRef[scene] = buttonComponet;
-            }
 
-            if (searchFilter)
-                searchFilter.onValueChanged.AddListener(FilterUpdated);
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null;
+                }
+            }
         }
 
         public void SetScene(SceneDef scene)

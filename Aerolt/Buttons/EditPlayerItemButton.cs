@@ -9,7 +9,6 @@ using RoR2;
 using RoR2.ContentManagement;
 using TMPro;
 using UnityEngine;
-using ZioConfigFile;
 
 namespace Aerolt.Buttons
 {
@@ -24,7 +23,6 @@ namespace Aerolt.Buttons
 
         private readonly Dictionary<ItemDef, int> itemDef = new();
         private readonly Dictionary<ItemDef, AddRemoveButtonGen<ItemDef>> itemDefRef = new();
-        private ZioConfigEntry<int>? sortModeEntry;
         private NetworkUser user = null!;
         private bool initialized = false;
 
@@ -40,10 +38,11 @@ namespace Aerolt.Buttons
                     "Tier Ascending",
                     "Name Ascending"
                 });
+                sortMode.onValueChanged.AddListener(_ => Sort());
             }
 
             if (searchFilter)
-                searchFilter.m_OnEndEdit.AddListener(FilterUpdated);
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
         }
 
         private void OnEnable()
@@ -99,12 +98,6 @@ namespace Aerolt.Buttons
             };
 
             foreach (var buttonGen in sorted) buttonGen.button.transform.SetSiblingIndex(0);
-        }
-
-        private void SortModeChanged(ZioConfigEntryBase arg1, object arg2, bool arg3)
-        {
-            sortMode.value = sortModeEntry!.Value;
-            Sort();
         }
 
         public void GiveItems()

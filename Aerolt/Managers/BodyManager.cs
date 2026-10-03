@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Buttons;
@@ -19,9 +20,29 @@ namespace Aerolt.Managers
         private GameObject _newBody = null!;
         private readonly Dictionary<CharacterBody, CustomButton> bodyDefRef = new();
         private NetworkUser target = null!;
+        private bool initialized;
 
         private void Awake()
         {
+            if (searchFilter)
+                searchFilter.onValueChanged.AddListener(FilterUpdated);
+            if (gameObject.activeInHierarchy)
+                StartCoroutine(GenerateButtons());
+        }
+        private void OnEnable()
+        {
+            if (!initialized)
+                StartCoroutine(GenerateButtons());
+        }
+
+        private IEnumerator GenerateButtons()
+        {
+            if (initialized) yield break;
+            initialized = true;
+
+            const int batchSize = 15; // Create 15 buttons per frame
+            var count = 0;
+
             foreach (var body in BodyCatalog.allBodyPrefabBodyBodyComponents.OrderBy(x =>
                          Language.GetString(x.baseNameToken)))
             {
@@ -32,10 +53,14 @@ namespace Aerolt.Managers
                     new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
                 customButton.button.onClick.AddListener(() => SetBodyDef(body));
                 bodyDefRef[body] = customButton;
-            }
 
-            if (searchFilter)
-                searchFilter.onValueChanged.AddListener(FilterUpdated);
+                count++;
+                if (count >= batchSize)
+                {
+                    count = 0;
+                    yield return null; 
+                }
+            }
         }
 
         public void SpawnAsBody()

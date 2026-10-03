@@ -21,6 +21,7 @@ namespace Aerolt.Classes
 
 
         public static Esp Instance = null!;
+        public static Camera MainCamera = null!;
 
         public Toggle showAdvancedToggle = null!;
         public Toggle showTeleporterToggle = null!;
@@ -98,10 +99,26 @@ namespace Aerolt.Classes
             showNewtAlterToggle.onValueChanged.AddListener(val => showNewtAlterEntry.Value = val);
 
             GatherObjects(); // these objects should exist by hud awake
+            // Re-scan on every new stage so the cached lists don't go stale after the first stage.
+            Stage.onStageStartGlobal += OnStageStart;
+        }
+
+        private void OnDestroy()
+        {
+            Stage.onStageStartGlobal -= OnStageStart;
+            if (Instance == this) Instance = null!;
+        }
+
+        private void OnStageStart(Stage stage)
+        {
+            GatherObjects();
         }
 
         public static void Draw()
         {
+            MainCamera = Camera.main;
+            if (!MainCamera) return; // no camera to project against this frame
+
             if (Instance.showTeleporterToggle.isOn)
                 ShowTeleporter();
             if (Instance.showChestToggle.isOn || Instance.showDuplicatorToggle.isOn || Instance.showDroneToggle.isOn ||
@@ -126,7 +143,7 @@ namespace Aerolt.Classes
                 if (!multiShopController) continue;
                 var transform1 = multiShopController.transform;
                 var position = transform1.position + transform1.up * 1.5f;
-                var distanceToObject = Mathf.RoundToInt(Vector3.Distance(Camera.main.transform.position, position));
+                var distanceToObject = Mathf.RoundToInt(Vector3.Distance(MainCamera.transform.position, position));
                 var advanced = CheckCursorPosition(position) || Instance.showAdvancedToggle.isOn;
                 if (advanced)
                     str.AppendLine("Multi Shop Terminal"); // TODO use lang token
@@ -195,7 +212,7 @@ namespace Aerolt.Classes
             if (TeleporterInteraction.instance)
             {
                 var teleporterInteraction = TeleporterInteraction.instance;
-                var distanceToObject = Vector3.Distance(Camera.main.transform.position,
+                var distanceToObject = Vector3.Distance(MainCamera.transform.position,
                     teleporterInteraction.transform.position);
                 var distance = (int)distanceToObject;
                 var friendlyName = "Teleporter";
@@ -235,7 +252,7 @@ namespace Aerolt.Classes
                 if (!barrel.Networkopened)
                 {
                     var friendlyName = "Barrel";
-                    float distance = (int)Vector3.Distance(Camera.main.transform.position, barrel.transform.position);
+                    float distance = (int)Vector3.Distance(MainCamera.transform.position, barrel.transform.position);
                     var boxText = $"{friendlyName}\n{distance}m";
 
                     if (Instance.showBarrelToggle.isOn || CheckCursorPosition(barrel.transform.position))
@@ -255,7 +272,7 @@ namespace Aerolt.Classes
                     var friendlyName = "Secret Button";
 
                     float distance =
-                        (int)Vector3.Distance(Camera.main.transform.position, secretButton.transform.position);
+                        (int)Vector3.Distance(MainCamera.transform.position, secretButton.transform.position);
                     var boxText = $"{friendlyName}\n{distance}m";
                     EspHelper.DrawEspLabel(secretButton.transform.position, Colors.GetColor("Secret_Plates"),
                         Color.clear, boxText);
@@ -270,7 +287,7 @@ namespace Aerolt.Classes
                     var friendlyName = "Scrapper";
 
                     var position = scrapper.transform.position;
-                    float distance = (int)Vector3.Distance(Camera.main.transform.position, position);
+                    float distance = (int)Vector3.Distance(MainCamera.transform.position, position);
                     var boxText = $"{friendlyName}\n{distance}m";
                     EspHelper.DrawEspLabel(position, Colors.GetColor("Scrappers"), Color.clear, boxText);
                 }
@@ -500,7 +517,7 @@ namespace Aerolt.Classes
 
         public static float GetDistance(Vector3 position)
         {
-            var distanceToObject = Vector3.Distance(Camera.main.transform.position, position);
+            var distanceToObject = Vector3.Distance(MainCamera.transform.position, position);
             var distance = (int)distanceToObject;
             return distance;
         }
@@ -509,9 +526,9 @@ namespace Aerolt.Classes
         {
             var mpEventSystem = LocalUserManager.GetFirstLocalUser().eventSystem;
             mpEventSystem.GetCursorPosition(out var cursorPos);
-            cursorPos.y = Camera.main.pixelRect.height - cursorPos.y;
+            cursorPos.y = MainCamera.pixelRect.height - cursorPos.y;
             if (!mpEventSystem.isCursorVisible)
-                cursorPos = Camera.main.pixelRect.center;
+                cursorPos = MainCamera.pixelRect.center;
             return Vector3.Distance(EspHelper.WorldToScreen(worldPos), cursorPos) < 50;
         }
     }

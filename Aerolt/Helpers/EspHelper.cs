@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Aerolt.Classes;
 using UnityEngine;
 
 namespace Aerolt.Managers
@@ -14,7 +15,7 @@ namespace Aerolt.Managers
             var style = GUI.skin.label;
             style.alignment = TextAnchor.MiddleCenter;
             var size = style.CalcSize(content);
-            var pos = Camera.main!.WorldToScreenPoint(worldpos);
+            var pos = Esp.MainCamera.WorldToScreenPoint(worldpos);
             pos.y = Screen.height - pos.y;
             if (!(pos.z >= 0)) return;
             GUI.color = Color.black;
@@ -36,7 +37,7 @@ namespace Aerolt.Managers
             var style = GUI.skin.label;
             style.alignment = TextAnchor.MiddleCenter;
             var size = style.CalcSize(content);
-            var pos = Camera.main.WorldToScreenPoint(worldpos);
+            var pos = Esp.MainCamera.WorldToScreenPoint(worldpos);
             pos.y = Screen.height - pos.y;
             if (pos.z >= 0)
             {
@@ -82,7 +83,7 @@ namespace Aerolt.Managers
             var style = GUI.skin.label;
             style.alignment = TextAnchor.MiddleCenter;
             var size = style.CalcSize(content);
-            var pos = Camera.main.WorldToScreenPoint(worldpos);
+            var pos = Esp.MainCamera.WorldToScreenPoint(worldpos);
             pos.y = Screen.height - pos.y;
             if (pos.z >= 0)
             {
@@ -132,7 +133,7 @@ namespace Aerolt.Managers
 
         public static Vector3 WorldToScreen(Vector3 worldpos)
         {
-            var pos = Camera.main.WorldToScreenPoint(worldpos);
+            var pos = Esp.MainCamera.WorldToScreenPoint(worldpos);
             pos.y = Screen.height - pos.y;
             return new Vector3(pos.x, pos.y);
         }
