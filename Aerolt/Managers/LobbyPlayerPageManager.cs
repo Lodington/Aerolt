@@ -112,9 +112,12 @@ namespace Aerolt.Managers
             playerManager = GetComponent<LobbyPlayerManager>();
             // Destroy EquipmentIcon component to prevent NRE in its Awake() when the
             // panel is activated before an inventory is available. We recreate it in SetUser.
-            equipmentIconGo = equipmentIcon.gameObject;
-            Destroy(equipmentIcon);
-            equipmentIcon = null!;
+            if (equipmentIcon)
+            {
+                equipmentIconGo = equipmentIcon.gameObject;
+                Destroy(equipmentIcon);
+                equipmentIcon = null!;
+            }
             bodyStats.Setup();
 
 
@@ -159,6 +162,15 @@ namespace Aerolt.Managers
             disableMobSpawns.settingChanged += MobSpawnsChanged;
             disableMobSpawnToggle.onValueChanged.AddListener(val => disableMobSpawns.Value = val);
             disableMobSpawns.Sync();
+
+            // If a user was already selected (SetUser ran before this ModuleStart, which can happen
+            // because LobbyPlayerManager.ModuleStart selects the owner), the equipment icon hookup
+            // was skipped since equipmentIconGo wasn't ready yet. Wire it up now.
+            if (master && !equipmentIcon && equipmentIconGo)
+            {
+                equipmentIcon = equipmentIconGo.AddComponent<EquipmentIcon>();
+                equipmentIcon.targetInventory = master.inventory;
+            }
         }
 
         void IModuleStartup.ModuleEnd()
@@ -195,8 +207,12 @@ namespace Aerolt.Managers
             if (!master) return;
             var inv = master.inventory;
             //inventoryDisplay.SetSubscribedInventory(inv);
-            if (!equipmentIcon) equipmentIcon = equipmentIconGo.AddComponent<EquipmentIcon>();
-            equipmentIcon.targetInventory = inv;
+            // equipmentIconGo is set in ModuleStart. Guard against it being missing so an early
+            // or out-of-order SetUser (e.g. before ModuleStart ran) can't NRE here.
+            if (!equipmentIcon && equipmentIconGo)
+                equipmentIcon = equipmentIconGo.AddComponent<EquipmentIcon>();
+            if (equipmentIcon)
+                equipmentIcon.targetInventory = inv;
 
             master.onBodyStart += SetBody;
             var bodyIn = master.GetBody();
