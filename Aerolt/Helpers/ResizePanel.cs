@@ -30,69 +30,79 @@ namespace Aerolt.Helpers
 
         private void OnDrag(BaseEventData data)
         {
+            if (Target == null) return;
             var ped = (PointerEventData)data;
-            //Target.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Target.rect.width + ped.delta.x);
-            //Target.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Target.rect.height + ped.delta.y);
-            RectTransform.Edge? horizontalEdge = null;
-            RectTransform.Edge? verticalEdge = null;
+
+            // Which edges this handle moves. The opposite edge stays anchored.
+            // +X = drag grows width on the right, -X = on the left; same idea vertically.
+            var horizontalDir = 0; // -1 left handle, +1 right handle, 0 none
+            var verticalDir = 0; // -1 bottom handle, +1 top handle, 0 none
 
             switch (Type)
             {
                 case HandlerType.TopRight:
-                    horizontalEdge = RectTransform.Edge.Left;
-                    verticalEdge = RectTransform.Edge.Bottom;
+                    horizontalDir = 1;
+                    verticalDir = 1;
                     break;
                 case HandlerType.Right:
-                    horizontalEdge = RectTransform.Edge.Left;
+                    horizontalDir = 1;
                     break;
                 case HandlerType.BottomRight:
-                    horizontalEdge = RectTransform.Edge.Left;
-                    verticalEdge = RectTransform.Edge.Top;
+                    horizontalDir = 1;
+                    verticalDir = -1;
                     break;
                 case HandlerType.Bottom:
-                    verticalEdge = RectTransform.Edge.Top;
+                    verticalDir = -1;
                     break;
                 case HandlerType.BottomLeft:
-                    horizontalEdge = RectTransform.Edge.Right;
-                    verticalEdge = RectTransform.Edge.Top;
+                    horizontalDir = -1;
+                    verticalDir = -1;
                     break;
                 case HandlerType.Left:
-                    horizontalEdge = RectTransform.Edge.Right;
+                    horizontalDir = -1;
                     break;
                 case HandlerType.TopLeft:
-                    horizontalEdge = RectTransform.Edge.Right;
-                    verticalEdge = RectTransform.Edge.Bottom;
+                    horizontalDir = -1;
+                    verticalDir = 1;
                     break;
                 case HandlerType.Top:
-                    verticalEdge = RectTransform.Edge.Bottom;
+                    verticalDir = 1;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (horizontalEdge != null)
+            var size = Target.sizeDelta;
+            var pos = Target.anchoredPosition;
+            var pivot = Target.pivot;
+
+            if (horizontalDir != 0)
             {
-                if (horizontalEdge == RectTransform.Edge.Right)
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)horizontalEdge,
-                        Screen.width - Target.position.x - Target.pivot.x * Target.rect.width,
-                        Mathf.Clamp(Target.rect.width - ped.delta.x, MinimumDimmensions.x, MaximumDimmensions.x));
-                else
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)horizontalEdge,
-                        Target.position.x - Target.pivot.x * Target.rect.width,
-                        Mathf.Clamp(Target.rect.width + ped.delta.x, MinimumDimmensions.x, MaximumDimmensions.x));
+                // Requested size change along X for this edge.
+                var desiredWidth = size.x + horizontalDir * ped.delta.x;
+                var newWidth = Mathf.Clamp(desiredWidth, MinimumDimmensions.x, MaximumDimmensions.x);
+                var appliedDelta = newWidth - size.x; // what actually changed after clamping
+
+                pos.x += horizontalDir > 0
+                    ? (1f - pivot.x) * appliedDelta
+                    : -pivot.x * appliedDelta;
+                size.x = newWidth;
             }
 
-            if (verticalEdge != null)
+            if (verticalDir != 0)
             {
-                if (verticalEdge == RectTransform.Edge.Top)
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)verticalEdge,
-                        Screen.height - Target.position.y - Target.pivot.y * Target.rect.height,
-                        Mathf.Clamp(Target.rect.height - ped.delta.y, MinimumDimmensions.y, MaximumDimmensions.y));
-                else
-                    Target.SetInsetAndSizeFromParentEdge((RectTransform.Edge)verticalEdge,
-                        Target.position.y - Target.pivot.y * Target.rect.height,
-                        Mathf.Clamp(Target.rect.height + ped.delta.y, MinimumDimmensions.y, MaximumDimmensions.y));
+                var desiredHeight = size.y + verticalDir * ped.delta.y;
+                var newHeight = Mathf.Clamp(desiredHeight, MinimumDimmensions.y, MaximumDimmensions.y);
+                var appliedDelta = newHeight - size.y;
+
+                pos.y += verticalDir > 0
+                    ? (1f - pivot.y) * appliedDelta
+                    : -pivot.y * appliedDelta;
+                size.y = newHeight;
             }
+
+            Target.sizeDelta = size;
+            Target.anchoredPosition = pos;
         }
     }
 }
