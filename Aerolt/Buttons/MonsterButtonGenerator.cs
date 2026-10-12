@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Messages;
 using BepInEx;
@@ -89,8 +90,8 @@ namespace Aerolt.Buttons
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var buttonComponet = newButton.GetComponent<CustomButton>();
                 buttonComponet.buttonText.text = Language.GetString(body.baseNameToken);
-                buttonComponet.image.sprite = Sprite.Create((Texture2D)body.portraitIcon,
-                    new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
+                var icon = IconCache.GetMasterIcon(master);
+                if (icon) buttonComponet.image.sprite = icon;
                 buttonComponet.button.onClick.AddListener(() => SpawnMonster(master));
                 masterDefRef[master] = buttonComponet;
 

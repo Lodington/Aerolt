@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Managers;
 using Aerolt.Messages;
@@ -46,7 +47,7 @@ namespace Aerolt.Buttons
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var customButton = newButton.GetComponent<CustomButton>();
                 customButton.buttonText.text = Language.GetString(def.nameToken);
-                customButton.image.sprite = def.pickupIconSprite;
+                customButton.image.sprite = IconCache.GetEquipmentIcon(def);
                 customButton.button.onClick.AddListener(() => SetEquipmentDef(def));
                 equipmentDefRef[def] = customButton;
 

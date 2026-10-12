@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using RoR2;
 using RoR2.Networking;
@@ -9,38 +10,104 @@ namespace Aerolt.Managers
     public static class NetworkManager
     {
         public static Type[] RegisteredMessages = null!;
+        private static readonly HashSet<int> ModdedConnectionIds = new();
+        public static bool HostOnly;
 
         public static void Initialize()
         {
             NetworkManagerSystem.onStartServerGlobal += RegisterMessages;
             NetworkManagerSystem.onStartClientGlobal += RegisterMessages;
+            NetworkManagerSystem.onServerDisconnectGlobal += OnServerDisconnect;
 
             RegisteredMessages = typeof(AeroltMessageBase).Assembly.GetTypes().Where(x =>
                 typeof(AeroltMessageBase).IsAssignableFrom(x) && x != typeof(AeroltMessageBase)).ToArray();
         }
 
+        private static void OnServerDisconnect(NetworkConnection conn)
+        {
+            // Forget this connection's modded status so a later client that reuses the same
+            // connection id doesn't inherit it.
+            if (conn != null) ModdedConnectionIds.Remove(conn.connectionId);
+        }
+
         private static void RegisterMessages()
         {
+            ModdedConnectionIds.Clear();
             NetworkServer.RegisterHandler(2004, HandleMessage);
         }
 
         public static void RegisterMessages(NetworkClient client)
         {
             client.RegisterHandler(2004, HandleMessage);
+            if (!NetworkServer.active)
+                ClientScene.readyConnection?.SendAerolt(new HandshakeMessage());
         }
 
         private static void HandleMessage(NetworkMessage netmsg)
         {
-            // we can do some auth checks in here later
+            if (NetworkServer.active && netmsg.conn != null)
+                ModdedConnectionIds.Add(netmsg.conn.connectionId);
+
             var message = netmsg.ReadMessage<AeroltMessage>();
-            if (message.message is BroadcastMessage mess) mess.fromConnection = netmsg.conn;
+
+            if (HostOnly && NetworkServer.active && message.message is not HandshakeMessage &&
+                !IsLocalConnection(netmsg.conn))
+                return;
+
+            if (message.message is BroadcastMessage mess && netmsg.conn != null)
+                mess.fromConnection = netmsg.conn;
             message.message.Handle();
+        }
+
+        private static bool IsLocalConnection(NetworkConnection? connection)
+        {
+            return connection != null && NetworkServer.localConnections.Contains(connection);
+        }
+
+        public static bool IsModded(NetworkConnection connection)
+        {
+            if (connection == null) return false;
+            if (IsLocalConnection(connection)) return true;
+            return ModdedConnectionIds.Contains(connection.connectionId);
+        }
+
+        //   aerolt_host_only        -> flips the current state
+        //   aerolt_host_only 1      -> force on   (also true/on)
+        //   aerolt_host_only 0      -> force off  (also false/off)
+        [ConCommand(commandName = "aerolt_host_only", flags = ConVarFlags.SenderMustBeServer,
+            helpText = "Toggle whether only the host can use Aerolt. When on, Aerolt actions from " +
+                       "connected clients are ignored. Optional argument: 1/0 (on/off); omit to toggle.")]
+        private static void CCHostOnly(ConCommandArgs args)
+        {
+            if (args.Count > 0)
+            {
+                var requested = args.TryGetArgBool(0);
+                HostOnly = requested ?? !HostOnly;
+            }
+            else
+            {
+                HostOnly = !HostOnly;
+            }
+
+            var state = HostOnly ? "ON (only the host can use Aerolt)" : "OFF (connected clients can use Aerolt)";
+            Chat.AddMessage($"<color=yellow>[Aerolt]</color> Host-only mode: {state}");
         }
 
         public static void SendAerolt<T>(this NetworkConnection connection, T message) where T : AeroltMessageBase
         {
+            if (connection == null) return;
+            if (message is not HandshakeMessage && NetworkServer.active && !IsModded(connection))
+                return;
+
             var mes = new AeroltMessage(message);
             connection.Send(2004, mes);
+        }
+    }
+
+    public class HandshakeMessage : AeroltMessageBase
+    {
+        public override void Handle()
+        {
         }
     }
 
@@ -110,8 +177,10 @@ namespace Aerolt.Managers
             base.Handle();
             foreach (var connection in NetworkServer.connections)
             {
+                if (connection == null) continue;
                 if (connection == fromConnection) continue;
                 if (!connection.isConnected) continue;
+                if (!NetworkManager.IsModded(connection)) continue;
                 connection.SendAerolt(message);
             }
 

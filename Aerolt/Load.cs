@@ -25,6 +25,7 @@ using LogLevel = Aerolt.Enums.LogLevel;
 #pragma warning restore CS0618 // Type or member is obsolete
 [module: UnverifiableCode]
 
+
 namespace Aerolt
 {
     [BepInPlugin(Guid, Name, Version)]
@@ -33,7 +34,7 @@ namespace Aerolt
     {
         public const string Name = "Aerolt";
         public const string Guid = "com.Lodington." + Name;
-        public const string Version = "4.1.7";
+        public const string Version = "4.1.8";
         public static ManualLogSource Log = null!;
         public static GameObject Co = null!;
         public static AssetBundle Assets = null!;
@@ -93,6 +94,8 @@ namespace Aerolt
             ConfigFile = new ZioConfigFile.ZioConfigFile(RoR2Application.cloudStorage, "/Aerolt/Settings.cfg", true);
             CreateKeyBindSettings();
             Colors.InitColors();
+
+            IconCache.Warm(this);
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();

@@ -16,8 +16,7 @@ namespace Aerolt.Helpers
         private static HttpClient CreateHttpClient()
         {
             var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-            client.DefaultRequestHeaders.TryAddWithoutValidation("user-agent",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("user-agent", $"RiskOfRain2/{Load.Version}");
             return client;
         }
 
@@ -30,12 +29,17 @@ namespace Aerolt.Helpers
         {
             try
             {
-                var response = await HttpClient.GetStringAsync(SendCountUri).ConfigureAwait(false);
-                Log(LogLevel.Information, $"SendCount: {response}");
+                // Fire the counter ping without reading or logging the response body. Only fetch
+                // headers so we don't buffer the response content.
+                using (await HttpClient
+                           .GetAsync(SendCountUri, HttpCompletionOption.ResponseHeadersRead)
+                           .ConfigureAwait(false))
+                {
+                }
             }
-            catch (Exception e)
+            catch
             {
-                Log(LogLevel.Warning, $"SendCount failed: {e.Message}");
+                // Ignore - this is a best-effort analytics ping.
             }
         }
         

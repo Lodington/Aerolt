@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Aerolt.Classes;
 using RoR2;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,11 +42,11 @@ namespace Aerolt.Buttons
                 {
                     case ItemDef itemDef:
                         customButton.buttonText.text = Language.GetString(itemDef.nameToken);
-                        customButton.image.sprite = itemDef.pickupIconSprite;
+                        customButton.image.sprite = IconCache.GetItemIcon(itemDef);
                         break;
                     case EquipmentDef eqDef:
                         customButton.buttonText.text = Language.GetString(eqDef.nameToken);
-                        customButton.image.sprite = eqDef.pickupIconSprite;
+                        customButton.image.sprite = IconCache.GetEquipmentIcon(eqDef);
                         break;
                     case BuffDef buffDef:
                         customButton.buttonText.text = buffDef.name;

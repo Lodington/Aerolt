@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Buttons;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Messages;
 using BepInEx;
@@ -49,8 +50,8 @@ namespace Aerolt.Managers
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var customButton = newButton.GetComponent<CustomButton>();
                 customButton.buttonText.text = Language.GetString(body.baseNameToken);
-                customButton.image.sprite = Sprite.Create((Texture2D)body.portraitIcon,
-                    new Rect(0, 0, body.portraitIcon.width, body.portraitIcon.height), new Vector2(0.5f, 0.5f));
+                var icon = IconCache.GetBodyIcon(body);
+                if (icon) customButton.image.sprite = icon;
                 customButton.button.onClick.AddListener(() => SetBodyDef(body));
                 bodyDefRef[body] = customButton;
 

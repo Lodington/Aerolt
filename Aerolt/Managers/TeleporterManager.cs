@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using Aerolt.Buttons;
+using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Messages;
 using BepInEx;
@@ -54,15 +55,8 @@ namespace Aerolt.Managers
                 buttonComponet.buttonText.text = !string.IsNullOrEmpty(scene.nameToken)
                     ? Language.GetString(scene.nameToken)
                     : scene.cachedName;
-                // previewTexture is deprecated in favor of the async AssetReferenceTexture
-                // previewTextureReference. Keep using the synchronous legacy field here to avoid
-                // reworking this into an async Addressables load; the field is still populated.
-#pragma warning disable CS0618 // Type or member is obsolete
-                if (scene.previewTexture)
-                    buttonComponet.image.sprite = Sprite.Create((Texture2D)scene.previewTexture,
-                        new Rect(0, 0, scene.previewTexture.width, scene.previewTexture.height),
-                        new Vector2(0.5f, 0.5f));
-#pragma warning restore CS0618 // Type or member is obsolete
+                var icon = IconCache.GetSceneIcon(scene);
+                if (icon) buttonComponet.image.sprite = icon;
                 buttonComponet.button.onClick.AddListener(() => SetScene(scene));
                 sceneDefRef[scene] = buttonComponet;
 
