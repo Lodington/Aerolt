@@ -48,6 +48,15 @@ namespace Aerolt.Buttons
             {
                 StartCoroutine(InitializeButtons());
             }
+            else
+            {
+                // Re-apply icons in case they finished loading (async) after the buttons were built.
+                foreach (var buttonGen in itemDefRef.Values)
+                {
+                    buttonGen.ApplyIcon();
+                    buttonGen.countRemoveButton?.ApplyIcon();
+                }
+            }
         }
 
         private System.Collections.IEnumerator InitializeButtons()

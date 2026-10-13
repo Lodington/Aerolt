@@ -36,6 +36,14 @@ namespace Aerolt.Buttons
             {
                 StartCoroutine(InitializeButtons());
             }
+            else
+            {
+                foreach (var buttonGen in buffDefRef.Values)
+                {
+                    buttonGen.ApplyIcon();
+                    buttonGen.countRemoveButton?.ApplyIcon();
+                }
+            }
         }
 
         private System.Collections.IEnumerator InitializeButtons()

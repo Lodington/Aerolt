@@ -1,9 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using Aerolt.Enums;
 using Aerolt.Helpers;
 using RoR2;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Aerolt.Classes
 {
@@ -103,20 +107,55 @@ namespace Aerolt.Classes
             return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
 
-        public static Sprite? GetItemIcon(ItemDef? itemDef)
+        private static readonly Dictionary<object, Sprite> ReferenceSprites = new();
+        private static readonly FieldInfo? ItemIconReferenceField =
+            typeof(ItemDef).GetField("pickupIconSpriteReference");
+
+        private static readonly FieldInfo? EquipmentIconReferenceField =
+            typeof(EquipmentDef).GetField("pickupIconSpriteReference");
+
+        public static void LoadItemIcon(ItemDef? itemDef, Action<Sprite> onReady)
         {
-            if (itemDef == null) return null;
-            if (itemDef.pickupIconSprite) return itemDef.pickupIconSprite;
-            var pickup = PickupCatalog.GetPickupDef(PickupCatalog.FindPickupIndex(itemDef.itemIndex));
-            return pickup?.iconSprite;
+            if (itemDef == null) return;
+            if (itemDef.pickupIconSprite)
+            {
+                onReady(itemDef.pickupIconSprite);
+                return;
+            }
+
+            LoadSpriteReference(ItemIconReferenceField?.GetValue(itemDef) as AssetReference, onReady);
         }
 
-        public static Sprite? GetEquipmentIcon(EquipmentDef? equipmentDef)
+        public static void LoadEquipmentIcon(EquipmentDef? equipmentDef, Action<Sprite> onReady)
         {
-            if (equipmentDef == null) return null;
-            if (equipmentDef.pickupIconSprite) return equipmentDef.pickupIconSprite;
-            var pickup = PickupCatalog.GetPickupDef(PickupCatalog.FindPickupIndex(equipmentDef.equipmentIndex));
-            return pickup?.iconSprite;
+            if (equipmentDef == null) return;
+            if (equipmentDef.pickupIconSprite)
+            {
+                onReady(equipmentDef.pickupIconSprite);
+                return;
+            }
+
+            LoadSpriteReference(EquipmentIconReferenceField?.GetValue(equipmentDef) as AssetReference, onReady);
+        }
+
+        private static void LoadSpriteReference(AssetReference? reference, Action<Sprite> onReady)
+        {
+            if (reference == null || !reference.RuntimeKeyIsValid()) return;
+
+            var key = reference.RuntimeKey;
+            if (ReferenceSprites.TryGetValue(key, out var cached))
+            {
+                if (cached) onReady(cached);
+                return;
+            }
+
+            var handle = Addressables.LoadAssetAsync<Sprite>(key);
+            handle.Completed += op =>
+            {
+                if (op.Status != AsyncOperationStatus.Succeeded || !op.Result) return;
+                ReferenceSprites[key] = op.Result;
+                onReady(op.Result);
+            };
         }
 
         public static Sprite? GetBodyIcon(CharacterBody? body)

@@ -47,7 +47,11 @@ namespace Aerolt.Buttons
                 var newButton = Instantiate(buttonPrefab, buttonParent.transform);
                 var customButton = newButton.GetComponent<CustomButton>();
                 customButton.buttonText.text = Language.GetString(def.nameToken);
-                customButton.image.sprite = IconCache.GetEquipmentIcon(def);
+                var img = customButton.image;
+                IconCache.LoadEquipmentIcon(def, sprite =>
+                {
+                    if (sprite && img) img.sprite = sprite;
+                });
                 customButton.button.onClick.AddListener(() => SetEquipmentDef(def));
                 equipmentDefRef[def] = customButton;
 

@@ -42,27 +42,49 @@ namespace Aerolt.Buttons
                 {
                     case ItemDef itemDef:
                         customButton.buttonText.text = Language.GetString(itemDef.nameToken);
-                        customButton.image.sprite = IconCache.GetItemIcon(itemDef);
                         break;
                     case EquipmentDef eqDef:
                         customButton.buttonText.text = Language.GetString(eqDef.nameToken);
-                        customButton.image.sprite = IconCache.GetEquipmentIcon(eqDef);
                         break;
                     case BuffDef buffDef:
                         customButton.buttonText.text = buffDef.name;
-                        var image = customButton.image;
-                        image.sprite = buffDef.iconSprite;
-                        image.color = buffDef.buffColor;
+                        customButton.image.color = buffDef.buffColor;
                         break;
                     default:
                         customButton.buttonText.text = "This Mod Sucks Balls";
                         break;
                 }
+
+                ApplyIcon();
             }
             catch (Exception ex)
             {
                 Debug.Log("A mod isn't set up correctly." + ex);
             }
+        }
+
+        public void ApplyIcon()
+        {
+            if (!customButton || !customButton.image) return;
+
+            switch (def)
+            {
+                case ItemDef itemDef:
+                    IconCache.LoadItemIcon(itemDef, SetIcon);
+                    break;
+                case EquipmentDef eqDef:
+                    IconCache.LoadEquipmentIcon(eqDef, SetIcon);
+                    break;
+                case BuffDef buffDef:
+                    if (buffDef.iconSprite) SetIcon(buffDef.iconSprite);
+                    break;
+            }
+        }
+
+        private void SetIcon(Sprite sprite)
+        {
+            // The async icon load can complete after this button was destroyed; guard against it.
+            if (sprite && customButton && customButton.image) customButton.image.sprite = sprite;
         }
 
 
