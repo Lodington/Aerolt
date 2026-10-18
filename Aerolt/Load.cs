@@ -35,7 +35,7 @@ namespace Aerolt
     {
         public const string Name = "Aerolt";
         public const string Guid = "com.Lodington." + Name;
-        public const string Version = "4.1.8";
+        public const string Version = "4.2.0";
         public static ManualLogSource Log = null!;
         public static AssetBundle Assets = null!;
 
@@ -101,6 +101,7 @@ namespace Aerolt
 
             IconCache.Warm(this);
             Esp.Init();
+            AeroltIcon.Init();
             Run.onRunStartGlobal += OnRunStart;
 
             var harm = new Harmony(Info.Metadata.GUID);

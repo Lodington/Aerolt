@@ -58,6 +58,16 @@ namespace Aerolt.UI.Sections
                 if (_suppress) return;
                 NetworkManager.HostOnly = on;
             });
+
+            var iconObj = UIFactory.CreateToggle(parent, "ShowIcon", out var showIcon, out var iconText);
+            UIFactory.SetLayoutElement(iconObj, minHeight: 28, flexibleWidth: 9999);
+            iconText.text = "Show menu icon (top-left logo)";
+            showIcon.isOn = AeroltIcon.ShowIcon.Value;
+            showIcon.onValueChanged.AddListener(on =>
+            {
+                if (_suppress) return;
+                AeroltIcon.ShowIcon.Value = on;
+            });
         }
 
         private void OnHostOnlyChangedExternally(bool value)

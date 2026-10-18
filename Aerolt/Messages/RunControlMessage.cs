@@ -11,10 +11,6 @@ namespace Aerolt.Messages
         SetDifficulty
     }
 
-    /// <summary>
-    ///     Server-authoritative changes to Run-level state: the run timer, stages cleared, and
-    ///     difficulty. Sent through the existing Aerolt network channel.
-    /// </summary>
     public class RunControlMessage : AeroltMessageBase
     {
         private RunControlType _type;

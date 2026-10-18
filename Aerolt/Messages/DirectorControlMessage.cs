@@ -12,10 +12,7 @@ namespace Aerolt.Messages
         StartBoss
     }
 
-    /// <summary>
-    ///     Server-authoritative combat-director control: pause/resume monster spawns, set monster
-    ///     credits, or kick off the teleporter boss.
-    /// </summary>
+
     public class DirectorControlMessage : AeroltMessageBase
     {
         private DirectorControlType _type;
