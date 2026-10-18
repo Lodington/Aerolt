@@ -8,5 +8,6 @@ namespace Aerolt.UI
         GameObject Root { get; }
         void Build(GameObject contentParent);
         void OnShown();
+        bool ScrollableContent => true;
     }
 }

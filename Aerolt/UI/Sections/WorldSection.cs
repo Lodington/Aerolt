@@ -23,12 +23,12 @@ namespace Aerolt.UI.Sections
 
         public void Build(GameObject contentParent)
         {
-            Root = UIFactory.CreateVerticalGroup(contentParent, "WorldSection", true, true, true, true, 0,
-                default, new Color(0.14f, 0.14f, 0.14f));
-            UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, flexibleHeight: 9999);
 
-            UIFactory.CreateScrollView(Root, "WorldScroll", out var content, out _, new Color(0.12f, 0.12f, 0.12f));
-            UIFactory.SetLayoutGroup<VerticalLayoutGroup>(content, false, false, true, true, 6, 4, 4, 4, 4);
+            Root = UIFactory.CreateVerticalGroup(contentParent, "WorldSection", false, false, true, true, 6,
+                new Vector4(4, 4, 4, 4), new Color(0.14f, 0.14f, 0.14f));
+            UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, minHeight: 10, flexibleHeight: 0);
+
+            var content = Root;
 
             BuildGameSpeed(content);
             BuildStageActions(content);

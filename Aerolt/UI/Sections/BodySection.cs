@@ -19,6 +19,7 @@ namespace Aerolt.UI.Sections
 
         public string Title => "Spawn As";
         public GameObject Root { get; private set; } = null!;
+        public bool ScrollableContent => false; 
 
         public void Build(GameObject contentParent)
         {

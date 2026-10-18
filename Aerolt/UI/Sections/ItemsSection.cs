@@ -17,6 +17,7 @@ namespace Aerolt.UI.Sections
 
         public string Title => "Items";
         public GameObject Root { get; private set; } = null!;
+        public bool ScrollableContent => false; 
 
         public void Build(GameObject contentParent)
         {

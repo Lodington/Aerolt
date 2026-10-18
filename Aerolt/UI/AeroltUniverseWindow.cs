@@ -65,9 +65,11 @@ namespace Aerolt.UI
                 new Vector4(4, 4, 4, 4), new Color(0.12f, 0.12f, 0.12f));
             UIFactory.SetLayoutElement(body, flexibleWidth: 9999, flexibleHeight: 9999);
 
-            _nav = UIFactory.CreateVerticalGroup(body, "Nav", false, false, true, true, 4,
-                new Vector4(4, 4, 4, 4), new Color(0.08f, 0.08f, 0.08f));
-            UIFactory.SetLayoutElement(_nav, minWidth: 140, flexibleWidth: 0, flexibleHeight: 9999);
+  
+            var navScroll = UIFactory.CreateScrollView(body, "NavScroll", out _nav, out _,
+                new Color(0.08f, 0.08f, 0.08f));
+            UIFactory.SetLayoutElement(navScroll, minWidth: 150, flexibleWidth: 0, flexibleHeight: 9999);
+            UIFactory.SetLayoutGroup<VerticalLayoutGroup>(_nav, false, false, true, true, 4, 4, 4, 4, 4);
 
             _contentArea = UIFactory.CreateVerticalGroup(body, "Content", true, true, true, true, 4,
                 new Vector4(6, 6, 6, 6), new Color(0.14f, 0.14f, 0.14f));
@@ -104,7 +106,22 @@ namespace Aerolt.UI
             btn.OnClick += () => SetActiveSection(section);
             _navButtons[section] = btn;
 
-            section.Build(_contentArea);
+            // By default, wrap the section in a vertical scroll view so tall content scrolls
+            // automatically — mod authors don't have to add one. Sections that scroll internally
+            // (ScrollPool lists, etc.) opt out via ScrollableContent so we don't nest scrollers.
+            if (section.ScrollableContent)
+            {
+                var scroll = UIFactory.CreateScrollView(_contentArea, $"Scroll_{section.Title}",
+                    out var scrollContent, out _, new Color(0.14f, 0.14f, 0.14f));
+                UIFactory.SetLayoutElement(scroll, flexibleWidth: 9999, flexibleHeight: 9999);
+                UIFactory.SetLayoutGroup<VerticalLayoutGroup>(scrollContent, false, false, true, true, 4, 4, 4, 4, 4);
+                section.Build(scrollContent);
+            }
+            else
+            {
+                section.Build(_contentArea);
+            }
+
             section.Root.SetActive(false);
 
             // If this is the only section (e.g. everything else failed), show it.

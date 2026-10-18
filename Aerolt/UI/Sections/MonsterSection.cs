@@ -20,6 +20,7 @@ namespace Aerolt.UI.Sections
         private IconButtonList<CharacterMaster> _list = null!;
 
         public string Title => "Monsters";
+        public bool ScrollableContent => false; 
         public GameObject Root { get; private set; } = null!;
 
         public void Build(GameObject contentParent)

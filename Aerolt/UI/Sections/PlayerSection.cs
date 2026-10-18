@@ -31,9 +31,10 @@ namespace Aerolt.UI.Sections
 
         public void Build(GameObject contentParent)
         {
+
             Root = UIFactory.CreateVerticalGroup(contentParent, "PlayerSection", false, false, true, true, 4,
                 default, new Color(0.14f, 0.14f, 0.14f));
-            UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, flexibleHeight: 9999);
+            UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, minHeight: 10, flexibleHeight: 0);
 
             _god = AddToggle("God Mode", on => Apply(b => b.GodMode.Value = on));
             _noclip = AddToggle("Noclip", on => Apply(b => b.Noclip.Value = on));

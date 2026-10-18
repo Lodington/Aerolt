@@ -188,6 +188,20 @@ private void Awake()
 The UI is built with [UniverseLib](https://github.com/sinai-dev/UniverseLib); use its
 `UIFactory` to create controls so your tab matches the rest of the menu.
 
+### Scrolling
+
+By default your tab's content is automatically wrapped in a vertical scroll view, so if
+you stack more controls than fit, the tab scrolls — you don't need to add anything.
+Just build your controls and let them stack; size your `Root` to its content rather than
+forcing it to fill.
+
+If your tab manages its own scrolling internally (for example a UniverseLib `ScrollPool`
+or your own `ScrollView`), opt out of the automatic wrapper so scrollers aren't nested:
+
+```csharp
+public bool ScrollableContent => false;
+```
+
 ## Targeting the selected player
 
 The player bar at the top of the window picks which player actions apply to. Read and

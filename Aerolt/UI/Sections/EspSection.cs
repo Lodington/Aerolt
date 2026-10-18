@@ -13,12 +13,12 @@ namespace Aerolt.UI.Sections
 
         public void Build(GameObject contentParent)
         {
+
             Root = UIFactory.CreateVerticalGroup(contentParent, "EspSection", false, false, true, true, 4,
                 default, new Color(0.14f, 0.14f, 0.14f));
-            UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, flexibleHeight: 9999);
+            UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, minHeight: 10, flexibleHeight: 0);
 
-            UIFactory.CreateScrollView(Root, "EspScroll", out var content, out _, new Color(0.12f, 0.12f, 0.12f));
-            UIFactory.SetLayoutGroup<VerticalLayoutGroup>(content, false, false, true, true, 4, 4, 4, 4, 4);
+            var content = Root;
 
             AddToggle(content, "Teleporter", Esp.ShowTeleporter);
             AddToggle(content, "Chests", Esp.ShowChest);

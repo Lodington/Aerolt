@@ -29,6 +29,7 @@ namespace Aerolt.UI.Sections
 
         public string Title => "Body Stats";
         public GameObject Root { get; private set; } = null!;
+        public bool ScrollableContent => false; 
 
         public void Build(GameObject contentParent)
         {
