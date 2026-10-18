@@ -106,15 +106,12 @@ namespace Aerolt.UI
             btn.OnClick += () => SetActiveSection(section);
             _navButtons[section] = btn;
 
-            // By default, wrap the section in a vertical scroll view so tall content scrolls
-            // automatically — mod authors don't have to add one. Sections that scroll internally
-            // (ScrollPool lists, etc.) opt out via ScrollableContent so we don't nest scrollers.
+
             if (section.ScrollableContent)
             {
                 var scroll = UIFactory.CreateScrollView(_contentArea, $"Scroll_{section.Title}",
                     out var scrollContent, out _, new Color(0.14f, 0.14f, 0.14f));
                 UIFactory.SetLayoutElement(scroll, flexibleWidth: 9999, flexibleHeight: 9999);
-                UIFactory.SetLayoutGroup<VerticalLayoutGroup>(scrollContent, false, false, true, true, 4, 4, 4, 4, 4);
                 section.Build(scrollContent);
             }
             else
