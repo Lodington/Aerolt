@@ -1,5 +1,4 @@
 using System;
-using Aerolt.Buttons;
 using Aerolt.Classes;
 using Aerolt.Helpers;
 using Aerolt.Messages;
@@ -14,16 +13,14 @@ namespace Aerolt.Managers
         public ValueWrapper<bool> Aimbot;
         public ValueWrapper<float> AimbotWeight;
         public ValueWrapper<bool> AlwaysSprint;
-        public CustomButton customButton; // this probably shouldn't be in here, but it was convenient
         public ValueWrapper<bool> GodMode;
         public ValueWrapper<bool> InfiniteSkills;
         public ValueWrapper<bool> Noclip;
         public ValueWrapper<bool> NoclipInteractForDown;
         private readonly NetworkUser user;
 
-        public PlayerConfigBinding(NetworkUser currentUser, CustomButton button)
+        public PlayerConfigBinding(NetworkUser currentUser)
         {
-            customButton = button;
             user = currentUser;
 
             AimbotWeight = ValueWrapper.Get("PlayerMenu", "AimbotWeight", 0.5f, "", user);

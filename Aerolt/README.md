@@ -1,4 +1,12 @@
-# Aerolt Cheats
+# Aerolt Host Only Update!
+
+New Host only command lets you block clients from executing commands.
+
+aerolt_host_only        -> flips the current state
+aerolt_host_only 1      -> force on   (also true/on)
+aerolt_host_only 0      -> force off  (also false/off)
+
+
 
 F1 to open the menu!
 Now with Networking!!!!

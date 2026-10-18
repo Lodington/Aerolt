@@ -5,132 +5,81 @@ using Aerolt.Helpers;
 using Aerolt.Managers;
 using RoR2;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 using ZioConfigFile;
 
 namespace Aerolt.Classes
 {
-    public class Esp : MonoBehaviour, IModuleStartup
+    public static class Esp
     {
-        public static List<PurchaseInteraction> PurchaseInteractions = null!;
-        public static List<BarrelInteraction> BarrelInteractions = null!;
-        public static List<PressurePlateController> SecretButtons = null!;
-        public static List<ScrapperController> Scrappers = null!;
-        public static List<MultiShopController> MultiShops = null!;
+        public static List<PurchaseInteraction> PurchaseInteractions = new();
+        public static List<BarrelInteraction> BarrelInteractions = new();
+        public static List<PressurePlateController> SecretButtons = new();
+        public static List<ScrapperController> Scrappers = new();
+        public static List<MultiShopController> MultiShops = new();
 
-
-        public static Esp Instance = null!;
         public static Camera MainCamera = null!;
 
-        public Toggle showAdvancedToggle = null!;
-        public Toggle showTeleporterToggle = null!;
-        public Toggle showChestToggle = null!;
-        public Toggle showMultiShopToggle = null!;
-        public Toggle showBarrelToggle = null!;
-        public Toggle showScrapperToggle = null!;
-        public Toggle ShowSecretToggle = null!;
-        public Toggle showDuplicatorToggle = null!;
-        public Toggle showDroneToggle = null!;
-        public Toggle showShrineToggle = null!;
+        public static ZioConfigEntry<bool> ShowAdvanced = null!;
+        public static ZioConfigEntry<bool> ShowTeleporter = null!;
+        public static ZioConfigEntry<bool> ShowChest = null!;
+        public static ZioConfigEntry<bool> ShowMultiShop = null!;
+        public static ZioConfigEntry<bool> ShowBarrel = null!;
+        public static ZioConfigEntry<bool> ShowScrapper = null!;
+        public static ZioConfigEntry<bool> ShowSecret = null!;
+        public static ZioConfigEntry<bool> ShowDuplicator = null!;
+        public static ZioConfigEntry<bool> ShowDrone = null!;
+        public static ZioConfigEntry<bool> ShowShrine = null!;
+        public static ZioConfigEntry<bool> ShowNewtAlter = null!;
 
-        [FormerlySerializedAs("showClensingPoolToggle")]
-        public Toggle showNewtAlterToggle = null!;
+        private static bool _initialized;
 
-        private ZioConfigEntry<bool> advancedEntry = null!;
-        private ZioConfigEntry<bool> barrelEntry = null!;
-        private ZioConfigEntry<bool> chestEntry = null!;
-        private ZioConfigEntry<bool> droneEntry = null!;
-        private ZioConfigEntry<bool> duplicatorEntry = null!;
-        private ZioConfigEntry<bool> scrapperEntry = null!;
-        private ZioConfigEntry<bool> secretEntry = null!;
-        private ZioConfigEntry<bool> shopEntry = null!;
-        private ZioConfigEntry<bool> showNewtAlterEntry = null!;
-        private ZioConfigEntry<bool> shrineEntry = null!;
-        private ZioConfigEntry<bool> teleporterEntry = null!;
+        public static bool Enabled => _initialized;
 
-        public void ModuleStart()
+        public static void Init()
         {
-            var configFile = Load.ConfigFile;
+            if (_initialized) return;
+            var cfg = Load.ConfigFile;
 
-            teleporterEntry = configFile.Bind("ESP", "showTeleporter", false, "");
-            showTeleporterToggle.Set(teleporterEntry.Value);
-            chestEntry = configFile.Bind("ESP", "showChest", false, "");
-            showChestToggle.Set(chestEntry.Value);
-            shopEntry = configFile.Bind("ESP", "showShop", false, "");
-            showMultiShopToggle.Set(shopEntry.Value);
-            advancedEntry = configFile.Bind("ESP", "showAdvanced", false, "");
-            showAdvancedToggle.Set(advancedEntry.Value);
+            ShowTeleporter = cfg.Bind("ESP", "showTeleporter", false, "");
+            ShowChest = cfg.Bind("ESP", "showChest", false, "");
+            ShowMultiShop = cfg.Bind("ESP", "showShop", false, "");
+            ShowAdvanced = cfg.Bind("ESP", "showAdvanced", false, "");
+            ShowBarrel = cfg.Bind("ESP", "showBarrel", false, "");
+            ShowScrapper = cfg.Bind("ESP", "showScrapper", false, "");
+            ShowSecret = cfg.Bind("ESP", "showSecret", false, "");
+            ShowDuplicator = cfg.Bind("ESP", "showDuplicator", false, "");
+            ShowDrone = cfg.Bind("ESP", "showDrone", false, "");
+            ShowShrine = cfg.Bind("ESP", "showShrine", false, "");
+            ShowNewtAlter = cfg.Bind("ESP", "showNewtAlter", false, "");
 
-            barrelEntry = configFile.Bind("ESP", "showBarrel", false, "");
-            showBarrelToggle.Set(barrelEntry.Value);
-            scrapperEntry = configFile.Bind("ESP", "showScrapper", false, "");
-            showScrapperToggle.Set(scrapperEntry.Value);
-            secretEntry = configFile.Bind("ESP", "showSecret", false, "");
-            ShowSecretToggle.Set(secretEntry.Value);
+            _initialized = true;
 
-            duplicatorEntry = configFile.Bind("ESP", "showDuplicator", false, "");
-            showDuplicatorToggle.Set(duplicatorEntry.Value);
-            droneEntry = configFile.Bind("ESP", "showDrone", false, "");
-            showDroneToggle.Set(droneEntry.Value);
-            shrineEntry = configFile.Bind("ESP", "showShrine", false, "");
-            showShrineToggle.Set(shrineEntry.Value);
-
-            showNewtAlterEntry = configFile.Bind("ESP", "showNewtAlter", false, "");
-            showNewtAlterToggle.Set(showNewtAlterEntry.Value);
-
-
-            if (Instance) return;
-            Instance = this;
-
-            showTeleporterToggle.onValueChanged.AddListener(val => teleporterEntry.Value = val);
-            showChestToggle.onValueChanged.AddListener(val => chestEntry.Value = val);
-            showMultiShopToggle.onValueChanged.AddListener(val => shopEntry.Value = val);
-            showAdvancedToggle.onValueChanged.AddListener(val => advancedEntry.Value = val);
-
-
-            showBarrelToggle.onValueChanged.AddListener(val => barrelEntry.Value = val);
-            showScrapperToggle.onValueChanged.AddListener(val => scrapperEntry.Value = val);
-            ShowSecretToggle.onValueChanged.AddListener(val => secretEntry.Value = val);
-            showDuplicatorToggle.onValueChanged.AddListener(val => duplicatorEntry.Value = val);
-            showDroneToggle.onValueChanged.AddListener(val => droneEntry.Value = val);
-            showShrineToggle.onValueChanged.AddListener(val => shrineEntry.Value = val);
-
-            showNewtAlterToggle.onValueChanged.AddListener(val => showNewtAlterEntry.Value = val);
-
-            GatherObjects(); // these objects should exist by hud awake
-            // Re-scan on every new stage so the cached lists don't go stale after the first stage.
-            Stage.onStageStartGlobal += OnStageStart;
-        }
-
-        private void OnDestroy()
-        {
-            Stage.onStageStartGlobal -= OnStageStart;
-            if (Instance == this) Instance = null!;
-        }
-
-        private void OnStageStart(Stage stage)
-        {
             GatherObjects();
+            Stage.onStageStartGlobal += _ => GatherObjects();
         }
+
+        public static bool AnyEnabled =>
+            _initialized && (ShowTeleporter.Value || ShowChest.Value || ShowMultiShop.Value || ShowBarrel.Value ||
+                             ShowScrapper.Value || ShowSecret.Value || ShowDuplicator.Value || ShowDrone.Value ||
+                             ShowShrine.Value || ShowNewtAlter.Value);
 
         public static void Draw()
         {
+            if (!_initialized) return;
             MainCamera = Camera.main;
             if (!MainCamera) return; // no camera to project against this frame
 
-            if (Instance.showTeleporterToggle.isOn)
-                ShowTeleporter();
-            if (Instance.showChestToggle.isOn || Instance.showDuplicatorToggle.isOn || Instance.showDroneToggle.isOn ||
-                Instance.showShrineToggle.isOn || Instance.showNewtAlterToggle.isOn)
+            if (ShowTeleporter.Value)
+                ShowTeleporterEsp();
+            if (ShowChest.Value || ShowDuplicator.Value || ShowDrone.Value || ShowShrine.Value || ShowNewtAlter.Value)
                 DrawPurchaseInteractables();
-            if (Instance.showMultiShopToggle.isOn)
+            if (ShowMultiShop.Value)
                 DrawShops();
-            if (Instance.showBarrelToggle.isOn)
+            if (ShowBarrel.Value)
                 DrawBarrelInteractables();
-            if (Instance.showScrapperToggle.isOn)
+            if (ShowScrapper.Value)
                 DrawScrapperInteractables();
-            if (Instance.ShowSecretToggle.isOn)
+            if (ShowSecret.Value)
                 DrawSecretInteractables();
         }
 
@@ -144,7 +93,7 @@ namespace Aerolt.Classes
                 var transform1 = multiShopController.transform;
                 var position = transform1.position + transform1.up * 1.5f;
                 var distanceToObject = Mathf.RoundToInt(Vector3.Distance(MainCamera.transform.position, position));
-                var advanced = CheckCursorPosition(position) || Instance.showAdvancedToggle.isOn;
+                var advanced = CheckCursorPosition(position) || ShowAdvanced.Value;
                 if (advanced)
                     str.AppendLine("Multi Shop Terminal"); // TODO use lang token
                 var costSet = false;
@@ -198,16 +147,16 @@ namespace Aerolt.Classes
             }
         }
 
-        private void GatherObjects()
+        private static void GatherObjects()
         {
-            BarrelInteractions = FindObjectsOfType<BarrelInteraction>().ToList();
-            PurchaseInteractions = FindObjectsOfType<PurchaseInteraction>().ToList();
-            SecretButtons = FindObjectsOfType<PressurePlateController>().ToList();
-            Scrappers = FindObjectsOfType<ScrapperController>().ToList();
-            MultiShops = FindObjectsOfType<MultiShopController>().ToList();
+            BarrelInteractions = Object.FindObjectsOfType<BarrelInteraction>().ToList();
+            PurchaseInteractions = Object.FindObjectsOfType<PurchaseInteraction>().ToList();
+            SecretButtons = Object.FindObjectsOfType<PressurePlateController>().ToList();
+            Scrappers = Object.FindObjectsOfType<ScrapperController>().ToList();
+            MultiShops = Object.FindObjectsOfType<MultiShopController>().ToList();
         }
 
-        private static void ShowTeleporter()
+        private static void ShowTeleporterEsp()
         {
             if (TeleporterInteraction.instance)
             {
@@ -255,7 +204,7 @@ namespace Aerolt.Classes
                     float distance = (int)Vector3.Distance(MainCamera.transform.position, barrel.transform.position);
                     var boxText = $"{friendlyName}\n{distance}m";
 
-                    if (Instance.showBarrelToggle.isOn || CheckCursorPosition(barrel.transform.position))
+                    if (ShowBarrel.Value || CheckCursorPosition(barrel.transform.position))
                         EspHelper.DrawEspLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear,
                             boxText);
                     else
@@ -300,56 +249,56 @@ namespace Aerolt.Classes
                 if (!purchaseInteraction || !purchaseInteraction.available) continue;
 
                 var chest = purchaseInteraction.GetComponent<ChestBehavior>();
-                if (chest && Instance.showChestToggle.isOn)
-                    ShowChest(chest, purchaseInteraction);
+                if (chest && ShowChest.Value)
+                    DrawChest(chest, purchaseInteraction);
 
                 var optionChest = purchaseInteraction.GetComponent<OptionChestBehavior>();
-                if (optionChest && Instance.showChestToggle.isOn)
-                    ShowChest(optionChest, purchaseInteraction);
+                if (optionChest && ShowChest.Value)
+                    DrawChest(optionChest, purchaseInteraction);
 
                 var casinoChest = purchaseInteraction.GetComponent<RouletteChestController>();
-                if (casinoChest && Instance.showChestToggle.isOn)
-                    ShowChest(casinoChest, purchaseInteraction);
+                if (casinoChest && ShowChest.Value)
+                    DrawChest(casinoChest, purchaseInteraction);
 
                 var timedChest =
                     purchaseInteraction.GetComponent<TimedChestController>(); // TODO this is not a purchase interaction
-                if (timedChest && Instance.showChestToggle.isOn)
-                    ShowChest(timedChest, purchaseInteraction);
+                if (timedChest && ShowChest.Value)
+                    DrawChest(timedChest, purchaseInteraction);
 
                 var shopTerminal = purchaseInteraction.GetComponent<ShopTerminalBehavior>();
                 if (shopTerminal)
-                    if (Instance.showDuplicatorToggle.isOn)
+                    if (ShowDuplicator.Value)
                     {
                         var possibleNames = new[]
                             { "DUPLICATOR_NAME", "DUPLICATOR_MILITARY_NAME", "BAZAAR_CAULDRON_NAME" };
                         foreach (var name in possibleNames)
                             if (purchaseInteraction.displayNameToken == name)
                             {
-                                ShowDuplicator(name, shopTerminal);
+                                DrawDuplicator(name, shopTerminal);
                                 break;
                             }
                     }
 
                 var masterSummon = purchaseInteraction.GetComponent<SummonMasterBehavior>();
-                if (masterSummon && Instance.showDroneToggle.isOn) ShowDrone(purchaseInteraction);
+                if (masterSummon && ShowDrone.Value) DrawDrone(purchaseInteraction);
 
                 var nameProvider = purchaseInteraction.GetComponent<GenericDisplayNameProvider>();
                 if (nameProvider)
-                    if (Instance.showShrineToggle.isOn && nameProvider.displayToken.ToUpper().Contains("SHRINE"))
-                        ShowShrine(purchaseInteraction);
+                    if (ShowShrine.Value && nameProvider.displayToken.ToUpper().Contains("SHRINE"))
+                        DrawShrine(purchaseInteraction);
 
                 var portalBehaviour = purchaseInteraction.GetComponent<PortalStatueBehavior>();
-                if (portalBehaviour && Instance.showNewtAlterToggle.isOn) ShowNewtAlter(purchaseInteraction);
+                if (portalBehaviour && ShowNewtAlter.Value) DrawNewtAlter(purchaseInteraction);
             }
         }
 
-        private static void ShowNewtAlter(PurchaseInteraction purchaseInteraction)
+        private static void DrawNewtAlter(PurchaseInteraction purchaseInteraction)
         {
             EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("NewtAlter"), Color.clear,
                 GetLabel(purchaseInteraction));
         }
 
-        private static void ShowShrine(PurchaseInteraction purchaseInteraction)
+        private static void DrawShrine(PurchaseInteraction purchaseInteraction)
         {
             var colorName = purchaseInteraction.displayNameToken switch
             {
@@ -368,13 +317,13 @@ namespace Aerolt.Classes
                 purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
         }
 
-        private static void ShowDrone(PurchaseInteraction purchaseInteraction)
+        private static void DrawDrone(PurchaseInteraction purchaseInteraction)
         {
             EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Drone"), Color.clear,
                 GetLabel(purchaseInteraction));
         }
 
-        private static void ShowDuplicator(string token, ShopTerminalBehavior shopTerminal)
+        private static void DrawDuplicator(string token, ShopTerminalBehavior shopTerminal)
         {
             var def = PickupCatalog.GetPickupDef(shopTerminal.pickup.pickupIndex);
             if (def.itemIndex != ItemIndex.None)
@@ -384,9 +333,9 @@ namespace Aerolt.Classes
                         .GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickup.pickupIndex).itemIndex).nameToken));
         }
 
-        private static void ShowChest(TimedChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
+        private static void DrawChest(TimedChestController optionChestBehavior, PurchaseInteraction purchaseInteraction)
         {
-            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            if (ShowAdvanced.Value || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var items = optionChestBehavior.remainingTime;
                 EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
@@ -399,10 +348,10 @@ namespace Aerolt.Classes
             }
         }
 
-        private static void ShowChest(RouletteChestController optionChestBehavior,
+        private static void DrawChest(RouletteChestController optionChestBehavior,
             PurchaseInteraction purchaseInteraction)
         {
-            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            if (ShowAdvanced.Value || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var items = optionChestBehavior.entries != null
                     ? optionChestBehavior.entries.OrderByDescending(x =>
@@ -434,9 +383,9 @@ namespace Aerolt.Classes
             }
         }
 
-        private static void ShowChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
+        private static void DrawChest(ChestBehavior chest, PurchaseInteraction purchaseInteraction)
         {
-            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            if (ShowAdvanced.Value || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var def = PickupCatalog.GetPickupDef(chest.currentPickup.pickupIndex);
                 if (def.itemIndex != ItemIndex.None)
@@ -457,9 +406,9 @@ namespace Aerolt.Classes
             }
         }
 
-        public static void ShowChest(OptionChestBehavior optionChestBehavior, PurchaseInteraction purchaseInteraction)
+        private static void DrawChest(OptionChestBehavior optionChestBehavior, PurchaseInteraction purchaseInteraction)
         {
-            if (Instance.showAdvancedToggle.isOn || CheckCursorPosition(purchaseInteraction.transform.position))
+            if (ShowAdvanced.Value || CheckCursorPosition(purchaseInteraction.transform.position))
             {
                 var items = optionChestBehavior.generatedPickups != null
                     ? optionChestBehavior.generatedPickups.Select(x =>

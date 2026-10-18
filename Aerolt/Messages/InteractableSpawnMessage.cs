@@ -1,3 +1,4 @@
+using Aerolt.Classes;
 using Aerolt.Managers;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -36,7 +37,7 @@ namespace Aerolt.Messages
         public override void Handle()
         {
             base.Handle();
-            InteractableManager.Spawn(index, position);
+            AeroltInteractableSpawner.Spawn(index, position);
         }
     }
 }

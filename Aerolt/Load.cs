@@ -6,6 +6,7 @@ using Aerolt.Enums;
 using Aerolt.Helpers;
 using Aerolt.Managers;
 using Aerolt.Overrides;
+using Aerolt.UI;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
@@ -36,17 +37,13 @@ namespace Aerolt
         public const string Guid = "com.Lodington." + Name;
         public const string Version = "4.1.8";
         public static ManualLogSource Log = null!;
-        public static GameObject Co = null!;
         public static AssetBundle Assets = null!;
 
         public static Load Instance = null!;
 
         public static Dictionary<ButtonNames, ZioConfigEntry<KeyboardShortcut>> KeyBinds = new();
 
-        public static Dictionary<NetworkUser, GameObject> AeroltUIs = new();
         public static ZioConfigFile.ZioConfigFile ConfigFile = null!;
-        public static NetworkUser? TempViewer;
-        public static HUD? TempHud;
         public static string Path = null!;
 
 
@@ -58,9 +55,6 @@ namespace Aerolt
             Path = System.IO.Path.GetDirectoryName(Info.Location)!;
             Assets = AssetBundle.LoadFromFile(System.IO.Path.Combine(Path!, "aeroltbundle"));
             Tools.Log(LogLevel.Information, "Loaded AssetBundle");
-            Co = Assets.LoadAsset<GameObject>("PlayerCanvas");
-
-            Assets.LoadAsset<GameObject>("AeroltUI");
 
             Tools.SendCount();
             NetworkManager.Initialize();
@@ -69,16 +63,26 @@ namespace Aerolt
         public void Start()
         {
             RoR2Application.onLoad += GameLoad;
-            HUD.shouldHudDisplay += CreateHud;
         }
 
         public void OnGUI()
         {
-            if (!Esp.Instance)
+            if (AeroltUniverseUI.IsReady)
+                AeroltIcon.Draw();
+
+            if (!Esp.AnyEnabled)
                 return;
             if (Event.current.type != EventType.Repaint)
                 return;
             Esp.Draw();
+        }
+
+        public void Update()
+        {
+            if (AeroltUniverseUI.IsReady &&
+                KeyBinds.TryGetValue(ButtonNames.OpenMenu, out var entry) &&
+                GetKeyPressed(entry))
+                AeroltUniverseUI.Toggle();
         }
 
         public static bool GetKeyPressed(ZioConfigEntry<KeyboardShortcut> entry)
@@ -96,9 +100,17 @@ namespace Aerolt
             Colors.InitColors();
 
             IconCache.Warm(this);
+            Esp.Init();
+            Run.onRunStartGlobal += OnRunStart;
 
             var harm = new Harmony(Info.Metadata.GUID);
             new PatchClassProcessor(harm, typeof(Hooks)).Patch();
+        }
+
+        private static void OnRunStart(Run run)
+        {
+            if (!AeroltUniverseUI.IsReady)
+                AeroltUniverseUI.Bootstrap();
         }
 
         private void CreateKeyBindSettings()
@@ -113,52 +125,6 @@ namespace Aerolt
         {
             foreach (var value in KeyBinds.Values) ModSettingsManager.AddOption(new ZioKeyBindOption(value));
             ModSettingsManager.SetModIcon(Assets.LoadAsset<Sprite>("NewLogo"));
-        }
-
-
-        public static void CreateHud(HUD hud, ref bool shoulddisplay)
-        {
-            if (!hud.cameraRigController) return;
-
-            if (hud.gameObject.GetComponent<AeroltHudLoader>()) return;
-
-            var viewer = hud.cameraRigController.viewer;
-            if (AeroltUIs.ContainsKey(viewer)) return;
-
-            var loader = hud.gameObject.AddComponent<AeroltHudLoader>();
-            loader.hud = hud;
-
-            loader.Invoke(nameof(AeroltHudLoader.SpawnHud), 1);
-        }
-
-        public class AeroltHudLoader : MonoBehaviour
-        {
-            public HUD hud = null!;
-
-            public void SpawnHud()
-            {
-                if (!hud.cameraRigController) return;
-                var viewer = hud.cameraRigController.viewer;
-
-                if (!viewer) return;
-                if (AeroltUIs.ContainsKey(viewer)) return;
-
-                TempViewer = viewer;
-                TempHud = hud;
-                var ui = Instantiate(Co);
-                ui.GetComponent<MPEventSystemProvider>().eventSystem = hud.eventSystemProvider.eventSystem;
-                TempViewer = null!;
-                TempHud = null!;
-
-                if (!ui)
-                {
-                    AeroltUIs.Remove(viewer);
-                    return;
-                }
-
-                AeroltUIs[viewer] = ui;
-                Tools.Log(LogLevel.Information, "Created UI");
-            }
         }
     }
 }

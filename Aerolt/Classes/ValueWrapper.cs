@@ -84,7 +84,7 @@ namespace Aerolt.Classes
                 (!forceLocalOrRemote.HasValue && who?.localUser != null))
             {
                 isLocalBinding = true;
-                var file = who ? MenuInfo.Files[who!.localUser!] : Load.ConfigFile;
+                var file = who ? PlayerConfigFiles.GetForLocalUser(who!.localUser!) : Load.ConfigFile;
                 configEntry = file.Bind(category, name, defaultValue, description);
                 configEntry.SettingChanged += (_, _, _) =>
                 {

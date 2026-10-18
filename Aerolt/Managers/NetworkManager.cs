@@ -11,8 +11,20 @@ namespace Aerolt.Managers
     {
         public static Type[] RegisteredMessages = null!;
         private static readonly HashSet<int> ModdedConnectionIds = new();
-        public static bool HostOnly;
+        private static bool _hostOnly;
 
+        public static bool HostOnly
+        {
+            get => _hostOnly;
+            set
+            {
+                if (_hostOnly == value) return;
+                _hostOnly = value;
+                HostOnlyChanged?.Invoke(value);
+            }
+        }
+
+        public static event System.Action<bool>? HostOnlyChanged;
         public static void Initialize()
         {
             NetworkManagerSystem.onStartServerGlobal += RegisterMessages;
@@ -25,8 +37,6 @@ namespace Aerolt.Managers
 
         private static void OnServerDisconnect(NetworkConnection conn)
         {
-            // Forget this connection's modded status so a later client that reuses the same
-            // connection id doesn't inherit it.
             if (conn != null) ModdedConnectionIds.Remove(conn.connectionId);
         }
 
@@ -113,7 +123,6 @@ namespace Aerolt.Managers
 
     public class AeroltMessageBase : MessageBase
     {
-        // Needed to create empty instance of class so it can be read
         public virtual void Handle()
         {
         }
