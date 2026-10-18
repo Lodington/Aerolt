@@ -6,10 +6,7 @@ using UnityEngine;
 
 namespace Aerolt.Classes
 {
-    /// <summary>
-    ///     Shared interactable spawn-card data and spawning, extracted from the old
-    ///     InteractableManager so the UI and InteractableSpawnMessage don't depend on the old UI.
-    /// </summary>
+
     public static class AeroltInteractableSpawner
     {
         [CanBeNull] private static SpawnCard[]? _spawnCards;
@@ -18,13 +15,12 @@ namespace Aerolt.Classes
 
         static AeroltInteractableSpawner()
         {
-            // Clear the card cache on a new run so it refills if expansions change.
+
             Run.onRunStartGlobal += _ => _spawnCards = null;
         }
 
         public static Dictionary<SpawnCard, int> StartOfRoundScaledInteractableCosts { get; } = new();
 
-        /// <summary>The current stage's interactable spawn cards (memoized per run).</summary>
         public static SpawnCard[] Cards => _spawnCards ??= ClassicStageInfo.instance.interactableDccsPool
             .GenerateWeightedSelection().choices.Where(x => !x.Equals(null) && x.value).Select(x => x.value)
             .Where(x => !x.Equals(null) && x.categories != null).Select(x => x.categories).SelectMany(x => x)

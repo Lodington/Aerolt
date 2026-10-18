@@ -1,88 +1,117 @@
-# Aerolt Host Only Update!
+# Aerolt
 
-New Host only command lets you block clients from executing commands.
+A rebuilt, networked cheat menu for Risk of Rain 2 with a fast new UniverseLib UI.
 
+- Press **F1** (rebindable) or click the Aerolt logo in the top-left to open the menu.
+- Networked: actions work in multiplayer, with a host-only mode to lock clients out.
+- Select any player in your lobby from the bar at the top of the window; player-
+  targeted tabs act on whoever is selected. Supports full 16-player lobbies.
+- Mods can add their own tabs via the Extension API (see below).
+
+## Host Only
+
+A console command lets the host block clients from running Aerolt actions. There's also
+a toggle for it under the Settings tab.
+
+```
 aerolt_host_only        -> flips the current state
 aerolt_host_only 1      -> force on   (also true/on)
 aerolt_host_only 0      -> force off  (also false/off)
+```
 
+## Player
 
-
-F1 to open the menu!
-Now with Networking!!!!
-New UI!
-
-# Main UI
-This Menu lets you select players that are in your lobby and modifiers their behaviors and items.
-- Aimbot Toggle
-- Noclip
+Toggles and actions for the selected player:
 - God Mode
-- Infinite Sprint
-- Disable Mob spawns
-- Kill all Mobs
-- Kick Player
-- Ban Player
-- Goto Player
-- Bring Player
-- Revive Player
-- Spawn as (changes the players current character they are playing as)
-- Give all Items to that players
-- Clear inventory of that player
-- Edit the players team
-- Edit XP
-- Edit Money
-- Edit Lunar coins
-- Edit Void Markers
-- Edit Buffs
-- Edit Equipment
-- Edit Items
-- Edit all values of the player
+- Noclip
+- Aimbot (with an aimbot weight slider)
+- Infinite Skills
+- Always Sprint
+- Disable Mob Spawns
+- Kill / Revive / Goto / Bring / Kick / Ban
+- Set Money, Lunar Coins, Void Coins, and Level
+- Switch team
 
-# Esp
-Shows all objects based on the selection
-- Advanced Show the non collapsed version of the esp
+## Body Stats
+
+Edit any float stat on the selected player's body (health, move speed, damage, etc.).
+- Live "Default" view of the body's current values
+- 3 saveable stat profiles you can apply with one click
+
+## Items
+
+Searchable, scrollable item editor for the selected player.
+- Per-item count rows with +/- (hold Shift for ±5)
+- Give, Give All, Give Random, and Clear inventory
+
+## Equipment
+
+Searchable equipment list; click an entry to give it to the selected player.
+
+## Buffs
+
+Searchable buff editor; set per-buff counts and apply them to the selected player.
+
+## Spawn As
+
+Change the selected player's character to any body in the game.
+
+## Monsters
+
+Spawn any monster and tune it before spawning:
+- Braindead toggle (disables AI)
+- Team selection
+- Elite type
+
+## Interactables
+
+Spawn any interactable that has a spawn card (chests, shrines, printers, etc.) at your
+aim point. Includes a Refresh button since the available cards depend on the stage.
+
+## Teleporter
+
+- Change to any selectable stage
+- Spawn Gold / Newt / Blue (Celestial) / Void / All portals at the teleporter
+- Instantly charge the teleporter
+- Skip the current stage
+- Add a Mountain shrine stack
+
+## World
+
+Run- and stage-wide controls:
+- Game speed slider (local) with reset
+- Charge Teleporter, Next Stage, Restart Stage
+- Set the run timer and stages-cleared count
+- Change difficulty
+- Combat Director: stop/resume spawns, start the boss, set monster credits
+- Toggle any artifact on or off
+
+## ESP
+
+Highlights objects in the world. Toggle any of:
 - Teleporter
 - Chests
-- Shops
+- Multishops
 - Barrels
 - Scrappers
-- Secrets (like the pressure plates)
-- Printers
-- Newt Alter
+- Secret Buttons
+- Duplicators
 - Drones
 - Shrines
+- Newt Altars
+- Advanced Info (expanded, non-collapsed labels)
 
-# Interactable
-Spawn any interactable in the game that has a spawn card
+ESP colors are configurable under Settings.
 
-# Monsters
-Spawn any monster in the game and edit there properties
-- Brain Dead (Turns off the ai)
-- Change Team
-- Change elite type
-- Edit Items
+## Settings
 
-# Teleporter
-Change any thing that is related to the teleport
-- change stage to any stage that is selectable
-- Spawn Newt portal at teleporter
-- Spawn Gold portal at teleporter
-- Spawn Celestial portal at teleporter
-- Spawn Void portal at teleporter
-- Spawn ALL portal at teleporter
-- Skip current stage without adding to the stage count
-- Insta Charge teleporter
-- Add Mountain shrine
-
-# Social
-Connect to a Chat server to invite and talk to people that are using aerolt
+- Host Only toggle
+- Rebind the menu keybind
+- Customize ESP colors (shared with the ESP tab and Risk of Options)
 
 # Privacy Policy – No Personal Data Collection
 This app and/or service does not collect, store, or transmit any personal information.
 This mod only collects your Risk of Rain 2 profile name or your Steam name.
-
-https://github.com/Lodington/Aerolt
-https://github.com/Lodington/AeroltChatServer
 
 # Support us
 Support Lodington
@@ -93,92 +122,111 @@ Support Bubbet
 
 A shout out to Voidsenight✨#0060 for helping make the icons!
 
-# Changelog
-- 4.1.1
-  - fixed a issue where aerolt wouldnt load due to long load times.
-- 4.1.0
-  - Attempted Fix for not spawning at the start of the stage (Bubbet)
-  - Fixed interactable not spawning.
-  - Fixed Resize shooting off the screen.
-- 4.0.14
-    - Changed discord Link
-- 4.0.13
-    - Fixed users stats not being populated.
-- 4.0.12
-    - Brought the changes from 4.0.10 back :D
-- 4.0.11
-    - Added Logo to Risk of Options UI.
-    - Cleaned up some code
-- 4.0.10
-    - Fixed a where items would'nt populate due to a nametoken missing from a item
-- 4.0.9
-    - Fixed Logo Not being persistent on scene change
-- 4.0.8
-    - New ESP Enchancements from ruinedyourlife.
-    - feat: shrine colors
-    - feat: items rarity
-    - fix: shrine & altar names
-    - feat: chest items rarity
-    - fix: rename & sort methods
-    - feat: equipment barrel color
-    - fix: getitemtierdef
-    - feat: teleporter & duplicator
-    - wip: multishop rarity
-- 4.0.7
-    - Fixed SetUser Bug not allowing users to edit other users
-- 4.0.3, 4.0.4, 4.0.5, 4.0.6
-    - Potental fix to the infinite Item Bug Fixed
-- 4.0.2
-    - Fixed a bug with users not being able to type in IRC Chat
-- 4.0.1
-    - Updated Clients connection to chat server
-- 4.0.0
-    - Completely reamped the mod .
-- 3.0.0
-    - Not Released To public
-- 2.0.0
-    - Mod has been developed from the ground up (again)
-    - ESP
-        - Add ESP for Shops
-        - Changed How esp displays
-    - Player
-        - Added Disable mob spawns
-        - Reworked Character stats so you can edit more stats
-    - Monsters
-        - Added Edit Items
-        - Added team Change
-    - Lobby
-        - Added Currency, Lunar, and void marker edit fields
-        - Added Edit inventory for all players
-- 1.3.3
-    - Fixed Item Tab crashing
-- 1.3.2
-    - Fixed Monster Tab not spawning elites
-    - Added a remove and add item button in players tab
+# Extension API (for mod developers)
 
-- 1.3.1
-    - Fixed Monsters Spawining in like crazy
-- 1.3.0
-    - Added Custom Console
-    - Added Monsters tab
-    - Added Interactable Tab
-    - Fixed player respawn button
-    - Changed the player tabs format
-    - Optimized UI code
-    - Stopped Cursor from moving the character when menu is active
-    - Moved ESP colors to the esp tab
-- 1.2.3
-    - Fixed Stat modifiers
+Other BepInEx mods can add their own tabs (and windows) to the Aerolt menu without
+forking it. Everything lives in the `Aerolt.API.AeroltAPI` static class.
 
-- 1.2.2
-    - Updated For SOV update
+## Setup
 
-- 1.2.1
-    - Fixed ESP Lag Issue
+1. Add a reference to `Aerolt.dll` in your project.
+2. Declare a dependency so Aerolt loads first:
 
-- 1.2.0
-    - Added Damage and crit modifiers for each level up
-    - Added Equipment Tab
+```csharp
+[BepInPlugin("my.cool.mod", "My Cool Mod", "1.0.0")]
+[BepInDependency("com.Lodington.Aerolt")]
+public class MyMod : BaseUnityPlugin { /* ... */ }
+```
 
-- 1.0.0
-    - Initial Release
+Aerolt builds its UI the first time a run starts (not at the main menu), so the window
+may not exist when your plugin's `Awake` runs. The API handles this for you:
+`RegisterSection` queues your tab if the UI isn't ready yet and adds it as soon as the
+window is created.
+
+## Add a tab
+
+Implement `Aerolt.UI.IAeroltSection` and register it:
+
+```csharp
+using Aerolt.API;
+using Aerolt.UI;
+using UnityEngine;
+using UniverseLib.UI;
+
+public class MySection : IAeroltSection
+{
+    public string Title => "My Tab";          // nav button label
+    public GameObject Root { get; private set; }
+
+    public void Build(GameObject contentParent)
+    {
+        // Called once, when the tab is created. Build your controls under Root.
+        Root = UIFactory.CreateVerticalGroup(contentParent, "MySection",
+            false, false, true, true, 4, default, new Color(0.14f, 0.14f, 0.14f));
+        UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, flexibleHeight: 9999);
+
+        var btn = UIFactory.CreateButton(Root, "Hello", "Say hi");
+        btn.OnClick += () => Debug.Log("hi from my tab");
+    }
+
+    public void OnShown()
+    {
+        // Called every time this tab becomes active. Good place to refresh from the
+        // currently targeted player.
+        var user = AeroltAPI.SelectedPlayer;
+    }
+}
+```
+
+```csharp
+private void Awake()
+{
+    AeroltAPI.RegisterSection(new MySection());
+}
+```
+
+The UI is built with [UniverseLib](https://github.com/sinai-dev/UniverseLib); use its
+`UIFactory` to create controls so your tab matches the rest of the menu.
+
+## Targeting the selected player
+
+The player bar at the top of the window picks which player actions apply to. Read and
+react to it from your tab:
+
+```csharp
+NetworkUser target = AeroltAPI.SelectedPlayer;      // may be null
+AeroltAPI.SelectPlayer(someUser);                   // change the target
+AeroltAPI.SelectedPlayerChanged += () => { /* re-sync your UI */ };
+```
+
+## Menu visibility
+
+```csharp
+bool open = AeroltAPI.MenuOpen;
+AeroltAPI.ToggleMenu();
+AeroltAPI.SetMenuVisible(true);
+```
+
+## Knowing when the UI exists
+
+```csharp
+if (AeroltAPI.IsReady) { /* window exists now */ }
+
+AeroltAPI.Ready += () => { /* fires when the UI is created; immediate if already ready */ };
+```
+
+## Advanced: your own window
+
+For a full separate window rather than a tab, create your own UniverseLib `PanelBase`
+against Aerolt's shared canvas so it inherits the same cursor handling:
+
+```csharp
+AeroltAPI.Ready += () =>
+{
+    var uiBase = AeroltAPI.SharedUIBase;   // UniverseLib.UI.UIBase
+    var myPanel = new MyPanel(uiBase);     // your PanelBase subclass
+};
+```
+
+Prefer `RegisterSection` for simple extensions — it's less code and stays consistent
+with the rest of the menu.
