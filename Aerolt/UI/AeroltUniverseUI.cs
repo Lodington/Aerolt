@@ -30,9 +30,10 @@ namespace Aerolt.UI
         {
             _uiBase = UniversalUI.RegisterUI(UiId, OnUpdate);
             _window = new AeroltUniverseWindow(_uiBase);
-            _window.SetActive(true); // the panel stays active the UIBase root is what we toggle
-            _uiBase.Enabled = false;
             Tools.Log(LogLevel.Information, "Aerolt UniverseLib UI ready.");
+
+            // Start hidden.
+            SetVisible(false);
 
             AeroltAPI.NotifyReady(_window);
         }
@@ -40,8 +41,7 @@ namespace Aerolt.UI
         private static void OnUpdate()
         {
         }
-
-        public static bool IsOpen => _uiBase != null && _uiBase.Enabled;
+        public static bool IsOpen => _window != null && _window.Enabled;
 
         public static void Toggle()
         {
@@ -50,8 +50,9 @@ namespace Aerolt.UI
 
         public static void SetVisible(bool visible)
         {
-            if (_uiBase == null) return;
+            if (_uiBase == null || _window == null) return;
             _uiBase.Enabled = visible;
+            _window.SetActive(visible);
         }
 
         private static void LogHandler(string message, LogType type)

@@ -18,6 +18,7 @@ namespace Aerolt.UI
 
         private readonly List<IAeroltSection> _sections = new();
         private readonly Dictionary<IAeroltSection, ButtonRef> _navButtons = new();
+        private readonly Dictionary<IAeroltSection, GameObject> _sectionRoots = new();
         private readonly Dictionary<RoR2.NetworkUser, ButtonRef> _playerButtons = new();
         private GameObject _playerBar = null!;
         private GameObject _nav = null!;
@@ -28,6 +29,10 @@ namespace Aerolt.UI
 
         public AeroltUniverseWindow(UIBase owner) : base(owner)
         {
+        }
+        protected override void OnClosePanelClicked()
+        {
+            AeroltUniverseUI.SetVisible(false);
         }
 
         public override string Name => "Aerolt";
@@ -107,19 +112,24 @@ namespace Aerolt.UI
             _navButtons[section] = btn;
 
 
+            GameObject toggleRoot;
             if (section.ScrollableContent)
             {
+
                 var scroll = UIFactory.CreateScrollView(_contentArea, $"Scroll_{section.Title}",
                     out var scrollContent, out _, new Color(0.14f, 0.14f, 0.14f));
                 UIFactory.SetLayoutElement(scroll, flexibleWidth: 9999, flexibleHeight: 9999);
                 section.Build(scrollContent);
+                toggleRoot = scroll;
             }
             else
             {
                 section.Build(_contentArea);
+                toggleRoot = section.Root;
             }
 
-            section.Root.SetActive(false);
+            _sectionRoots[section] = toggleRoot;
+            toggleRoot.SetActive(false);
 
             // If this is the only section (e.g. everything else failed), show it.
             if (_active == null)
@@ -180,11 +190,12 @@ namespace Aerolt.UI
         {
             if (_active == section) return;
 
-            if (_active != null)
-                _active.Root.SetActive(false);
+            if (_active != null && _sectionRoots.TryGetValue(_active, out var prevRoot))
+                prevRoot.SetActive(false);
 
             _active = section;
-            section.Root.SetActive(true);
+            if (_sectionRoots.TryGetValue(section, out var root))
+                root.SetActive(true);
             section.OnShown();
 
             foreach (var kvp in _navButtons)
