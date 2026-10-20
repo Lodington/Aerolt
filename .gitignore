@@ -1,5 +1,7 @@
 /Aerolt/obj/
 /Aerolt/bin/
+/ItemLoadouts/obj/
+/ItemLoadouts/bin/
 .idea
 .vs
 /Aerolt.manifest

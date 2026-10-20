@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aerolt", "Aerolt\Aerolt.csproj", "{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItemLoadouts", "ItemLoadouts\ItemLoadouts.csproj", "{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,5 +17,11 @@ Global
 		{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}.DebugOutDir|Any CPU.ActiveCfg = DebugOutDir|Any CPU
 		{2B1CEEC0-0D2D-4DC9-A2EF-C1DFA9BF604F}.DebugOutDir|Any CPU.Build.0 = DebugOutDir|Any CPU
+		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.DebugOutDir|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.DebugOutDir|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <ImplicitUsings>false</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>9</LangVersion>
+        <Configurations>Debug;Release;DebugOutDir</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <AssemblyName>ItemLoadouts</AssemblyName>
+        <RootNamespace>ItemLoadouts</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.Core" Version="5.4.19" />
+        <PackageReference Include="RiskOfRain2.GameLibs" Version="1.4.1-r.0" />
+        <PackageReference Include="UniverseLib.Mono" Version="1.5.1" />
+        <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" />
+    </ItemGroup>
+
+    <!-- Reference the main Aerolt mod for the extension API, IAeroltSection, and the networked
+         item-setting message. Aerolt loads first (declared as a BepInDependency in Plugin.cs). -->
+    <ItemGroup>
+        <ProjectReference Include="..\Aerolt\Aerolt.csproj">
+            <Private>false</Private>
+        </ProjectReference>
+    </ItemGroup>
+
+</Project>
