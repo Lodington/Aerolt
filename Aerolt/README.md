@@ -40,9 +40,11 @@ Edit any float stat on the selected player's body (health, move speed, damage, e
 
 ## Items
 
-Searchable, scrollable item editor for the selected player.
-- Per-item count rows with +/- (hold Shift for ±5)
-- Give, Give All, Give Random, and Clear inventory
+Searchable grid of item icons for the selected player.
+- Click an item to give one; Shift+click gives 5. Right-click removes one (Shift -5).
+- Give All, Give Random, and Clear inventory
+- **Edit Items** opens a two-grid window: the full item list on the left (click to give)
+  and the player's current inventory on the right (click to remove). Shift for ±5.
 
 ## Equipment
 
@@ -62,6 +64,8 @@ Spawn any monster and tune it before spawning:
 - Braindead toggle (disables AI)
 - Team selection
 - Elite type
+- Edit Items — give the monster an item loadout to spawn with (two-grid editor)
+- Kill All Monsters
 
 ## Interactables
 

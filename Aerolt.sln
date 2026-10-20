@@ -4,6 +4,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aerolt", "Aerolt\Aerolt.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItemLoadouts", "ItemLoadouts\ItemLoadouts.csproj", "{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DamageLog", "DamageLog\DamageLog.csproj", "{4D3E00F2-2F4F-6FE1-C401-E3F1CB082F11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillPanel", "SkillPanel\SkillPanel.csproj", "{5E4F11A3-3A5A-7A02-D512-F402DC193A22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityInspector", "EntityInspector\EntityInspector.csproj", "{6F5A22B4-4B6B-8B13-E623-A513ED2A4B33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,5 +29,23 @@ Global
 		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.DebugOutDir|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C2DFFE1-1E3E-5ED0-B3F0-D2E0BAF715E0}.DebugOutDir|Any CPU.Build.0 = Debug|Any CPU
+		{4D3E00F2-2F4F-6FE1-C401-E3F1CB082F11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D3E00F2-2F4F-6FE1-C401-E3F1CB082F11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D3E00F2-2F4F-6FE1-C401-E3F1CB082F11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D3E00F2-2F4F-6FE1-C401-E3F1CB082F11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D3E00F2-2F4F-6FE1-C401-E3F1CB082F11}.DebugOutDir|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D3E00F2-2F4F-6FE1-C401-E3F1CB082F11}.DebugOutDir|Any CPU.Build.0 = Debug|Any CPU
+		{5E4F11A3-3A5A-7A02-D512-F402DC193A22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E4F11A3-3A5A-7A02-D512-F402DC193A22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E4F11A3-3A5A-7A02-D512-F402DC193A22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E4F11A3-3A5A-7A02-D512-F402DC193A22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E4F11A3-3A5A-7A02-D512-F402DC193A22}.DebugOutDir|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E4F11A3-3A5A-7A02-D512-F402DC193A22}.DebugOutDir|Any CPU.Build.0 = Debug|Any CPU
+		{6F5A22B4-4B6B-8B13-E623-A513ED2A4B33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F5A22B4-4B6B-8B13-E623-A513ED2A4B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F5A22B4-4B6B-8B13-E623-A513ED2A4B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F5A22B4-4B6B-8B13-E623-A513ED2A4B33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F5A22B4-4B6B-8B13-E623-A513ED2A4B33}.DebugOutDir|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F5A22B4-4B6B-8B13-E623-A513ED2A4B33}.DebugOutDir|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

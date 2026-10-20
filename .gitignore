@@ -2,6 +2,12 @@
 /Aerolt/bin/
 /ItemLoadouts/obj/
 /ItemLoadouts/bin/
+/DamageLog/obj/
+/DamageLog/bin/
+/SkillPanel/obj/
+/SkillPanel/bin/
+/EntityInspector/obj/
+/EntityInspector/bin/
 .idea
 .vs
 /Aerolt.manifest

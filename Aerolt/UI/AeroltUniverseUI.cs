@@ -14,11 +14,23 @@ namespace Aerolt.UI
 
         private static UIBase? _uiBase;
         private static AeroltUniverseWindow? _window;
+        private static ItemEditorWindow? _itemEditor;
 
         public static bool IsReady => _uiBase != null && _window != null;
         public static UIBase? UiBase => _uiBase;
 
         public static AeroltUniverseWindow? Window => _window;
+
+    
+        public static void OpenItemEditor(IItemEditTarget? target = null)
+        {
+            if (_uiBase == null) return;
+
+            _itemEditor ??= new ItemEditorWindow(_uiBase);
+            _uiBase.Enabled = true;
+            _itemEditor.SetActive(true);
+            _itemEditor.SetTarget(target ?? new PlayerInventoryTarget());
+        }
 
         public static void Bootstrap()
         {

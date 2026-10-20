@@ -1,23 +1,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Classes;
-using Aerolt.Managers;
 using Aerolt.Messages;
 using RoR2;
 using RoR2.ContentManagement;
 using UnityEngine;
-using UnityEngine.UI;
 using UniverseLib.UI;
 
 namespace Aerolt.UI.Sections
 {
+
     public class ItemsSection : IAeroltSection
     {
-        private CountEditorList<ItemDef> _list = null!;
+        private ItemGrid _grid = null!;
 
         public string Title => "Items";
         public GameObject Root { get; private set; } = null!;
-        public bool ScrollableContent => false; 
+        public bool ScrollableContent => false; // the grid scrolls internally
 
         public void Build(GameObject contentParent)
         {
@@ -27,27 +26,23 @@ namespace Aerolt.UI.Sections
 
             var actions = UIFactory.CreateHorizontalGroup(Root, "Actions", false, false, true, true, 4);
             UIFactory.SetLayoutElement(actions, minHeight: 30, flexibleHeight: 0, flexibleWidth: 9999);
-            AddAction(actions, "Give", GiveItems);
             AddAction(actions, "Give All", GiveAllItems);
             AddAction(actions, "Give Random", GiveRandomItems);
             AddAction(actions, "Clear", ClearInventory);
+            AddAction(actions, "Edit Items", () => AeroltUniverseUI.OpenItemEditor());
 
-            _list = new CountEditorList<ItemDef>(
-                def => Language.GetString(def.nameToken),
-                (entry, icon, stillValid) =>
-                {
-                    IconCache.LoadItemIcon(entry.Def, sprite =>
-                    {
-                        if (sprite && icon && stillValid()) icon.sprite = sprite;
-                    });
-                });
-            _list.Build(Root, ContentManager._itemDefs);
+            var hint = UIFactory.CreateLabel(Root, "Hint",
+                "Click an item to give one (Shift +5, right-click to remove).", TextAnchor.MiddleLeft);
+            UIFactory.SetLayoutElement(hint.gameObject, minHeight: 18, flexibleWidth: 9999);
+            hint.fontSize = 12;
+
+            _grid = new ItemGrid(GetCount, Adjust);
+            _grid.Build(Root, ContentManager._itemDefs);
         }
 
         public void OnShown()
         {
-            _list.RefreshIcons();
-            SeedFromInventory();
+            _grid.Refresh();
         }
 
         private static void AddAction(GameObject parent, string label, System.Action onClick)
@@ -57,24 +52,23 @@ namespace Aerolt.UI.Sections
             btn.OnClick += onClick;
         }
 
-        private void SeedFromInventory()
+        private static int GetCount(ItemDef def)
         {
-            var master = PlayerSelection.Selected ? PlayerSelection.Selected!.master : null;
-            var inv = master ? master!.inventory : null;
-            if (!inv) return;
-            foreach (var def in ContentManager._itemDefs)
-                _list.SetCount(def, inv!.GetItemCountEffective(def));
+            var inv = GetInventory();
+            return inv ? inv!.GetItemCountEffective(def) : 0;
         }
 
-        private void GiveItems()
+        private void Adjust(ItemDef def, int amount)
         {
-            var master = GetMaster();
-            if (!master) return;
-            var counts = _list.Entries
-                .Where(kvp => kvp.Value.Count > 0)
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Count);
-            if (counts.Count == 0) return;
-            new SetItemCountMessage(master!.inventory, counts).SendToServer();
+            var inv = GetInventory();
+            if (!inv || amount == 0) return;
+
+            var current = inv!.GetItemCountEffective(def);
+            var target = Mathf.Max(0, current + amount);
+            if (target == current) return;
+
+            new SetItemCountMessage(inv, new Dictionary<ItemDef, int> { { def, target } }).SendToServer();
+            _grid.Refresh();
         }
 
         private void GiveAllItems()
@@ -84,6 +78,7 @@ namespace Aerolt.UI.Sections
             var items = ContentManager.itemDefs.Except(ItemHelpers.GiveAllFilteredItems)
                 .ToDictionary(x => x, def => master!.inventory.GetItemCountEffective(def) + 1);
             new SetItemCountMessage(master!.inventory, items).SendToServer();
+            _grid.Refresh();
         }
 
         private void GiveRandomItems()
@@ -101,6 +96,7 @@ namespace Aerolt.UI.Sections
             }
 
             new SetItemCountMessage(master!.inventory, items).SendToServer();
+            _grid.Refresh();
         }
 
         private void ClearInventory()
@@ -109,7 +105,13 @@ namespace Aerolt.UI.Sections
             if (!master) return;
             var items = ContentManager.itemDefs.ToDictionary(x => x, _ => 0);
             new SetItemCountMessage(master!.inventory, items).SendToServer();
-            foreach (var def in ContentManager._itemDefs) _list.SetCount(def, 0);
+            _grid.Refresh();
+        }
+
+        private static Inventory? GetInventory()
+        {
+            var master = GetMaster();
+            return master && master!.inventory ? master.inventory : null;
         }
 
         private static CharacterMaster? GetMaster()

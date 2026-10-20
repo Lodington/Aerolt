@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniverseLib;
 using UniverseLib.UI;
+using UniverseLib.UI.Models;
 
 namespace Aerolt.UI.Sections
 {
@@ -18,6 +19,9 @@ namespace Aerolt.UI.Sections
         private Dropdown _eliteDropdown = null!;
         private Toggle _brainDead = null!;
         private IconButtonList<CharacterMaster> _list = null!;
+
+        private readonly Dictionary<ItemDef, int> _items = new();
+        private ButtonRef _editItemsButton = null!;
 
         public string Title => "Monsters";
         public bool ScrollableContent => false; 
@@ -46,6 +50,16 @@ namespace Aerolt.UI.Sections
             var toggleObj = UIFactory.CreateToggle(options, "BrainDead", out _brainDead, out var toggleText);
             UIFactory.SetLayoutElement(toggleObj, minHeight: 28, minWidth: 100, flexibleWidth: 0);
             toggleText.text = "Braindead";
+
+            _editItemsButton = UIFactory.CreateButton(options, "EditItems", "Edit Items");
+            UIFactory.SetLayoutElement(_editItemsButton.Component.gameObject, minHeight: 28, minWidth: 120,
+                flexibleWidth: 0);
+            _editItemsButton.OnClick += OpenItemEditor;
+            UpdateEditItemsLabel();
+
+            var killAll = UIFactory.CreateButton(options, "KillAllMonsters", "Kill All Monsters");
+            UIFactory.SetLayoutElement(killAll.Component.gameObject, minHeight: 28, minWidth: 130, flexibleWidth: 0);
+            killAll.OnClick += KillAllMonsters;
 
             _list = new IconButtonList<CharacterMaster>(
                 master => Language.GetString(master.bodyPrefab.GetComponent<CharacterBody>().baseNameToken),
@@ -81,6 +95,24 @@ namespace Aerolt.UI.Sections
 
         public void OnShown()
         {
+            UpdateEditItemsLabel();
+        }
+
+        private static void KillAllMonsters()
+        {
+            new KillAllTeamMessage(TeamIndex.Player).SendToServer();
+        }
+
+        private void OpenItemEditor()
+        {
+            AeroltUniverseUI.OpenItemEditor(new DictionaryItemTarget(_items, "Monster Items"));
+            UpdateEditItemsLabel();
+        }
+
+        private void UpdateEditItemsLabel()
+        {
+            if (_editItemsButton?.ButtonText)
+                _editItemsButton!.ButtonText.text = _items.Count > 0 ? $"Edit Items ({_items.Count})" : "Edit Items";
         }
 
         private void SpawnMonster(CharacterMaster monsterMaster)
@@ -95,8 +127,12 @@ namespace Aerolt.UI.Sections
                 : EquipmentIndex.None;
             var team = (TeamIndex)_teamDropdown.value;
 
+            var items = _items
+                .Where(kvp => kvp.Key && kvp.Value > 0)
+                .ToDictionary(kvp => kvp.Key, kvp => (uint)kvp.Value);
+
             new MonsterSpawnMessage(monsterMaster.name, body.name, location, team, elite, _brainDead.isOn,
-                new Dictionary<ItemDef, uint>()).SendToServer();
+                items).SendToServer();
         }
     }
 }
