@@ -92,7 +92,11 @@ Run- and stage-wide controls:
 
 ## ESP
 
-Highlights objects in the world. Toggle any of:
+Highlights objects in the world. By default each enabled object shows its in-game
+locator icon at its screen position. Turn on **Advanced Info** (or hover the cursor over
+an object) to switch to detailed text labels with name, cost, distance, and contents.
+
+Toggle any of:
 - Teleporter
 - Chests
 - Multishops
@@ -102,8 +106,9 @@ Highlights objects in the world. Toggle any of:
 - Duplicators
 - Drones
 - Shrines
+- Cleansing Pools
 - Newt Altars
-- Advanced Info (expanded, non-collapsed labels)
+- Advanced Info (detailed text labels instead of icons)
 
 ESP colors are configurable under Settings.
 

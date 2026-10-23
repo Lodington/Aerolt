@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Aerolt.Classes;
 using Aerolt.Messages;
 using RoR2;
 using RoR2.ContentManagement;
@@ -75,8 +76,8 @@ namespace Aerolt.UI
 
     public class ItemEditorWindow : PanelBase
     {
-        private ItemGrid _catalogGrid = null!;
-        private ItemGrid _inventoryGrid = null!;
+        private IconGrid<ItemDef> _catalogGrid = null!;
+        private IconGrid<ItemDef> _inventoryGrid = null!;
         private Text _rightLabel = null!;
         private IItemEditTarget _target = new PlayerInventoryTarget();
 
@@ -123,7 +124,14 @@ namespace Aerolt.UI
             var leftLabel = UIFactory.CreateLabel(left, "CatalogLabel", "All Items", TextAnchor.MiddleCenter);
             UIFactory.SetLayoutElement(leftLabel.gameObject, minHeight: 22, flexibleWidth: 9999);
 
-            _catalogGrid = new ItemGrid(def => _target.GetCount(def), (def, amount) => Adjust(def, amount));
+            _catalogGrid = new IconGrid<ItemDef>(
+                def => Language.GetString(def.nameToken),
+                (def, icon, stillValid) => IconCache.LoadItemIcon(def, sprite =>
+                {
+                    if (sprite && icon && stillValid()) icon.sprite = sprite;
+                }),
+                onClick: (def, amount) => Adjust(def, amount),
+                getCount: def => _target.GetCount(def));
             _catalogGrid.Build(left, ContentManager._itemDefs);
 
             var right = UIFactory.CreateVerticalGroup(body, "InventorySide", false, false, true, true, 2,
@@ -132,7 +140,14 @@ namespace Aerolt.UI
             _rightLabel = UIFactory.CreateLabel(right, "InventoryLabel", _target.RightLabel, TextAnchor.MiddleCenter);
             UIFactory.SetLayoutElement(_rightLabel.gameObject, minHeight: 22, flexibleWidth: 9999);
 
-            _inventoryGrid = new ItemGrid(def => _target.GetCount(def), (def, amount) => Adjust(def, -amount),
+            _inventoryGrid = new IconGrid<ItemDef>(
+                def => Language.GetString(def.nameToken),
+                (def, icon, stillValid) => IconCache.LoadItemIcon(def, sprite =>
+                {
+                    if (sprite && icon && stillValid()) icon.sprite = sprite;
+                }),
+                onClick: (def, amount) => Adjust(def, -amount),
+                getCount: def => _target.GetCount(def),
                 onlyOwned: true);
             _inventoryGrid.Build(right, ContentManager._itemDefs);
         }

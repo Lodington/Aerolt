@@ -18,7 +18,7 @@ namespace Aerolt.UI.Sections
         private Dropdown _teamDropdown = null!;
         private Dropdown _eliteDropdown = null!;
         private Toggle _brainDead = null!;
-        private IconButtonList<CharacterMaster> _list = null!;
+        private IconGrid<CharacterMaster> _list = null!;
 
         private readonly Dictionary<ItemDef, int> _items = new();
         private ButtonRef _editItemsButton = null!;
@@ -61,14 +61,14 @@ namespace Aerolt.UI.Sections
             UIFactory.SetLayoutElement(killAll.Component.gameObject, minHeight: 28, minWidth: 130, flexibleWidth: 0);
             killAll.OnClick += KillAllMonsters;
 
-            _list = new IconButtonList<CharacterMaster>(
+            _list = new IconGrid<CharacterMaster>(
                 master => Language.GetString(master.bodyPrefab.GetComponent<CharacterBody>().baseNameToken),
                 (master, icon, stillValid) =>
                 {
                     var sprite = IconCache.GetMasterIcon(master);
                     if (sprite && icon && stillValid()) icon.sprite = sprite;
                 },
-                SpawnMonster);
+                onClick: (master, _) => SpawnMonster(master));
 
             _list.Build(Root, MasterCatalog.allMasters
                 .Where(x => x.bodyPrefab && x.bodyPrefab.GetComponent<CharacterBody>()?.portraitIcon)

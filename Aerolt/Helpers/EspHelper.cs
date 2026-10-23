@@ -137,5 +137,31 @@ namespace Aerolt.Managers
             pos.y = Screen.height - pos.y;
             return new Vector3(pos.x, pos.y);
         }
+
+        public static void DrawEspIcon(Vector3 worldpos, Sprite? sprite, Color tint, float size = 32f)
+        {
+            var pos = Esp.MainCamera.WorldToScreenPoint(worldpos);
+            if (pos.z < 0) return; // behind the camera
+            var sx = pos.x;
+            var sy = Screen.height - pos.y;
+
+            var rect = new Rect(sx - size / 2f, sy - size / 2f, size, size);
+
+            if (sprite && sprite!.texture)
+            {
+                var tex = sprite.texture;
+                var tr = sprite.textureRect;
+                var uv = new Rect(tr.x / tex.width, tr.y / tex.height, tr.width / tex.width, tr.height / tex.height);
+
+                var prev = GUI.color;
+                GUI.color = tint;
+                GUI.DrawTextureWithTexCoords(rect, tex, uv);
+                GUI.color = prev;
+            }
+            else
+            {
+                DrawEspLabel(worldpos, tint, Color.clear, "+");
+            }
+        }
     }
 }

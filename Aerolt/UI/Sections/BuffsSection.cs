@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Messages;
 using RoR2;
@@ -9,7 +10,7 @@ namespace Aerolt.UI.Sections
 {
     public class BuffsSection : IAeroltSection
     {
-        private CountEditorList<BuffDef> _list = null!;
+        private IconGrid<BuffDef> _grid = null!;
 
         public string Title => "Buffs";
         public GameObject Root { get; private set; } = null!;
@@ -21,43 +22,47 @@ namespace Aerolt.UI.Sections
                 default, new Color(0.14f, 0.14f, 0.14f));
             UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, flexibleHeight: 9999);
 
-            var actions = UIFactory.CreateHorizontalGroup(Root, "Actions", false, false, true, true, 4);
-            UIFactory.SetLayoutElement(actions, minHeight: 30, flexibleHeight: 0, flexibleWidth: 9999);
-            var give = UIFactory.CreateButton(actions, "GiveBuffs", "Give");
-            UIFactory.SetLayoutElement(give.Component.gameObject, minHeight: 28, flexibleWidth: 9999);
-            give.OnClick += GiveBuffs;
+            var hint = UIFactory.CreateLabel(Root, "Hint",
+                "Click a buff to add one (Shift +5, right-click to remove).", TextAnchor.MiddleLeft);
+            UIFactory.SetLayoutElement(hint.gameObject, minHeight: 18, flexibleWidth: 9999);
+            hint.fontSize = 12;
 
-            _list = new CountEditorList<BuffDef>(
+            _grid = new IconGrid<BuffDef>(
                 def => def.name,
-                (entry, icon, _) =>
+                (def, icon, _) =>
                 {
-                    if (entry.Def.iconSprite) icon.sprite = entry.Def.iconSprite;
-                    icon.color = entry.Def.buffColor;
-                });
-            _list.Build(Root, ContentManager.buffDefs.OrderBy(x => x.name));
+                    if (def.iconSprite) icon.sprite = def.iconSprite;
+                },
+                onClick: Adjust,
+                getCount: GetCount,
+                tint: def => def.buffColor);
+
+            _grid.Build(Root, ContentManager.buffDefs.Where(x => x).OrderBy(x => x.name));
         }
 
         public void OnShown()
         {
-            _list.RefreshIcons();
-            SeedFromBody();
+            _grid.Refresh();
         }
 
-        private void SeedFromBody()
+        private static int GetCount(BuffDef def)
         {
             var body = GetBody();
-            if (!body) return;
-            foreach (var def in ContentManager.buffDefs)
-                _list.SetCount(def, body!.GetBuffCount(def));
+            return body ? body!.GetBuffCount(def) : 0;
         }
 
-        private void GiveBuffs()
+        private void Adjust(BuffDef def, int amount)
         {
             var body = GetBody();
-            if (!body) return;
-            var counts = _list.Entries
-                .ToDictionary(kvp => kvp.Key.buffIndex, kvp => (uint)kvp.Value.Count);
-            new SetBuffCountMessage(body!, counts).SendToServer();
+            if (!body || amount == 0) return;
+
+            var current = body!.GetBuffCount(def);
+            var target = Mathf.Max(0, current + amount);
+            if (target == current) return;
+
+            new SetBuffCountMessage(body, new Dictionary<BuffIndex, uint> { { def.buffIndex, (uint)target } })
+                .SendToServer();
+            _grid.Refresh();
         }
 
         private static CharacterBody? GetBody()

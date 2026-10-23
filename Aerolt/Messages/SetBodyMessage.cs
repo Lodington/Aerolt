@@ -38,6 +38,9 @@ namespace Aerolt.Messages
             }
 
             if (!NetworkServer.active) return;
+
+            ClearGameOverLatch();
+
             var oldPod = false;
             if (Stage.instance)
             {
@@ -48,6 +51,27 @@ namespace Aerolt.Messages
             user.master.preventRespawnUntilNextStageServer = false;
             user.master.CmdRespawn(newBody);
             if (Stage.instance) Stage.instance.usePod = oldPod;
+        }
+
+        private static void ClearGameOverLatch()
+        {
+            var run = Run.instance;
+            if (!run || !run.isGameOverServer) return;
+
+            var type = typeof(Run);
+            var setter = type.GetProperty("isGameOverServer",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public |
+                    System.Reflection.BindingFlags.NonPublic)
+                ?.GetSetMethod(true);
+            if (setter != null)
+            {
+                setter.Invoke(run, new object[] { false });
+                return;
+            }
+
+            var field = type.GetField("<isGameOverServer>k__BackingField",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            field?.SetValue(run, false);
         }
 
         public override void Deserialize(NetworkReader reader)

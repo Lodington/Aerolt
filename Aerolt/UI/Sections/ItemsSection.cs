@@ -12,7 +12,7 @@ namespace Aerolt.UI.Sections
 
     public class ItemsSection : IAeroltSection
     {
-        private ItemGrid _grid = null!;
+        private IconGrid<ItemDef> _grid = null!;
 
         public string Title => "Items";
         public GameObject Root { get; private set; } = null!;
@@ -32,11 +32,20 @@ namespace Aerolt.UI.Sections
             AddAction(actions, "Edit Items", () => AeroltUniverseUI.OpenItemEditor());
 
             var hint = UIFactory.CreateLabel(Root, "Hint",
-                "Click an item to give one (Shift +5, right-click to remove).", TextAnchor.MiddleLeft);
+                "The player's current items. Click to remove one (Shift -5). Use Edit Items to add.",
+                TextAnchor.MiddleLeft);
             UIFactory.SetLayoutElement(hint.gameObject, minHeight: 18, flexibleWidth: 9999);
             hint.fontSize = 12;
 
-            _grid = new ItemGrid(GetCount, Adjust);
+            _grid = new IconGrid<ItemDef>(
+                def => Language.GetString(def.nameToken),
+                (def, icon, stillValid) => IconCache.LoadItemIcon(def, sprite =>
+                {
+                    if (sprite && icon && stillValid()) icon.sprite = sprite;
+                }),
+                onClick: (def, amount) => Adjust(def, -amount),
+                getCount: GetCount,
+                onlyOwned: true);
             _grid.Build(Root, ContentManager._itemDefs);
         }
 

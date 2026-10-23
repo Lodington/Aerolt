@@ -32,7 +32,10 @@ namespace Aerolt.Helpers
             { "Teleporter Idle", Color.magenta },
             { "Teleporter Charging", Color.yellow },
             { "Teleporter Charged", Color.green },
-            { "Teleporter Finished", Color.red }
+            { "Teleporter Finished", Color.red },
+            { "Enemy", Color.red },
+            { "Enemy Elite", new Color32(255, 128, 0, 255) },
+            { "Enemy Boss", new Color32(180, 0, 255, 255) }
         };
 
         public static readonly Dictionary<string, ZioConfigEntry<Color>> GlobalColors = new();

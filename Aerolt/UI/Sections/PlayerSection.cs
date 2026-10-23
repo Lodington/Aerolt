@@ -36,11 +36,29 @@ namespace Aerolt.UI.Sections
                 default, new Color(0.14f, 0.14f, 0.14f));
             UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, minHeight: 10, flexibleHeight: 0);
 
-            _god = AddToggle("God Mode", on => Apply(b => b.GodMode.Value = on));
-            _noclip = AddToggle("Noclip", on => Apply(b => b.Noclip.Value = on));
-            _aimbot = AddToggle("Aimbot", on => Apply(b => b.Aimbot.Value = on));
-            _infiniteSkills = AddToggle("Infinite Skills", on => Apply(b => b.InfiniteSkills.Value = on));
-            _alwaysSprint = AddToggle("Always Sprint", on => Apply(b => b.AlwaysSprint.Value = on));
+            _disableMobSpawnsWrapper = ValueWrapper.Get("PlayerMenu", "DisableMobSpawns", false, "");
+            _disableMobSpawnsWrapper.settingChanged += OnMobSpawnsChanged;
+
+            Header("Cheats");
+            var toggleGrid = UIFactory.CreateUIObject("ToggleGrid", Root);
+            var grid = toggleGrid.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(170, 28);
+            grid.spacing = new Vector2(6, 4);
+            grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
+            grid.startAxis = GridLayoutGroup.Axis.Horizontal;
+            grid.childAlignment = TextAnchor.UpperLeft;
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = 2;
+            var gridFitter = toggleGrid.AddComponent<ContentSizeFitter>();
+            gridFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            UIFactory.SetLayoutElement(toggleGrid, minHeight: 28, flexibleWidth: 9999);
+
+            _god = AddToggle(toggleGrid, "God Mode", on => Apply(b => b.GodMode.Value = on));
+            _noclip = AddToggle(toggleGrid, "Noclip", on => Apply(b => b.Noclip.Value = on));
+            _aimbot = AddToggle(toggleGrid, "Aimbot", on => Apply(b => b.Aimbot.Value = on));
+            _infiniteSkills = AddToggle(toggleGrid, "Infinite Skills", on => Apply(b => b.InfiniteSkills.Value = on));
+            _alwaysSprint = AddToggle(toggleGrid, "Always Sprint", on => Apply(b => b.AlwaysSprint.Value = on));
+            _disableMobSpawns = AddToggle(toggleGrid, "Disable Mob Spawns", on => SetMobSpawns(on));
 
             // Aimbot weight slider.
             var sliderRow = UIFactory.CreateHorizontalGroup(Root, "AimbotWeightRow", false, false, true, true, 4);
@@ -54,11 +72,8 @@ namespace Aerolt.UI.Sections
             _aimbotWeight.maxValue = 1f;
             _aimbotWeight.onValueChanged.AddListener(val => Apply(b => b.AimbotWeight.Value = val));
 
-            _disableMobSpawnsWrapper = ValueWrapper.Get("PlayerMenu", "DisableMobSpawns", false, "");
-            _disableMobSpawnsWrapper.settingChanged += OnMobSpawnsChanged;
-            _disableMobSpawns = AddToggle("Disable Mob Spawns", on => _disableMobSpawnsWrapper.Value = on);
-
             // Action buttons.
+            Header("Actions");
             var actions = UIFactory.CreateHorizontalGroup(Root, "Actions", false, false, true, true, 4);
             UIFactory.SetLayoutElement(actions, minHeight: 30, flexibleHeight: 0, flexibleWidth: 9999);
             AddButton(actions, "Kill", Kill);
@@ -69,6 +84,7 @@ namespace Aerolt.UI.Sections
             AddButton(actions, "Ban", Ban);
 
             // Currency setters.
+            Header("Currency");
             AddCurrencyRow("Money", CurrencyType.Money);
             AddCurrencyRow("Lunar Coins", CurrencyType.Lunar);
             AddCurrencyRow("Void Coins", CurrencyType.Void);
@@ -93,9 +109,9 @@ namespace Aerolt.UI.Sections
 
         // --- builders ---
 
-        private Toggle AddToggle(string label, UnityEngine.Events.UnityAction<bool> onChanged)
+        private Toggle AddToggle(GameObject parent, string label, UnityEngine.Events.UnityAction<bool> onChanged)
         {
-            var obj = UIFactory.CreateToggle(Root, $"Toggle_{label}", out var toggle, out var text);
+            var obj = UIFactory.CreateToggle(parent, $"Toggle_{label}", out var toggle, out var text);
             UIFactory.SetLayoutElement(obj, minHeight: 28, flexibleWidth: 9999);
             text.text = label;
             toggle.onValueChanged.AddListener(on =>
@@ -104,6 +120,18 @@ namespace Aerolt.UI.Sections
                 onChanged(on);
             });
             return toggle;
+        }
+
+        private void SetMobSpawns(bool on)
+        {
+            _disableMobSpawnsWrapper.Value = on;
+        }
+
+        private void Header(string text)
+        {
+            var label = UIFactory.CreateLabel(Root, $"Header_{text}", text, TextAnchor.MiddleLeft);
+            UIFactory.SetLayoutElement(label.gameObject, minHeight: 22, flexibleWidth: 9999);
+            label.fontStyle = FontStyle.Bold;
         }
 
         private static void AddButton(GameObject parent, string label, Action onClick)

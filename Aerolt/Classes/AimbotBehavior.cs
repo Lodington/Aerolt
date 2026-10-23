@@ -4,11 +4,13 @@ using UnityEngine;
 
 namespace Aerolt.Classes
 {
+
     public class AimbotBehavior : MonoBehaviour
     {
         public float weight = 0.5f;
+
         private CharacterBody body = null!;
-        private Vector3? direction;
+        private Vector3? targetDirection;
         private InputBankTest inputBank = null!;
         private TeamIndex team;
 
@@ -23,58 +25,52 @@ namespace Aerolt.Classes
         private void Update()
         {
             if (inputBank.interact.down) return;
-            if (direction is not null)
-                inputBank.aimDirection = direction.Value;
+            if (targetDirection is null) return;
+
+            var t = weight >= 0.999f ? 1f : Mathf.Clamp01(Mathf.Lerp(0.15f, 0.9f, weight));
+
+            inputBank.aimDirection = Vector3.Slerp(inputBank.aimDirection, targetDirection.Value.normalized, t);
         }
 
         private void FixedUpdate()
         {
+            targetDirection = null;
+
             if (!body.isPlayerControlled) return;
-            if (!body.master.playerCharacterMasterController.networkUser.cameraRigController) return;
+            var cam = body.master.playerCharacterMasterController.networkUser.cameraRigController;
+            if (!cam) return;
+
             var ray = inputBank.GetAimRay();
-            ray.direction =
-                (body.master.playerCharacterMasterController.networkUser.cameraRigController.crosshairWorldPosition -
-                 ray.origin).normalized;
-            var targets = HurtBox.sniperTargetsList.Union(HurtBox.bullseyesList).Select(x =>
-            {
-                var position = x.transform.position;
-                var vector = position - ray.origin;
-                var info = new BullseyeSearch.CandidateInfo
+            var aimDir = (cam.crosshairWorldPosition - ray.origin).normalized;
+            var maxDot = Mathf.Cos(Mathf.Deg2Rad * Mathf.Lerp(10f, 180f, weight));
+
+            var best = HurtBox.sniperTargetsList.Union(HurtBox.bullseyesList)
+                .Where(x => x && x.healthComponent && x.healthComponent.alive && x.teamIndex != team)
+                .Select(x =>
                 {
-                    hurtBox = x,
-                    position = position,
-                    dot = Vector3.Dot(ray.direction, vector.normalized),
-                    distanceSqr = vector.sqrMagnitude
-                };
-                return info;
-            }).Where(x =>
-            {
-                var dir = x.hurtBox.transform.position - ray.origin;
-                var passesLos = !Physics.Raycast(ray.origin, dir, out _, dir.magnitude, LayerIndex.world.mask,
-                    QueryTriggerInteraction.UseGlobal);
-                return x.hurtBox.teamIndex != team && passesLos && x.dot > weight - 0.5f;
-            }).ToArray();
-            if (!targets.Any())
-            {
-                direction = null;
-                return;
-            }
+                    var toTarget = x.transform.position - ray.origin;
+                    return new
+                    {
+                        hurtBox = x,
+                        dir = toTarget.normalized,
+                        dot = Vector3.Dot(aimDir, toTarget.normalized),
+                        distSqr = toTarget.sqrMagnitude
+                    };
+                })
+                .Where(x => x.dot >= maxDot && HasLineOfSight(ray.origin, x.hurtBox))
+                .OrderByDescending(x => x.dot + (x.hurtBox.isSniperTarget ? 2f : 0f))
+                .FirstOrDefault();
 
-            ;
-            var dotMax = targets.Max(x => x.dot);
-            var distMax = targets.Max(x => x.distanceSqr);
-            targets = targets.OrderByDescending(x =>
-                    x.dot / dotMax * weight - x.distanceSqr / distMax * (1 - weight) +
-                    (x.hurtBox.isSniperTarget ? 10 : 0))
-                .ToArray();
-            var target = targets.FirstOrDefault();
-            if (target.Equals(default) || !target.hurtBox)
-            {
-                direction = null;
-                return;
-            }
+            if (best == null || !best.hurtBox) return;
 
-            direction = target.hurtBox.transform.position - ray.origin;
+            targetDirection = best.dir;
+        }
+
+        private static bool HasLineOfSight(Vector3 origin, HurtBox target)
+        {
+            var dir = target.transform.position - origin;
+            return !Physics.Raycast(origin, dir, out _, dir.magnitude, LayerIndex.world.mask,
+                QueryTriggerInteraction.UseGlobal);
         }
     }
 }

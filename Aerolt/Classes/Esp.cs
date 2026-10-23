@@ -30,6 +30,9 @@ namespace Aerolt.Classes
         public static ZioConfigEntry<bool> ShowDrone = null!;
         public static ZioConfigEntry<bool> ShowShrine = null!;
         public static ZioConfigEntry<bool> ShowNewtAlter = null!;
+        public static ZioConfigEntry<bool> ShowCleansePool = null!;
+        public static ZioConfigEntry<bool> ShowEnemies = null!;
+        public static ZioConfigEntry<bool> ShowEnemyHealth = null!;
 
         private static bool _initialized;
 
@@ -51,6 +54,9 @@ namespace Aerolt.Classes
             ShowDrone = cfg.Bind("ESP", "showDrone", false, "");
             ShowShrine = cfg.Bind("ESP", "showShrine", false, "");
             ShowNewtAlter = cfg.Bind("ESP", "showNewtAlter", false, "");
+            ShowCleansePool = cfg.Bind("ESP", "showCleansePool", false, "");
+            ShowEnemies = cfg.Bind("ESP", "showEnemies", false, "");
+            ShowEnemyHealth = cfg.Bind("ESP", "showEnemyHealth", true, "");
 
             _initialized = true;
 
@@ -61,7 +67,20 @@ namespace Aerolt.Classes
         public static bool AnyEnabled =>
             _initialized && (ShowTeleporter.Value || ShowChest.Value || ShowMultiShop.Value || ShowBarrel.Value ||
                              ShowScrapper.Value || ShowSecret.Value || ShowDuplicator.Value || ShowDrone.Value ||
-                             ShowShrine.Value || ShowNewtAlter.Value);
+                             ShowShrine.Value || ShowNewtAlter.Value || ShowCleansePool.Value || ShowEnemies.Value);
+
+        private static void DrawMarker(GameObject? source, Vector3 worldPos, Color color, string? advancedText)
+        {
+            var detailed = ShowAdvanced.Value || CheckCursorPosition(worldPos);
+            if (detailed)
+            {
+                EspHelper.DrawEspLabel(worldPos, color, Color.clear, advancedText);
+                return;
+            }
+
+            var sprite = source ? RoR2.UI.PingIndicator.GetInteractableIcon(source) : null;
+            EspHelper.DrawEspIcon(worldPos, sprite, color);
+        }
 
         public static void Draw()
         {
@@ -71,7 +90,8 @@ namespace Aerolt.Classes
 
             if (ShowTeleporter.Value)
                 ShowTeleporterEsp();
-            if (ShowChest.Value || ShowDuplicator.Value || ShowDrone.Value || ShowShrine.Value || ShowNewtAlter.Value)
+            if (ShowChest.Value || ShowDuplicator.Value || ShowDrone.Value || ShowShrine.Value ||
+                ShowNewtAlter.Value || ShowCleansePool.Value)
                 DrawPurchaseInteractables();
             if (ShowMultiShop.Value)
                 DrawShops();
@@ -81,6 +101,57 @@ namespace Aerolt.Classes
                 DrawScrapperInteractables();
             if (ShowSecret.Value)
                 DrawSecretInteractables();
+            if (ShowEnemies.Value)
+                DrawEnemies();
+        }
+
+        private static void DrawEnemies()
+        {
+            var localUser = LocalUserManager.GetFirstLocalUser();
+            var myTeam = localUser != null && localUser.cachedBody && localUser.cachedBody.teamComponent
+                ? localUser.cachedBody.teamComponent.teamIndex
+                : TeamIndex.Player;
+
+            foreach (var enemy in CharacterBody.readOnlyInstancesList)
+            {
+                if (!enemy || !enemy.healthComponent || !enemy.healthComponent.alive) continue;
+                if (!enemy.teamComponent || enemy.teamComponent.teamIndex == myTeam) continue;
+                if (enemy.isPlayerControlled) continue;
+
+                var position = enemy.corePosition;
+                var color = EnemyColor(enemy);
+
+                string label;
+                if (ShowAdvanced.Value || CheckCursorPosition(position))
+                {
+                    var name = enemy.GetDisplayName();
+                    var hp = Mathf.CeilToInt(enemy.healthComponent.combinedHealth);
+                    var maxHp = Mathf.CeilToInt(enemy.healthComponent.fullCombinedHealth);
+                    var dist = (int)Vector3.Distance(MainCamera.transform.position, position);
+                    label = ShowEnemyHealth.Value
+                        ? $"{name}\n{hp}/{maxHp} HP\n{dist}m"
+                        : $"{name}\n{dist}m";
+                }
+                else if (ShowEnemyHealth.Value)
+                {
+                    var hp = Mathf.CeilToInt(enemy.healthComponent.combinedHealth);
+                    var maxHp = Mathf.CeilToInt(enemy.healthComponent.fullCombinedHealth);
+                    label = $"{enemy.GetDisplayName()}\n{hp}/{maxHp}";
+                }
+                else
+                {
+                    label = enemy.GetDisplayName();
+                }
+
+                EspHelper.DrawEspLabel(position, color, Color.clear, label);
+            }
+        }
+
+        private static Color EnemyColor(CharacterBody enemy)
+        {
+            if (enemy.isBoss || enemy.isChampion) return Colors.GetColor("Enemy Boss");
+            if (enemy.isElite) return Colors.GetColor("Enemy Elite");
+            return Colors.GetColor("Enemy");
         }
 
         private static void DrawShops()
@@ -94,8 +165,14 @@ namespace Aerolt.Classes
                 var position = transform1.position + transform1.up * 1.5f;
                 var distanceToObject = Mathf.RoundToInt(Vector3.Distance(MainCamera.transform.position, position));
                 var advanced = CheckCursorPosition(position) || ShowAdvanced.Value;
-                if (advanced)
-                    str.AppendLine("Multi Shop Terminal"); // TODO use lang token
+                if (!advanced)
+                {
+                    var icon = RoR2.UI.PingIndicator.GetInteractableIcon(multiShopController.gameObject);
+                    EspHelper.DrawEspIcon(position, icon, Colors.GetColor("Shop"));
+                    continue;
+                }
+
+                str.AppendLine("Multi Shop Terminal"); // TODO use lang token
                 var costSet = false;
                 if (multiShopController.terminalGameObjects == null) continue;
 
@@ -189,7 +266,8 @@ namespace Aerolt.Classes
                 var status = TeleporterInteraction.instance.activationState.ToString();
 
                 var boxText = $"{friendlyName}\n{status}\n{distance}m";
-                EspHelper.DrawEspLabel(teleporterInteraction.transform.position, teleporterColor, Color.clear, boxText);
+                DrawMarker(teleporterInteraction.gameObject, teleporterInteraction.transform.position, teleporterColor,
+                    boxText);
             }
         }
 
@@ -203,12 +281,7 @@ namespace Aerolt.Classes
                     var friendlyName = "Barrel";
                     float distance = (int)Vector3.Distance(MainCamera.transform.position, barrel.transform.position);
                     var boxText = $"{friendlyName}\n{distance}m";
-
-                    if (ShowBarrel.Value || CheckCursorPosition(barrel.transform.position))
-                        EspHelper.DrawEspLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear,
-                            boxText);
-                    else
-                        EspHelper.DrawEspLabel(barrel.transform.position, Colors.GetColor("Barrels"), Color.clear, "+");
+                    DrawMarker(barrel.gameObject, barrel.transform.position, Colors.GetColor("Barrels"), boxText);
                 }
             }
         }
@@ -223,8 +296,8 @@ namespace Aerolt.Classes
                     float distance =
                         (int)Vector3.Distance(MainCamera.transform.position, secretButton.transform.position);
                     var boxText = $"{friendlyName}\n{distance}m";
-                    EspHelper.DrawEspLabel(secretButton.transform.position, Colors.GetColor("Secret_Plates"),
-                        Color.clear, boxText);
+                    DrawMarker(secretButton.gameObject, secretButton.transform.position,
+                        Colors.GetColor("Secret_Plates"), boxText);
                 }
         }
 
@@ -238,7 +311,7 @@ namespace Aerolt.Classes
                     var position = scrapper.transform.position;
                     float distance = (int)Vector3.Distance(MainCamera.transform.position, position);
                     var boxText = $"{friendlyName}\n{distance}m";
-                    EspHelper.DrawEspLabel(position, Colors.GetColor("Scrappers"), Color.clear, boxText);
+                    DrawMarker(scrapper.gameObject, position, Colors.GetColor("Scrappers"), boxText);
                 }
         }
 
@@ -284,8 +357,17 @@ namespace Aerolt.Classes
 
                 var nameProvider = purchaseInteraction.GetComponent<GenericDisplayNameProvider>();
                 if (nameProvider)
-                    if (ShowShrine.Value && nameProvider.displayToken.ToUpper().Contains("SHRINE"))
+                {
+                    var isCleanse = purchaseInteraction.displayNameToken == "SHRINE_CLEANSE_NAME";
+                    if (isCleanse)
+                    {
+                        if (ShowCleansePool.Value) DrawShrine(purchaseInteraction);
+                    }
+                    else if (ShowShrine.Value && nameProvider.displayToken.ToUpper().Contains("SHRINE"))
+                    {
                         DrawShrine(purchaseInteraction);
+                    }
+                }
 
                 var portalBehaviour = purchaseInteraction.GetComponent<PortalStatueBehavior>();
                 if (portalBehaviour && ShowNewtAlter.Value) DrawNewtAlter(purchaseInteraction);
@@ -294,8 +376,8 @@ namespace Aerolt.Classes
 
         private static void DrawNewtAlter(PurchaseInteraction purchaseInteraction)
         {
-            EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("NewtAlter"), Color.clear,
-                GetLabel(purchaseInteraction));
+            DrawMarker(purchaseInteraction.gameObject, purchaseInteraction.transform.position,
+                Colors.GetColor("NewtAlter"), GetLabel(purchaseInteraction));
         }
 
         private static void DrawShrine(PurchaseInteraction purchaseInteraction)
@@ -313,21 +395,29 @@ namespace Aerolt.Classes
                 _ => "Shrine"
             };
             var position = purchaseInteraction.transform.position;
-            EspHelper.DrawEspLabel(position, Colors.GetColor(colorName), Color.clear,
+            DrawMarker(purchaseInteraction.gameObject, position, Colors.GetColor(colorName),
                 purchaseInteraction.GetDisplayName() + "\n" + GetDistance(position) + "m");
         }
 
         private static void DrawDrone(PurchaseInteraction purchaseInteraction)
         {
-            EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Drone"), Color.clear,
-                GetLabel(purchaseInteraction));
+            DrawMarker(purchaseInteraction.gameObject, purchaseInteraction.transform.position,
+                Colors.GetColor("Drone"), GetLabel(purchaseInteraction));
         }
 
         private static void DrawDuplicator(string token, ShopTerminalBehavior shopTerminal)
         {
+            var position = shopTerminal.transform.position;
+            if (!ShowAdvanced.Value && !CheckCursorPosition(position))
+            {
+                var sprite = RoR2.UI.PingIndicator.GetInteractableIcon(shopTerminal.gameObject);
+                EspHelper.DrawEspIcon(position, sprite, Colors.GetColor("Printer"));
+                return;
+            }
+
             var def = PickupCatalog.GetPickupDef(shopTerminal.pickup.pickupIndex);
             if (def.itemIndex != ItemIndex.None)
-                EspHelper.DrawRarityEspLabel(shopTerminal.transform.position, Colors.GetColor("Printer"), Color.clear,
+                EspHelper.DrawRarityEspLabel(position, Colors.GetColor("Printer"), Color.clear,
                     GetLabelDuplicator(Language.GetString(token), shopTerminal), GetDropColor(def.itemIndex),
                     Language.GetString(ItemCatalog
                         .GetItemDef(PickupCatalog.GetPickupDef(shopTerminal.pickup.pickupIndex).itemIndex).nameToken));
@@ -343,8 +433,7 @@ namespace Aerolt.Classes
             }
             else
             {
-                EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    "+");
+                DrawChestIcon(purchaseInteraction);
             }
         }
 
@@ -378,8 +467,7 @@ namespace Aerolt.Classes
             }
             else
             {
-                EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    "+");
+                DrawChestIcon(purchaseInteraction);
             }
         }
 
@@ -401,9 +489,14 @@ namespace Aerolt.Classes
             }
             else
             {
-                EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    "+");
+                DrawChestIcon(purchaseInteraction);
             }
+        }
+
+        private static void DrawChestIcon(PurchaseInteraction purchaseInteraction)
+        {
+            var sprite = RoR2.UI.PingIndicator.GetInteractableIcon(purchaseInteraction.gameObject);
+            EspHelper.DrawEspIcon(purchaseInteraction.transform.position, sprite, Colors.GetColor("Chest"));
         }
 
         private static void DrawChest(OptionChestBehavior optionChestBehavior, PurchaseInteraction purchaseInteraction)
@@ -424,8 +517,7 @@ namespace Aerolt.Classes
             }
             else
             {
-                EspHelper.DrawEspLabel(purchaseInteraction.transform.position, Colors.GetColor("Chest"), Color.clear,
-                    "+");
+                DrawChestIcon(purchaseInteraction);
             }
         }
 

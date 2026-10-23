@@ -29,7 +29,10 @@ namespace Aerolt.UI.Sections
             AddToggle(content, "Duplicators", Esp.ShowDuplicator);
             AddToggle(content, "Drones", Esp.ShowDrone);
             AddToggle(content, "Shrines", Esp.ShowShrine);
+            AddToggle(content, "Cleansing Pools", Esp.ShowCleansePool);
             AddToggle(content, "Newt Altars", Esp.ShowNewtAlter);
+            AddToggle(content, "Enemies", Esp.ShowEnemies);
+            AddToggle(content, "Enemy Health", Esp.ShowEnemyHealth);
             AddToggle(content, "Advanced Info", Esp.ShowAdvanced);
         }
 

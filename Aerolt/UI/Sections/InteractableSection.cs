@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Aerolt.Classes;
 using Aerolt.Enums;
@@ -10,21 +9,19 @@ using RoR2;
 using RoR2.UI;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
-using UniverseLib;
 using UniverseLib.UI;
 
 namespace Aerolt.UI.Sections
 {
     public class InteractableSection : IAeroltSection
     {
-        private readonly Dictionary<SpawnCard, GameObject> _rows = new();
-        private GameObject _listContent = null!;
+        private IconGrid<SpawnCard> _grid = null!;
+        private GameObject _gridHost = null!;
         private bool _built;
 
         public string Title => "Interactables";
         public GameObject Root { get; private set; } = null!;
-        public bool ScrollableContent => false; 
+        public bool ScrollableContent => false;
 
         public void Build(GameObject contentParent)
         {
@@ -32,36 +29,26 @@ namespace Aerolt.UI.Sections
                 default, new Color(0.14f, 0.14f, 0.14f));
             UIFactory.SetLayoutElement(Root, flexibleWidth: 9999, flexibleHeight: 9999);
 
-            var search = UIFactory.CreateInputField(Root, "Search", "Search interactables...");
-            UIFactory.SetLayoutElement(search.Component.gameObject, minHeight: 28, flexibleWidth: 9999);
-            search.OnValueChanged += FilterUpdated;
-
             var refresh = UIFactory.CreateButton(Root, "Refresh", "Refresh list");
             UIFactory.SetLayoutElement(refresh.Component.gameObject, minHeight: 26, flexibleWidth: 9999);
             refresh.OnClick += Rebuild;
 
-            UIFactory.CreateScrollView(Root, "List", out _listContent, out _, new Color(0.1f, 0.1f, 0.1f));
-            UIFactory.SetLayoutGroup<VerticalLayoutGroup>(_listContent, false, false, true, true, 2, 2, 2, 2, 2);
+            _gridHost = UIFactory.CreateVerticalGroup(Root, "GridHost", false, false, true, true, 0,
+                default, new Color(0.14f, 0.14f, 0.14f));
+            UIFactory.SetLayoutElement(_gridHost, flexibleWidth: 9999, flexibleHeight: 9999);
         }
 
         public void OnShown()
         {
-            if (_rows.Count == 0)
+            if (!_built)
                 Rebuild();
         }
 
         private void Rebuild()
         {
-            foreach (var go in _rows.Values)
-                if (go) UnityEngine.Object.Destroy(go);
-            _rows.Clear();
-            _built = false;
+            foreach (Transform child in _gridHost.transform)
+                UnityEngine.Object.Destroy(child.gameObject);
 
-            RuntimeHelper.StartCoroutine(BuildRows());
-        }
-
-        private System.Collections.IEnumerator BuildRows()
-        {
             SpawnCard[] cards;
             try
             {
@@ -70,59 +57,44 @@ namespace Aerolt.UI.Sections
             catch (Exception e)
             {
                 Tools.Log(LogLevel.Warning, $"Interactables unavailable (not in a stage?): {e.Message}");
-                yield break;
+                _built = false;
+                return;
             }
 
             AeroltInteractableSpawner.StartOfRoundScaledInteractableCosts.Clear();
 
             var ordered = cards
-                .Where(x => !x.Equals(null) && !x.Equals(default) && x.prefab)
-                .Select(card =>
-                {
-                    var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
-                    var name = provider != null ? provider.GetDisplayName() : card.name;
-                    return (card, name);
-                })
-                .OrderBy(x => x.name)
+                .Where(x => x && x.prefab)
+                .OrderBy(DisplayName)
                 .ToArray();
 
-            const int batchSize = 15;
-            var count = 0;
-
-            foreach (var (card, displayName) in ordered)
+            foreach (var card in ordered)
             {
-                var captured = card;
-
-                var row = UIFactory.CreateHorizontalGroup(_listContent, "Row", false, false, true, true, 4,
-                    new Vector4(2, 2, 2, 2));
-                UIFactory.SetLayoutElement(row, minHeight: 30, flexibleWidth: 9999);
-
-                var iconObj = UIFactory.CreateUIObject("Icon", row);
-                UIFactory.SetLayoutElement(iconObj, minWidth: 24, minHeight: 24, preferredWidth: 24,
-                    preferredHeight: 24, flexibleWidth: 0, flexibleHeight: 0);
-                var icon = iconObj.AddComponent<Image>();
-                icon.preserveAspect = true;
-                var sprite = PingIndicator.GetInteractableIcon(card.prefab);
-                if (sprite) icon.sprite = sprite;
-
-                var btn = UIFactory.CreateButton(row, "Spawn", displayName);
-                UIFactory.SetLayoutElement(btn.Component.gameObject, minHeight: 26, flexibleWidth: 9999);
-                btn.OnClick += () => SpawnInteractable(captured);
-
-                _rows[card] = row;
-
                 var purchaseInteraction = card.prefab.GetComponent<PurchaseInteraction>();
                 if (purchaseInteraction && purchaseInteraction.costType == CostTypeIndex.Money &&
-                    Run.instance && !AeroltInteractableSpawner.StartOfRoundScaledInteractableCosts.ContainsKey(card))
+                    Run.instance &&
+                    !AeroltInteractableSpawner.StartOfRoundScaledInteractableCosts.ContainsKey(card))
                     AeroltInteractableSpawner.StartOfRoundScaledInteractableCosts.Add(card,
                         Run.instance.GetDifficultyScaledCost(purchaseInteraction.cost));
-
-                if (++count < batchSize) continue;
-                count = 0;
-                yield return null;
             }
 
+            _grid = new IconGrid<SpawnCard>(
+                DisplayName,
+                (card, icon, stillValid) =>
+                {
+                    var sprite = PingIndicator.GetInteractableIcon(card.prefab);
+                    if (sprite && icon && stillValid()) icon.sprite = sprite;
+                },
+                onClick: (card, _) => SpawnInteractable(card));
+
+            _grid.Build(_gridHost, ordered);
             _built = true;
+        }
+
+        private static string DisplayName(SpawnCard card)
+        {
+            var provider = card.prefab.GetComponentInChildren<IDisplayNameProvider>();
+            return provider != null ? provider.GetDisplayName() : card.name;
         }
 
         private static void SpawnInteractable(SpawnCard card)
@@ -143,18 +115,6 @@ namespace Aerolt.UI.Sections
                 AeroltInteractableSpawner.Spawn(index, position + aimRay);
             else
                 ClientScene.readyConnection.SendAerolt(new InteractableSpawnMessage(index, position + aimRay));
-        }
-
-        private void FilterUpdated(string text)
-        {
-            if (!_built) return;
-            var lower = text?.ToLowerInvariant() ?? "";
-            foreach (var kvp in _rows)
-            {
-                var provider = kvp.Key.prefab.GetComponentInChildren<IDisplayNameProvider>();
-                var name = (provider != null ? provider.GetDisplayName() : kvp.Key.name).ToLowerInvariant();
-                kvp.Value.SetActive(string.IsNullOrEmpty(lower) || name.Contains(lower));
-            }
         }
     }
 }

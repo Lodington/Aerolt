@@ -41,6 +41,8 @@ namespace Aerolt.Managers
             NoclipInteractForDown = ValueWrapper.Get("PlayerMenu", "NoclipInteractForDown", true, "", user,
                 firstSetup: config => ModSettingsManager.AddOption(new ZioCheckBoxOption(config), who, who));
             NoclipInteractForDown.settingChanged += OnNoclipForInteractDownChanged;
+
+            CharacterBody.onBodyStartGlobal += OnBodyStart;
         }
 
         public void OnDestroy()
@@ -52,6 +54,31 @@ namespace Aerolt.Managers
             GodMode.settingChanged -= OnGodModeChanged;
             Noclip.settingChanged -= OnNoclipChanged;
             NoclipInteractForDown.settingChanged -= OnNoclipForInteractDownChanged;
+            CharacterBody.onBodyStartGlobal -= OnBodyStart;
+        }
+
+        private void OnBodyStart(CharacterBody body)
+        {
+            if (!body || !user || !user.master) return;
+            if (body.master != user.master) return; // only this user's body
+            ApplyAll(body);
+        }
+
+        
+        public void ApplyAll(CharacterBody body)
+        {
+            if (!body) return;
+            if (Aimbot.Value) SetAimbot(body, true, AimbotWeight.Value);
+            if (Noclip.Value)
+            {
+                SetNoclip(body, true);
+                var comp = body.GetComponent<NoclipBehavior>();
+                if (comp) comp.shouldUseInteractForDown = NoclipInteractForDown.Value;
+            }
+
+            if (InfiniteSkills.Value) SetInfiniteSkills(body, true);
+            if (AlwaysSprint.Value) SetAlwaysSprint(body, true);
+            if (GodMode.Value) SetGodMode(body, true);
         }
 
         private void OnNoclipForInteractDownChanged()
